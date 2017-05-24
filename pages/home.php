@@ -85,7 +85,7 @@
 								<td>16</td>
 							</tr>
 							<tr class="treeCert">
-								<td><?=Core::fakeLink( 'cert','0','Information Security')?></td>
+								<td><?=Core::fakeLink( 'cert','CEXXX','Information Security')?></td>
 								<td>CEXXX</td>
 								<td>17</td>
 							</tr>
@@ -102,17 +102,17 @@
 								<td>Units</td>
 							</tr>
 							<tr class="treeCert">
-								<td><?=Core::fakeLink( 'cert','0','Web Developer')?></td>
+								<td><?=Core::fakeLink( 'cert','CE843','Web Developer')?></td>
 								<td>CE843</td>
 								<td>17</td>
 							</tr>
 							<tr class="treeCert">
-								<td><?=Core::fakeLink( 'cert','0','Web Designer')?></td>
+								<td><?=Core::fakeLink( 'cert','CE820','Web Designer')?></td>
 								<td>CE820</td>
 								<td>17</td>
 							</tr>
 							<tr class="treeCert">
-								<td><?=Core::fakeLink( 'cert','0','Computer Applications')?></td>
+								<td><?=Core::fakeLink( 'cert','CE276','Computer Applications')?></td>
 								<td>AS/CE276</td>
 								<td>32.5</td>
 							</tr>

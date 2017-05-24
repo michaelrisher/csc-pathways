@@ -23,12 +23,12 @@
 		<tr>
 			<td>8 Week Classes</td>
 			<td>
-				<span>8/28 - 10/20</span>
+				<span>Early Start</span>
 				<?=Core::fakeLink( 'class','c2','CSC/CIS 2')?>
 				<?=Core::fakeLink( 'class','c62','CSC/CIS 62')?>
 			</td>
 			<td>
-				<span>10/23 - 12/14</span>
+				<span>Late Start</span>
 				<?=Core::fakeLink( 'class','c20','CIS 20')?>
 				<?=Core::fakeLink( 'class','c91','CIS/CAT 91')?>
 			</td>
@@ -36,7 +36,7 @@
 		<tr>
 			<td>16 Week Classes</td>
 			<td colspan="2">
-				<span>8/28 - 12/4</span>
+<!--				<span>8/28 - 12/4</span>-->
 				<?=Core::fakeLink( 'class','c61','CSC/CIS 61')?>
 			</td>
 		</tr>

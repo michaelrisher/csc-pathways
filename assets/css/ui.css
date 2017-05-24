@@ -241,6 +241,9 @@
 .italic {
   font-style: italic;
 }
+.red {
+  color: red;
+}
 html,
 body {
   background-color: #d3dce6;
@@ -281,7 +284,7 @@ body {
 }
 #wrapper #main #tree .certList {
   position: relative;
-  top: -50px;
+  top: -70px;
 }
 #wrapper #main #tree .middleTree {
   margin: 0 70px 0;

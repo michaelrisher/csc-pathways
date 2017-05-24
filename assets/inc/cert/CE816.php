@@ -12,7 +12,7 @@
 		<div class="clearfix margin10">
 			<p class="info">Certification Information <img class="floatright margin15Right back" data-to="top" width=20 src="<?=CORE_URL . 'assets/img/back.png'?>" /></p>
 		</div>
-		<p>Relational Database Certificate (CE 806)</p>
+		<p>Relational Database Certificate (CE 816)</p>
 		<p>One Year Completion - Online</p>
 	</div>
 	<table>

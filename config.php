@@ -5,7 +5,7 @@
 	 * Date: 5/22/2017
 	 * Time: 09:47
 	 */
-	define( 'MODE', 'live' );
+	define( 'MODE', 'local' );
 	
 
 	if( MODE == 'local' ) {
@@ -14,7 +14,7 @@
 		define( 'CORE_ROOT', $_SERVER['DOCUMENT_ROOT'] . substr( $_SERVER['SCRIPT_NAME'], 0, ( -9 - strlen( CORE_DIR ) ) ) );
 		define( 'CORE_REQUEST_TYPE', $_SERVER['REQUEST_METHOD'] );
 		define( 'CORE_URL', ( isset( $_SERVER['HTTPS'] ) ? 'https' : 'http' ) . '://' . $_SERVER[ 'HTTP_HOST' ] . '/' . CORE_DIR . '/' );
-	} else if( MODE == 'live' ) {
+	} else if( MODE == 'live' | MODE == 'staging' ) {
 		define( 'CORE_DIR', 'pathways/' );
 		define( 'CORE_PATH', '/home/michael_risher/public_html/' . CORE_DIR );//$_SERVER['DOCUMENT_ROOT'] . substr( $_SERVER['SCRIPT_NAME'], 0, -9 ) );
 		define( 'CORE_ROOT', '/home/michael_risher/public_html/' );//$_SERVER['DOCUMENT_ROOT'] . substr( $_SERVER['SCRIPT_NAME'], 0, ( -9 - strlen( CORE_DIR ) ) ) );
@@ -37,7 +37,11 @@
 	function __autoload( $className ) {
 		$lib = CORE_PATH . 'classes/class.' . $className . '.php';
 		if( IS_AJAX ){ //to make the Core work on the classes and cert pages
-			$lib = CORE_ROOT . CORE_DIR . 'classes/class.' . $className . '.php';
+			if( MODE == 'local' ) {
+				$lib = $_SERVER['DOCUMENT_ROOT'] . '/' . CORE_DIR . 'classes/class.' . $className . '.php';
+			} elseif( MODE == 'live' || MODE == 'staging' ){
+				$lib = CORE_ROOT . CORE_DIR . 'classes/class.' . $className . '.php';
+			}
 			//die( $lib );
 		}
 		if( file_exists( $lib ) ){
