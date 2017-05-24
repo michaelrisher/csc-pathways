@@ -5,21 +5,24 @@
 	 * Date: 5/22/2017
 	 * Time: 09:47
 	 */
-	define( 'MODE', 'local' );
-	define( 'CORE_URL', ( isset( $_SERVER['HTTPS'] ) ? 'https' : 'http' ) . '://' . $_SERVER[ 'HTTP_HOST' ] . '/lab/' );
+	define( 'MODE', 'live' );
+	
 
 	if( MODE == 'local' ) {
 		define( 'CORE_DIR', 'lab/' );
 		define( 'CORE_PATH', $_SERVER['DOCUMENT_ROOT'] . substr( $_SERVER['SCRIPT_NAME'], 0, -9 ) );
 		define( 'CORE_ROOT', $_SERVER['DOCUMENT_ROOT'] . substr( $_SERVER['SCRIPT_NAME'], 0, ( -9 - strlen( CORE_DIR ) ) ) );
 		define( 'CORE_REQUEST_TYPE', $_SERVER['REQUEST_METHOD'] );
+		define( 'CORE_URL', ( isset( $_SERVER['HTTPS'] ) ? 'https' : 'http' ) . '://' . $_SERVER[ 'HTTP_HOST' ] . '/' . CORE_DIR . '/' );
 	} else if( MODE == 'live' ) {
-		define( 'CORE_DIR', 'lab/' );
-		define( 'CORE_PATH', '/home/michael_risher/public_html/' . CORE_PATH );//$_SERVER['DOCUMENT_ROOT'] . substr( $_SERVER['SCRIPT_NAME'], 0, -9 ) );
+		define( 'CORE_DIR', 'pathways/' );
+		define( 'CORE_PATH', '/home/michael_risher/public_html/' . CORE_DIR );//$_SERVER['DOCUMENT_ROOT'] . substr( $_SERVER['SCRIPT_NAME'], 0, -9 ) );
 		define( 'CORE_ROOT', '/home/michael_risher/public_html/' );//$_SERVER['DOCUMENT_ROOT'] . substr( $_SERVER['SCRIPT_NAME'], 0, ( -9 - strlen( CORE_DIR ) ) ) );
 		define( 'CORE_REQUEST_TYPE', $_SERVER['REQUEST_METHOD'] );
+		define( 'CORE_URL', ( isset( $_SERVER['HTTPS'] ) ? 'https' : 'http' ) . '://' . $_SERVER[ 'HTTP_HOST' ] . '/~michael_risher/' . CORE_DIR . '/' );
 	}
-
+	
+	
 	if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
 		define( 'IS_AJAX', true );
 	} else{
@@ -34,7 +37,8 @@
 	function __autoload( $className ) {
 		$lib = CORE_PATH . 'classes/class.' . $className . '.php';
 		if( IS_AJAX ){ //to make the Core work on the classes and cert pages
-			$lib = $_SERVER['DOCUMENT_ROOT'] . '/' . CORE_DIR . 'classes/class.' . $className . '.php';
+			$lib = CORE_ROOT . CORE_DIR . 'classes/class.' . $className . '.php';
+			//die( $lib );
 		}
 		if( file_exists( $lib ) ){
 			require_once( $lib );

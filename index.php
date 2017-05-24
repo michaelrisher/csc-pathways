@@ -21,8 +21,7 @@
 	//some globals for page loading
 	$scriptQueue = array();
 	$styleQueue = array();
-
-
+	
 	if ( file_exists( CORE_PATH . 'pages/' . $url['url'] .'.php' ) ) {
 		Core::queueStyle( 'assets/css/reset.css' );
 		Core::queueStyle( 'assets/css/ui.css' );
