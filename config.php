@@ -1,0 +1,42 @@
+<?php
+	/**
+	 * Created by IntelliJ IDEA.
+	 * User: Michael Risher
+	 * Date: 5/22/2017
+	 * Time: 09:47
+	 */
+	define( 'MODE', 'local' );
+	define( 'CORE_URL', ( isset( $_SERVER['HTTPS'] ) ? 'https' : 'http' ) . '://' . $_SERVER[ 'HTTP_HOST' ] . '/lab/' );
+
+	if( MODE == 'local' ) {
+		define( 'CORE_DIR', 'lab/' );
+		define( 'CORE_PATH', $_SERVER['DOCUMENT_ROOT'] . substr( $_SERVER['SCRIPT_NAME'], 0, -9 ) );
+		define( 'CORE_ROOT', $_SERVER['DOCUMENT_ROOT'] . substr( $_SERVER['SCRIPT_NAME'], 0, ( -9 - strlen( CORE_DIR ) ) ) );
+		define( 'CORE_REQUEST_TYPE', $_SERVER['REQUEST_METHOD'] );
+	} else if( MODE == 'live' ) {
+		define( 'CORE_DIR', 'lab/' );
+		define( 'CORE_PATH', '/home/michael_risher/public_html/' . CORE_PATH );//$_SERVER['DOCUMENT_ROOT'] . substr( $_SERVER['SCRIPT_NAME'], 0, -9 ) );
+		define( 'CORE_ROOT', '/home/michael_risher/public_html/' );//$_SERVER['DOCUMENT_ROOT'] . substr( $_SERVER['SCRIPT_NAME'], 0, ( -9 - strlen( CORE_DIR ) ) ) );
+		define( 'CORE_REQUEST_TYPE', $_SERVER['REQUEST_METHOD'] );
+	}
+
+	if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+		define( 'IS_AJAX', true );
+	} else{
+		define( 'IS_AJAX', false );
+	}
+	//auth db settings
+//	define( 'DB_IP', 'localhost' );
+//	define( 'DB_USER', 'root' );
+//	define( 'DB_PASS', '' );
+//	define( 'DB_DB', 'lab' );
+
+	function __autoload( $className ) {
+		$lib = CORE_PATH . 'classes/class.' . $className . '.php';
+		if( IS_AJAX ){ //to make the Core work on the classes and cert pages
+			$lib = $_SERVER['DOCUMENT_ROOT'] . '/' . CORE_DIR . 'classes/class.' . $className . '.php';
+		}
+		if( file_exists( $lib ) ){
+			require_once( $lib );
+		}
+	}

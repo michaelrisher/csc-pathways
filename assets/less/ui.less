@@ -1,0 +1,110 @@
+@import 'mixins.less';
+
+html, body{ background-color: #d3dce6; }
+#headerWrapper{
+	background-color: #26354a;
+	#header{
+		width: 1000px;
+		margin: 0 auto 20px;
+		height: 50px;
+		background-color: #26354a;
+		color: #d3dce6;
+		letter-spacing: .3em;
+		font: 11px Arial, helvetica, sans-serif;
+		line-height: 16px;
+		.padding15;
+
+		.title{
+			color: #ffba00;
+			line-height: 26px;
+			font: 24px Times New Roman, Time, serif;
+			&:after{
+				content: " | ";
+			}
+		}
+	}
+}
+#wrapper{
+	background-color: #d3dce6;
+	#main{
+		width: 1000px;
+		margin: 0 auto 0;
+
+		#tree{
+			.treeCertSubject{
+				font-weight: bold;
+				margin: 0 0 30px 0;
+				.aligncenter
+			}
+			.certList{
+				position: relative;
+				top: -50px;
+			}
+			.middleTree{
+				margin: 0 70px 0;
+			}
+			table {
+				padding: 5px;
+				tr.treeCertsDesc {
+					font-weight: bold;
+					border-bottom: 1px solid black;
+					.padding5Bottom;
+				}
+				tr{
+					td:nth-child(1){
+						padding-right: 5px;
+					}
+					td:nth-child(2){
+						.aligncenter;
+						.padding5Right;
+					}
+					td:nth-child(3){
+						.padding5Left;
+					}
+				}
+			}
+		}
+
+		#cert, #class{
+			margin: 100px 0 25px 0;
+			border: 1px solid black;
+
+			.info{
+				font-weight: bold;
+				margin: 0 0 30px 0;
+				.back{
+					cursor: pointer;
+				}
+			}
+			table{
+				width: 100%;
+				a{
+					display: block;
+				}
+
+				td{
+					border: 1px dotted black;
+				}
+			}
+		}
+		 #class a {
+			 display: inline;
+		 }
+		#cert {
+			padding-bottom: 20px;
+		}
+	}
+
+	a {
+		color: #0000ee/* browser's internal value */;
+		text-decoration: underline;
+		cursor: pointer;
+	}
+}
+
+.padding30Bottom{
+	padding-bottom: 30px;
+}
+.margin25Top{
+	margin-top: 25px
+}
