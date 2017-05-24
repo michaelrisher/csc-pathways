@@ -38,12 +38,12 @@
 								<td>Units</td>
 							</tr>
 							<tr class="treeCert">
-								<td><?=Core::fakeLink( 'cert','0','Computer Science AD-T')?></td>
+								<td><?=Core::fakeLink( 'cert','AS650','Computer Science AD-T')?></td>
 								<td>AS650</td>
 								<td>29</td>
 							</tr>
 							<tr class="treeCert">
-								<td><?=Core::fakeLink( 'cert','CE729','Computer Programming')?></td>
+								<td><?=Core::fakeLink( 'cert','CE728','Computer Programming')?></td>
 								<td>AS/CE728</td>
 								<td>26.5</td>
 							</tr>

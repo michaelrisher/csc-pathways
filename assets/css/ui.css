@@ -321,6 +321,14 @@ body {
 #wrapper #main #class .info .back {
   cursor: pointer;
 }
+#wrapper #main #cert ul,
+#wrapper #main #class ul {
+  padding-left: 40px;
+}
+#wrapper #main #cert ul li,
+#wrapper #main #class ul li {
+  display: list-item;
+}
 #wrapper #main #cert table,
 #wrapper #main #class table {
   width: 100%;
