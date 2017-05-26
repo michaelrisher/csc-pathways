@@ -35,8 +35,11 @@
 			<td>&nbsp;</td>
 			<td>
 				<?=Core::fakeLink( 'class','c21a','CIS 21A')?>
-				<?=Core::fakeLink( 'class','c26a','CIS 26A')?>
-				<?=Core::fakeLink( 'class','c26b','CIS 26B')?>
+				<?php
+					Core::initShortClassBlock();
+					Core::shortClassBlock( 'c26a','CIS 26A','c26b','CIS 26B');
+					Core::endShortClassBlock();
+				?>
 			</td>
 		</tr>
 	</table>
@@ -66,16 +69,23 @@
 			<td>&nbsp;</td>
 			<td>
 				<?=Core::fakeLink( 'class','c21a','CIS 21A')?>
-				<?=Core::fakeLink( 'class','c26a','CIS 26A')?>
-				<?=Core::fakeLink( 'class','c26b','CIS 26B')?>
+				<?php
+					Core::initShortClassBlock();
+					Core::shortClassBlock('c26a','CIS 26A','c26b','CIS 26B');
+					Core::endShortClassBlock()
+				?>
+
 			</td>
 		</tr>
 		<tr>
 			<td>Year 2</td>
 			<td>&nbsp;</td>
 			<td>
-				<?=Core::fakeLink( 'class','c26a','CIS 26A')?>
-				<?=Core::fakeLink( 'class','c26b','CIS 26B')?>
+				<?php
+					Core::initShortClassBlock();
+					Core::shortClassBlock('c26c','CIS 26C','c26d','CIS 26D');
+					Core::endShortClassBlock()
+				?>
 			</td>
 			<td>&nbsp;</td>
 			<td>&nbsp;</td>

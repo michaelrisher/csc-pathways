@@ -27,7 +27,7 @@
 			<td>Year 1</td>
 			<td>&nbsp;</td>
 			<td>
-				<?=Core::fakeLink( 'class','c1','CIS 1A*')?>
+				<?=Core::fakeLink( 'class','c1a','CIS 1A*')?>
 				<?=Core::fakeLink( 'class','c5','CSC/CIS 5')?>
 				<?=Core::fakeLink( 'class','m1a','MAT 1A')?>
 			</td>

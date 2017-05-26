@@ -75,8 +75,8 @@
 			</td>
 			<td>&nbsp;</td>
 			<td>
-				<?=Core::fakeLink( 'class','c17b','CSC/CIS 17B')?>
-				<?=Core::fakeLink( 'class','c17c','CSC/CIS 17C')?>
+				<?=Core::fakeLink( 'class','c18b','CSC/CIS 18B')?>
+				<?=Core::fakeLink( 'class','c18c','CSC/CIS 18C')?>
 			</td>
 		</tr>
 	</table>

@@ -17,34 +17,28 @@
 	</div>
 	<table>
 		<tr>
-			<td>Semester</td>
-			<td colspan="2">Fall</td>
+			<td class="width10">Year</td>
+			<td>Summer</td>
+			<td>Fall</td>
+			<td>Winter</td>
 			<td>Spring</td>
 		</tr>
 		<tr>
-			<td>8 Week Classes</td>
+			<td>Year 1</td>
+			<td>&nbsp;</td>
 			<td>
-				<span>8/28 - 10/20</span>
-				<?=Core::fakeLink( 'class','c2','CSC/CIS 2')?>
-				<?=Core::fakeLink( 'class','c62','CSC/CIS 62')?>
-			</td>
-			<td>
-				<span>10/23 - 12/14</span>
-				<?=Core::fakeLink( 'class','c20','CIS 20')?>
-				<?=Core::fakeLink( 'class','c91','CIS/CAT 91')?>
+				<?=Core::fakeLink('class','c61','CSC/CIS 61');?>
+				<?php
+					Core::initShortClassBlock();
+					Core::shortClassBlock('c2', 'CSC/CIS 2', 'c20', 'CSC/CIS 20');
+					Core::shortClassBlock('c62', 'CSC/CIS 62', 'c91', 'CSC/CIS 91');
+					Core::endShortClassBlock();
+				?>
 			</td>
 			<td>&nbsp;</td>
-		</tr>
-		<tr>
-			<td>16 Week Classes</td>
-			<td colspan="2">
-				<span>8/28 - 12/4</span>
-				<?=Core::fakeLink( 'class','c61','CSC/CIS 61')?>
-			</td>
 			<td>
-				<span>2/20 - 6/8</span>
-				<?=Core::fakeLink( 'class','c28a','CSC/CIS 28A')?>
-				<?=Core::fakeLink( 'class','c63','CSC/CIS 63')?>
+				<?=Core::fakeLink('class','c28a','CSC/CIS 28A');?>
+				<?=Core::fakeLink('class','c63','CSC/CIS 63');?>
 			</td>
 		</tr>
 	</table>

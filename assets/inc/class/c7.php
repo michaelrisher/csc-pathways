@@ -14,13 +14,13 @@
 		</div>
 		<div class="margin15 padding10">
 			<div class="clearfix">
-				<p class="floatleft">CIS-81 - Introduction to Desktop Publishing using Adobe InDesign</p>
+				<p class="floatleft">CSC-7 - Discrete Structures</p>
 				<p class="floatright">3 units</p>
 			</div>
 			<div class="padding30Bottom">
-				<p>CSU</p>
-				<p class="italic">Prerequisite: None</p><br>
-				<p class="alignjustify">Page design and layout techniques using Adobe InDesign. Mastery of beginning and intermediate techniques of document creation, including design skills. Successful incorporation of drawing and bit mapped files to create professional printed media. 54 hours lecture and 18 hours laboratory. (TBA option) (Letter Grade, or Pass/No Pass option.)</p>
+				<p>UC, CSU (C-ID COMP 152)</p>
+				<p class="italic">Prerequisite: <?=Core::fakeLink('class','c5','CSC/CIS 5')?></p><br>
+				<p class="alignjustify">A comprehensive course exploring the digital techniques, methods and software tools used by the industry to develop digital animation suitable for motion graphics, web design, film, video and multimedia platforms. 36 hours lecture and 72 hours laboratory.</p>
 			</div>
 		</div>
 

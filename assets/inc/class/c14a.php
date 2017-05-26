@@ -14,13 +14,14 @@
 		</div>
 		<div class="margin15 padding10">
 			<div class="clearfix">
-				<p class="floatleft">CIS-1A - Introduction to Computer Information Systems</p>
+				<p class="floatleft">CSC-14A - Web Programming: JavaScript</p>
 				<p class="floatright">3 units</p>
 			</div>
 			<div class="padding30Bottom">
-				<p>UC, CSU (C-ID ITIS 120)</p>
-				<p class="italic">Prerequisite: None</p><br>
-				<p class="alignjustify">Examination of information systems and their role in business. Focus on information systems, database management systems, networking, e-commerce, ethics and security, computer systems hardware and software components. Application of these concepts and methods through hands-on projects developing computer-based solutions to business problems. Utilizing a systems approach students will use databases, spreadsheets, word processors, presentation graphics, and the Internet to solve business problems and communicate solutions. 54 hours lecture and 18 hours laboratory. (TBA option)</p>
+				<p>CSU</p>
+				<p class="italic">Prerequisite: None</p>
+				<p class="italic">Advisory: <?=Core::fakeLink('class','c5','CSC/CIS-5')?> and <?=Core::fakeLink('class', 'c14a', 'CSC/CIS-14A')?> or <?=Core::fakeLink( 'class','c72a', 'CIS-72A')?></p><br>
+				<p class="alignjustify">Dynamic web site programming using PHP. Fundamentals of server-side web programming. Introduction to database-driven web sites, using PHP to access a database such as MySQL. Web applications such as user registration, content management, and e- commerce. This course is for students already familiar with the fundamentals of programming and HTML. 54 hours lecture and 18 hours laboratory. (TBA option) (Letter  Grade, or Pass/No Pass option.)</p>
 			</div>
 		</div>
 

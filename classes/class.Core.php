@@ -51,7 +51,34 @@
 		 * @param $text string text to display
 		 * @return string output
 		 */
-		public static function fakeLink( $goto, $code, $text ){
-			return "<a class='fakeLink' data-to='$goto' data-code='$code'>$text</a>";
+		public static function fakeLink( $goto, $code, $text, $float = null ){
+			if( is_null( $float ) ){
+				return "<a class='fakeLink' data-to='$goto' data-code='$code'>$text</a>";
+			} else {
+				return "<a class='fakeLink float$float' data-to='$goto' data-code='$code'>$text</a>";
+			}
+		}
+
+		public static function initShortClassBlock(){
+			$str = '';
+			$str .= '<div class="8week aligncenter">'.
+				'<span>8 Week Classes</span>';
+			echo $str;
+		}
+		public static function shortClassBlock( $leftCode, $leftTitle, $rightCode = null, $rightTitle = null ){
+			$str = '';
+			$str .= '<div class="clearfix">';
+			if( !is_null( $leftCode ) || !is_null( $leftTitle ) ){
+				$str .= Core::fakeLink( 'class', $leftCode, $leftTitle, 'left' );
+			}
+			if( !is_null( $rightCode ) || !is_null( $rightTitle ) ){
+				$str .= Core::fakeLink( 'class', $rightCode, $rightTitle, 'right' );
+			}
+			$str .= '</div>';
+			echo $str;
+		}
+
+		public static function endShortClassBlock(){
+			echo '</div>';
 		}
 	}

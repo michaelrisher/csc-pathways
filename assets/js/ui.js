@@ -5,8 +5,8 @@ $( document ).ready( function(){
 		var idLocation = '#' + loc; //the class to look up
 		var goto = $( this ).attr( 'data-code'); //the code for the filename eg CE803
 
-		if ( loc == 'cert' ) {
-			$( "#class" ).html( '' );
+		if ( loc == 'cert' && !$('#class' ).hasClass('none') ) {
+			$( "#class" ).toggleClass( 'none' ) ;
 		}
 
 		if( $(idLocation ).hasClass( 'none' ) ){

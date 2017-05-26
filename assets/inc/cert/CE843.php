@@ -27,10 +27,13 @@
 			<td>Year 1</td>
 			<td>&nbsp;</td>
 			<td>
-				<?=Core::fakeLink( 'class','c72a','CIS 72A')?>
-				<?=Core::fakeLink( 'class','c72b','CIS 72B')?>
 				<?=Core::fakeLink( 'class','c76b','CIS 76B')?>
 				<?=Core::fakeLink( 'class','c78a','CIS 78A')?>
+				<?php
+					Core::initShortClassBlock();
+					Core::shortClassBlock( 'c72a','CIS 72A','c72b','CIS 72B');
+					Core::endShortClassBlock();
+				?>
 			</td>
 			<td>&nbsp;</td>
 			<td>
@@ -57,10 +60,13 @@
 			<td>Year 1</td>
 			<td><?=Core::fakeLink( 'class','c79','CIS 79')?></td>
 			<td>
-				<?=Core::fakeLink( 'class','c72a','CIS 72A')?>
-				<?=Core::fakeLink( 'class','c72b','CIS 72B')?>
 				<?=Core::fakeLink( 'class','c76b','CIS 76B')?>
 				<?=Core::fakeLink( 'class','c78a','CIS 78A')?>
+				<?php
+					Core::initShortClassBlock();
+					Core::shortClassBlock( 'c72a','CIS 72A','c72b','CIS 72B');
+					Core::endShortClassBlock();
+				?>
 			</td>
 			<td><?=Core::fakeLink( 'class','c81','CIS 81')?></td>
 			<td>

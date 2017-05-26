@@ -30,24 +30,33 @@
 				<?=Core::fakeLink( 'class','c95a','CIS 95A')?>
 			</td>
 			<td>
-				<?=Core::fakeLink( 'class','c1a','CIS 1A')?>
-				<?=Core::fakeLink( 'class','c1b','CIS 1B')?>
-				<?=Core::fakeLink( 'class','c21','CIS 21')?>
-				<?=Core::fakeLink( 'class','c72a','CIS 72A')?>
-				<?=Core::fakeLink( 'class','c72b','CIS 72B')?>
+				<?php
+					Core::initShortClassBlock();
+					Core::shortClassBlock( 'c1a','CIS 1A','c1b','CIS 1B');
+					Core::shortClassBlock( 'c21','CIS 21');
+					Core::shortClassBlock( 'c72a','CIS 72A','c72b','CIS 72B');
+					Core::endShortClassBlock();
+				?>
 			</td>
 			<td>
 				<span class="red"><?=Core::fakeLink( 'class','c95a','CIS 95A')?></span>
 				<?=Core::fakeLink( 'class','c81','CIS 81')?>
 			</td>
 			<td>
-				<?=Core::fakeLink( 'class','c2','CIS 2')?>
-				<?=Core::fakeLink( 'class','c61','CIS 61')?>
 				<?=Core::fakeLink( 'class','c5','CSC/CIS 5')?>Or
 				<?=Core::fakeLink( 'class','c28a','CSC/CIS 28A')?>
-				<?=Core::fakeLink( 'class','c98a','CIS/CAT 98A*')?>
-				<?=Core::fakeLink( 'class','c98b','CSC/CIS 98B')?>
+				<?=Core::fakeLink( 'class','c80','CAT 80<sup>1</sup>')?>
+				<?php
+					Core::initShortClassBlock();
+					Core::shortClassBlock( 'c2','CIS 2','c61','CIS 61');
+					Core::shortClassBlock( 'c98a','CIS 98A*','c98b','CIS 98B');
+					Core::endShortClassBlock();
+				?>
 			</td>
 		</tr>
 	</table>
+	<div>
+		<p>*98B is the required course but has 98A as a prerequisite</p>
+		<p><sup>1</sup> can be taken in of CIS 98A and CIS 98B</p>
+	</div>
 </div>

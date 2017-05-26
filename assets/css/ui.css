@@ -312,6 +312,11 @@ body {
   margin: 100px 0 25px 0;
   border: 1px solid black;
 }
+#wrapper #main #cert sup,
+#wrapper #main #class sup {
+  vertical-align: super;
+  font-size: smaller;
+}
 #wrapper #main #cert .info,
 #wrapper #main #class .info {
   font-weight: bold;
