@@ -118,8 +118,8 @@
 								<td>17</td>
 							</tr>
 							<tr class="treeCert">
-								<td><?=Core::fakeLink( 'cert','CE276','Computer Applications')?></td>
-								<td>AS/CE276</td>
+								<td><?=Core::fakeLink( 'cert','CE726','Computer Applications')?></td>
+								<td>AS/CE726</td>
 								<td>32.5</td>
 							</tr>
 							<tr>

@@ -81,4 +81,49 @@
 		public static function endShortClassBlock(){
 			echo '</div>';
 		}
+
+
+		/**
+		 * clean strings of bad stuffs
+		 * @param $string
+		 * @param bool|false $allowhtml
+		 * @param bool|false $limit_range
+		 * @return mixed|string
+		 */
+		public static function sanitize( $string, $allowhtml = false, $limit_range = false ) {
+			if( gettype($string) == "array" ){
+				return Core::sanitizePost( $string );
+			}
+			$string = (string)$string;
+
+			if ($limit_range) {
+				$string = preg_replace('/[^(\t\x0-\x7F)]*/','', $string);
+			}
+
+			if ( get_magic_quotes_gpc() ) {
+				$string = stripslashes( trim( $string ) );
+			} else {
+				$string = trim($string);
+			}
+
+			if ( !$allowhtml ) {
+				$invalid = array('@<script[^>]*?>.*?</script>@si', '@<[\/\!]*?[^<>]*?>@si', '@<style[^>]*?>.*?</style>@siU', '@<![\s\S]*?--[ \t\n\r]*>@');
+				$string = preg_replace($invalid, '', $string);
+			}
+			return $string;
+		}
+
+		/**
+		 * clean strings of bad stuffs
+		 * @param $string
+		 * @param bool|false $allowhtml
+		 * @param bool|false $limit_range
+		 * @return mixed|string
+		 */
+		private static function sanitizePost( $post, $allowhtml = false, $limit_range = false ) {
+			foreach( $post as $key => $value ){
+				$post[$key] = Core::sanitize( $post[$key], $allowhtml, $limit_range );
+			}
+			return $post;
+		}
 	}

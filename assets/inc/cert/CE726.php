@@ -11,7 +11,7 @@
 	<div class="aligncenter">
 		<div class="clearfix margin10">
 			<p class="info">Certification Information <img class="floatright margin15Right back" data-to="top" width=20 src="<?=CORE_URL . 'assets/img/back.png'?>" /></p>
-			<p class="title">Computer Applications Certificate (AS/CE 276)</p>
+			<p class="title">Computer Applications Certificate (AS/CE 726)</p>
 			<div class="alignjustify">
 				<p>This program prepares individuals to perform basic data and text entry using standard and customized software products. This includes instruction in keyboarding skills, personal computer and work station operation, reading draft texts and raw data forms, and various interactive software programs used for tasks such as word processing, spreadsheets, databases, and others.</p>
 				<p class="bold margin15Top">Program Learning Outcomes</p>

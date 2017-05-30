@@ -7,13 +7,17 @@
 	 * Time: 16:01
 	 */
 	class DB {
+		public function __construct(){}
 		public function createConnection(){
 			$connection = new mysqli( DB_IP, DB_USER, DB_PASS, DB_DB );
 
 			if($connection->connect_errno > 0){
-				//TODO change this
-				die('Unable to connect to database [' . $connection->connect_error . ']');
+				if( MODE == 'live' ){
+					die('Unable to connect to database [' . $connection->connect_error . ']');
+				} else{
+					die( 'An error occurred. Please contact the administrator' );
+				}
 			}
-			$this->db = $connection;
+			return $connection;
 		}
 	}
