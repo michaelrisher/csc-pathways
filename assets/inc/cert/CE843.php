@@ -11,8 +11,18 @@
 	<div class="aligncenter">
 		<div class="clearfix margin10">
 			<p class="info">Certification Information <img class="floatright margin15Right back" data-to="top" width=20 src="<?=CORE_URL . 'assets/img/back.png'?>" /></p>
+			<p class="title">Webmaster Certificate - Developer (CE 843)</p>
+			<div class="alignjustify">
+				<p></p>
+				<p class="bold margin15Top">Program Learning Outcomes</p>
+				<p>Upon successful completion of this program, students should be able to:</p>
+				<ul>
+					<li>Apply programming principles to develop a fully functioning and customized web site experience for both the site user and site administrator.</li>
+					<li>Use JavaScript to enhance a web site's interactivity using the DOM.</li>
+					<li>Use PHP to enhance a web site's capabilities by creating data driven web page content, custom form validation and processing, and database manipulation.</li>
+				</ul>
+			</div>
 		</div>
-		<p>Webmaster Certificate - Developer (CE 843)</p>
 		<p>Full Time Completion in One Year</p>
 	</div>
 	<table>

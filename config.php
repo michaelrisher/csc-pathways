@@ -29,10 +29,10 @@
 		define( 'IS_AJAX', false );
 	}
 	//auth db settings
-//	define( 'DB_IP', 'localhost' );
-//	define( 'DB_USER', 'root' );
-//	define( 'DB_PASS', '' );
-//	define( 'DB_DB', 'lab' );
+	define( 'DB_IP', 'localhost' );
+	define( 'DB_USER', 'root' );
+	define( 'DB_PASS', '' );
+	define( 'DB_DB', 'pathways' );
 
 	function __autoload( $className ) {
 		$lib = CORE_PATH . 'classes/class.' . $className . '.php';

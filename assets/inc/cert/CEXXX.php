@@ -11,8 +11,16 @@
 	<div class="aligncenter">
 		<div class="clearfix margin10">
 			<p class="info">Certification Information <img class="floatright margin15Right back" data-to="top" width=20 src="<?=CORE_URL . 'assets/img/back.png'?>" /></p>
+			<p class="title">Information Security Certificate (CE XXX)</p>
+			<div class="alignjustify">
+				<p>certification description</p>
+				<p class="bold margin15Top">Program Learning Outcomes</p>
+				<p>Upon successful completion of this program, students should be able to:</p>
+				<ul>
+					<li>learn stuff</li>
+				</ul>
+			</div>
 		</div>
-		<p>Information Security Certificate (CE XXX)</p>
 		<p>Completion in One Year</p>
 	</div>
 	<table>

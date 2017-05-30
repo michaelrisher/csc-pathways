@@ -11,6 +11,24 @@
 	<div class="aligncenter">
 		<div class="clearfix margin10">
 			<p class="info">Certification Information <img class="floatright margin15Right back" data-to="top" width=20 src="<?=CORE_URL . 'assets/img/back.png'?>" /></p>
+			<div class="alignjustify">
+				<p>Create structured and Object code in C++ for business, gaming, mathematical and scientific problems by identifying  the information input requirements, synthesizing the algorithmic steps needed to transform the data input into the required output information, and organizing the output format to facilitate user communication.</p>
+				<p class="bold margin15Top">Program Learning Outcomes</p>
+				<p>Upon successful completion of this program, students should be able to:</p>
+				<ul>
+					<li>Create structured and Object code in C++ for business, gaming, mathematical and scientific problems by identifying the information input requirements, synthesizing the algorithmic steps needed to transform the data input into the required output information, and organizing the output format to facilitate user communication.</li>
+					<li>Using  C++  libraries  create  and  run  C++  programs  that incorporate the following:
+						<ul>
+							<li>Multiprocessors</li>
+							<li>Multimedia</li>
+							<li>ODBC</li>
+							<li>SQL</li>
+							<li>Establish client/server relationship</li>
+						</ul>
+					</li>
+					<li>OR Using C++ libraries create and run C++ programs that incorporate data structures.</li>
+				</ul>
+			</div>
 		</div>
 		<p>C++ Programming Certificate (CE 803)</p>
 		<p>Full Time Completion in 2 Years</p>

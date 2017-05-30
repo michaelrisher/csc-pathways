@@ -18,7 +18,7 @@
 	<div id="wrapper">
 		<div id="headerWrapper">
 			<div id="header">
-				<span class="title">Lorem ipsum dolor sit amet</span> ei nam omnis noster prodesset.
+				<p class="title">Computer Science & Computer Information Systems</p> Join the Bitcoin Revolution.
 			</div>
 		</div>
 		<div id="main">
@@ -89,6 +89,9 @@
 								<td>CEXXX</td>
 								<td>17</td>
 							</tr>
+							<tr>
+								<td class="aligncenter" colspan="3"><p class="padding15Top">Checkout <br> CSUSB CyberSecurity<br>Center</p></td>
+							</tr>
 						</table>
 					</div>
 					<div class="floatright">
@@ -115,6 +118,9 @@
 								<td><?=Core::fakeLink( 'cert','CE276','Computer Applications')?></td>
 								<td>AS/CE276</td>
 								<td>32.5</td>
+							</tr>
+							<tr>
+								<td class="aligncenter" colspan="3"><p class="padding15Top">* Not required but recommended</p></td>
 							</tr>
 						</table>
 					</div>

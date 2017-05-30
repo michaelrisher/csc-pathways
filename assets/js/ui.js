@@ -22,6 +22,21 @@ $( document ).ready( function(){
 			scrollTop: $( idLocation ).offset().top
 		}, 500);
 
+		//$.ajax( {
+		//	url: 'assets/inc/' + loc + '/' + goto + '.php',
+		//	type: 'GET',
+		//	success: function ( data ) {
+		//		$( idLocation ).html( data );
+		//		$( idLocation ).css( 'height', '' );
+		//	},
+		//	fail: function( data ){
+		//		failedAjax( idLocation );
+		//	},
+		//	error: function( data ){
+		//		failedAjax( idLocation );
+		//	}
+		//} );
+
 		$.ajax( {
 			url: 'assets/inc/' + loc + '/' + goto + '.php',
 			type: 'GET',

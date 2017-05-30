@@ -326,6 +326,12 @@ body {
 #wrapper #main #class .info .back {
   cursor: pointer;
 }
+#wrapper #main #cert p.title,
+#wrapper #main #class p.title {
+  font-size: larger;
+  font-weight: bold;
+  padding: 0 0 20px 0;
+}
 #wrapper #main #cert ul,
 #wrapper #main #class ul {
   padding-left: 40px;

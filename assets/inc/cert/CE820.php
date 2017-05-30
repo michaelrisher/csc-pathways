@@ -11,8 +11,19 @@
 	<div class="aligncenter">
 		<div class="clearfix margin10">
 			<p class="info">Certification Information <img class="floatright margin15Right back" data-to="top" width=20 src="<?=CORE_URL . 'assets/img/back.png'?>" /></p>
+			<p class="title">Webmaster Certificate - Designer (CE 843)</p>
+			<div class="alignjustify">
+				<p></p>
+				<p class="bold margin15Top">Program Learning Outcomes</p>
+				<p>Upon successful completion of this program, students should be able to:</p>
+				<ul>
+					<li>Apply design and visual communication principles to web site, page, and interface design.</li>
+					<li>Use Photoshop to create and edit images for use on the web, including photographs, logos, navigation buttons, background images, image maps, and web page design mockups (tracing images).</li>
+					<li>Use Flash to create web animations and interactive web sites.</li>
+
+				</ul>
+			</div>
 		</div>
-		<p>Webmaster Certificate - Designer (CE 843)</p>
 		<p>Full Time Completion in One Year</p>
 	</div>
 	<table>
