@@ -263,12 +263,17 @@ body {
   padding: 15px;
 }
 #headerWrapper #header .title {
+  text-align: center;
   color: #ffba00;
   line-height: 26px;
   font: 24px Times New Roman, Time, serif;
+  border-right: 2px #ffba00 solid;
+  padding-right: 10px;
 }
-#headerWrapper #header .title:after {
-  content: " | ";
+#headerWrapper #header .subtitle {
+  padding: 15px;
+  position: relative;
+  top: 6px;
 }
 #wrapper {
   background-color: #d3dce6;

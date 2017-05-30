@@ -18,7 +18,10 @@
 	<div id="wrapper">
 		<div id="headerWrapper">
 			<div id="header">
-				<p class="title">Computer Science & Computer Information Systems</p> Join the Bitcoin Revolution.
+				<div class="clearfix">
+					<div class="floatleft title">Computer Science <br> Computer Information Systems</div>
+					<div class="floatleft subtitle">Join the Bitcoin Revolution.</div>
+				</div>
 			</div>
 		</div>
 		<div id="main">

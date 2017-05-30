@@ -6,7 +6,7 @@
 	 * Time: 12:29
 	 */
 
-	$mysqli =
+//	$mysqli =
 ?>
 <div>
 	<div class="">
