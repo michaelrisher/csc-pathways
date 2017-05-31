@@ -1,37 +1,64 @@
 @import 'mixins.less';
 
 html, body{ background-color: #d3dce6; }
-#headerWrapper{
-	background-color: #26354a;
-	#header{
-		width: 1000px;
-		margin: 0 auto 20px;
-		height: 50px;
-		background-color: #26354a;
-		color: #d3dce6;
-		letter-spacing: .3em;
-		font: 11px Arial, helvetica, sans-serif;
-		line-height: 16px;
-		.padding15;
 
-		.title{
-			.aligncenter;
-			color: #ffba00;
-			line-height: 26px;
-			font: 24px Times New Roman, Time, serif;
-			border-right: 2px #ffba00 solid;
-			padding-right: 10px;
-		}
-
-		.subtitle{
-			padding: 15px;
-			position: relative;
-			top: 6px;
-		}
-	}
-}
 #wrapper{
 	background-color: #d3dce6;
+	&.admin #header{
+		height: 80px !important;
+	}
+
+	#headerWrapper {
+		background-color: #26354a;
+		#header {
+			width: 1000px;
+			margin: 0 auto 20px;
+			height: 50px;
+			background-color: #26354a;
+			color: #d3dce6;
+			letter-spacing: .3em;
+			font: 11px Arial, helvetica, sans-serif;
+			line-height: 16px;
+			.padding15;
+
+			.title {
+				.aligncenter;
+				color: #ffba00;
+				line-height: 26px;
+				font: 24px Times New Roman, Time, serif;
+				border-right: 2px #ffba00 solid;
+				padding-right: 10px;
+			}
+
+			.subtitle {
+				padding: 15px;
+				position: relative;
+				top: 6px;
+			}
+
+			.nav{
+				letter-spacing: 1.5px;
+				border-top: 1px solid #ffba00;
+				margin-top: 5px;
+				padding-top: 10px;
+				font-size: 14px;
+				ul, li{
+					list-style: none;
+					display: inline-block;
+				}
+				a{
+					cursor: pointer;
+					color: #d3dce6;
+					&:hover{
+						color: #ffba00;
+					}
+				}
+			}
+		}
+	}
+	
+
+
 	#main{
 		width: 1000px;
 		margin: 0 auto 0;
@@ -70,7 +97,6 @@ html, body{ background-color: #d3dce6; }
 				}
 			}
 		}
-
 		#cert, #class{
 			margin: 100px 0 25px 0;
 			border: 1px solid black;
@@ -112,11 +138,129 @@ html, body{ background-color: #d3dce6; }
 				}
 			}
 		}
-		 #class a {
+		#class a {
 			 display: inline;
 		 }
 		#cert {
 			padding-bottom: 20px;
+		}
+
+		.login{
+			margin: 30px;
+			.loginWrapper{
+				max-width:400px;
+				margin:50px auto;
+				
+				p{
+					font-size: larger;
+				}
+			}
+			form{
+				max-width:400px;
+				margin:50px auto;
+				background:#c1cad3;
+				border-radius:2px;
+				padding:20px;
+				font-family: Georgia, "Times New Roman", Times, serif;
+				h1{
+					display: block;
+					text-align: center;
+					padding: 0;
+					margin: 0px 0px 20px 0px;
+					color: #5C5C5C;
+					font-size:x-large;
+				}
+				ul{
+					list-style:none;
+					padding:0;
+					margin:0;
+					li{
+						display: block;
+						padding: 9px;
+						border:1px solid #a2aab2;
+						margin-bottom: 30px;
+						border-radius: 3px;
+					}
+					li.error{
+						border: 1px solid red !important;
+						&  > span{
+							background: red !important;
+						}
+					}
+					li:last-child{
+						border:none;
+						margin-bottom: 0px;
+						text-align: center;
+					}
+					li > label{
+						display: block;
+						float: left;
+						margin-top: -19px;
+						background: #c1cad3;
+						height: 14px;
+						padding: 2px 5px 2px 5px;
+						color: #8d8c8c;
+						font-size: 14px;
+						overflow: hidden;
+						font-family: Arial, Helvetica, sans-serif;
+					}
+
+					li > span{
+						background: #a2aab2;
+						display: block;
+						padding: 3px;
+						margin: 0 -9px -9px -9px;
+						text-align: center;
+						color: #fafafa;
+						font-family: Arial, Helvetica, sans-serif;
+						font-size: 11px;
+					}
+
+					input[type="text"], input[type="date"], input[type="datetime"], input[type="email"], input[type="number"], input[type="search"], input[type="time"], input[type="url"], input[type="password"], textarea, select
+					{
+						box-sizing: border-box;
+						-webkit-box-sizing: border-box;
+						-moz-box-sizing: border-box;
+						width: 100%;
+						display: block;
+						outline: none;
+						border: none;
+						height: 35px;
+						line-height: 35px;
+						font-size: 16px;
+						padding: 0;
+						font-family: Georgia, "Times New Roman", Times, serif;
+					}
+
+					textarea{
+						resize:none;
+					}
+
+					input[type="submit"],  input[type="button"]{
+						background: #2471FF;
+						border: none;
+						padding: 10px 20px 10px 20px;
+						border-bottom: 3px solid #5994FF;
+						border-radius: 3px;
+						color: #D2E2FF;
+					}
+
+					input[type="submit"]:hover, input[type="button"]:hover{
+						background: #6B9FFF;
+						color:#fff;
+					}
+				}
+			}
+		}
+		.errorPage, .logout{
+			div{
+				max-width:400px;
+				margin:50px auto;
+
+				p{
+					font-size: larger;
+				}
+			}
 		}
 	}
 

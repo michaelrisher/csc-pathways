@@ -248,10 +248,16 @@ html,
 body {
   background-color: #d3dce6;
 }
-#headerWrapper {
+#wrapper {
+  background-color: #d3dce6;
+}
+#wrapper.admin #header {
+  height: 80px !important;
+}
+#wrapper #headerWrapper {
   background-color: #26354a;
 }
-#headerWrapper #header {
+#wrapper #headerWrapper #header {
   width: 1000px;
   margin: 0 auto 20px;
   height: 50px;
@@ -262,7 +268,7 @@ body {
   line-height: 16px;
   padding: 15px;
 }
-#headerWrapper #header .title {
+#wrapper #headerWrapper #header .title {
   text-align: center;
   color: #ffba00;
   line-height: 26px;
@@ -270,13 +276,29 @@ body {
   border-right: 2px #ffba00 solid;
   padding-right: 10px;
 }
-#headerWrapper #header .subtitle {
+#wrapper #headerWrapper #header .subtitle {
   padding: 15px;
   position: relative;
   top: 6px;
 }
-#wrapper {
-  background-color: #d3dce6;
+#wrapper #headerWrapper #header .nav {
+  letter-spacing: 1.5px;
+  border-top: 1px solid #ffba00;
+  margin-top: 5px;
+  padding-top: 10px;
+  font-size: 14px;
+}
+#wrapper #headerWrapper #header .nav ul,
+#wrapper #headerWrapper #header .nav li {
+  list-style: none;
+  display: inline-block;
+}
+#wrapper #headerWrapper #header .nav a {
+  cursor: pointer;
+  color: #d3dce6;
+}
+#wrapper #headerWrapper #header .nav a:hover {
+  color: #ffba00;
 }
 #wrapper #main {
   width: 1000px;
@@ -363,6 +385,127 @@ body {
 }
 #wrapper #main #cert {
   padding-bottom: 20px;
+}
+#wrapper #main .login {
+  margin: 30px;
+}
+#wrapper #main .login .loginWrapper {
+  max-width: 400px;
+  margin: 50px auto;
+}
+#wrapper #main .login .loginWrapper p {
+  font-size: larger;
+}
+#wrapper #main .login form {
+  max-width: 400px;
+  margin: 50px auto;
+  background: #c1cad3;
+  border-radius: 2px;
+  padding: 20px;
+  font-family: Georgia, "Times New Roman", Times, serif;
+}
+#wrapper #main .login form h1 {
+  display: block;
+  text-align: center;
+  padding: 0;
+  margin: 0px 0px 20px 0px;
+  color: #5C5C5C;
+  font-size: x-large;
+}
+#wrapper #main .login form ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+#wrapper #main .login form ul li {
+  display: block;
+  padding: 9px;
+  border: 1px solid #a2aab2;
+  margin-bottom: 30px;
+  border-radius: 3px;
+}
+#wrapper #main .login form ul li.error {
+  border: 1px solid red !important;
+}
+#wrapper #main .login form ul li.error > span {
+  background: red !important;
+}
+#wrapper #main .login form ul li:last-child {
+  border: none;
+  margin-bottom: 0px;
+  text-align: center;
+}
+#wrapper #main .login form ul li > label {
+  display: block;
+  float: left;
+  margin-top: -19px;
+  background: #c1cad3;
+  height: 14px;
+  padding: 2px 5px 2px 5px;
+  color: #8d8c8c;
+  font-size: 14px;
+  overflow: hidden;
+  font-family: Arial, Helvetica, sans-serif;
+}
+#wrapper #main .login form ul li > span {
+  background: #a2aab2;
+  display: block;
+  padding: 3px;
+  margin: 0 -9px -9px -9px;
+  text-align: center;
+  color: #fafafa;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+}
+#wrapper #main .login form ul input[type="text"],
+#wrapper #main .login form ul input[type="date"],
+#wrapper #main .login form ul input[type="datetime"],
+#wrapper #main .login form ul input[type="email"],
+#wrapper #main .login form ul input[type="number"],
+#wrapper #main .login form ul input[type="search"],
+#wrapper #main .login form ul input[type="time"],
+#wrapper #main .login form ul input[type="url"],
+#wrapper #main .login form ul input[type="password"],
+#wrapper #main .login form ul textarea,
+#wrapper #main .login form ul select {
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  width: 100%;
+  display: block;
+  outline: none;
+  border: none;
+  height: 35px;
+  line-height: 35px;
+  font-size: 16px;
+  padding: 0;
+  font-family: Georgia, "Times New Roman", Times, serif;
+}
+#wrapper #main .login form ul textarea {
+  resize: none;
+}
+#wrapper #main .login form ul input[type="submit"],
+#wrapper #main .login form ul input[type="button"] {
+  background: #2471FF;
+  border: none;
+  padding: 10px 20px 10px 20px;
+  border-bottom: 3px solid #5994FF;
+  border-radius: 3px;
+  color: #D2E2FF;
+}
+#wrapper #main .login form ul input[type="submit"]:hover,
+#wrapper #main .login form ul input[type="button"]:hover {
+  background: #6B9FFF;
+  color: #fff;
+}
+#wrapper #main .errorPage div,
+#wrapper #main .logout div {
+  max-width: 400px;
+  margin: 50px auto;
+}
+#wrapper #main .errorPage div p,
+#wrapper #main .logout div p {
+  font-size: larger;
 }
 #wrapper a {
   color: #0000ee /* browser's internal value */;

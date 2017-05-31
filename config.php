@@ -13,7 +13,7 @@
 		define( 'CORE_PATH', $_SERVER['DOCUMENT_ROOT'] . substr( $_SERVER['SCRIPT_NAME'], 0, -9 ) );
 		define( 'CORE_ROOT', $_SERVER['DOCUMENT_ROOT'] . substr( $_SERVER['SCRIPT_NAME'], 0, ( -9 - strlen( CORE_DIR ) ) ) );
 		define( 'CORE_REQUEST_TYPE', $_SERVER['REQUEST_METHOD'] );
-		define( 'CORE_URL', ( isset( $_SERVER['HTTPS'] ) ? 'https' : 'http' ) . '://' . $_SERVER[ 'HTTP_HOST' ] . '/' . CORE_DIR . '/' );
+		define( 'CORE_URL', ( isset( $_SERVER['HTTPS'] ) ? 'https' : 'http' ) . '://' . $_SERVER[ 'HTTP_HOST' ] . '/' . CORE_DIR );
 	} else if( MODE == 'live' | MODE == 'staging' ) {
 		define( 'CORE_DIR', 'pathways/' );
 		define( 'CORE_PATH', '/home/michael_risher/public_html/' . CORE_DIR );//$_SERVER['DOCUMENT_ROOT'] . substr( $_SERVER['SCRIPT_NAME'], 0, -9 ) );

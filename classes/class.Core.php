@@ -126,4 +126,61 @@
 			}
 			return $post;
 		}
+
+		/**
+		 * Makes a unique 42 character string from sha1
+		 * @return string
+		 */
+		public static function uniqueId(){
+			do {
+				$str = microtime( true ) . $_SERVER['REQUEST_TIME_FLOAT'] . $_SERVER['HTTP_HOST'];
+				$str = sha1( $str );
+			} while( array_search( $str, Core::$uniqueIds ) );
+			array_push( Core::$uniqueIds, sha1( $str ) );
+			return sha1( $str );
+		}
+
+		/**
+		 * Give data to turn into a json response
+		 * @param $data
+		 * @param bool|true $status
+		 * @param $msg
+		 * @return string
+		 */
+		public static function ajaxResponse( $data, $status = true, $msg = null){
+			$o['success'] = $status;
+			$o['data'] = $data;
+			if( isset( $msg ) ){
+				$o['msg'] = $msg;
+			}
+			if( IS_AJAX ){
+				return json_encode( $o );
+			}
+		}
+
+		public static function phpRedirect( $page ){
+			header('Location: ' . CORE_URL . $page );
+		}
+
+		/**
+		 * debug var to screen
+		 * @param $arr
+		 */
+		public static function debug( $arr ){
+			echo '<pre>';
+			print_r( $arr );
+			echo '</pre>';
+		}
+
+		public static function errorPage( $code ){
+			$data['error'] = $code;
+			Core::queueStyle( 'assets/css/reset.css' );
+			Core::queueStyle( 'assets/css/ui.css' );
+			include( CORE_PATH . 'pages/error.php' );
+			die;
+		}
+
+		public static function createTimer( $time ){
+			return "<span class='timer' data-time='$time'>$time</span>";
+		}
 	}

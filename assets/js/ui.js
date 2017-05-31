@@ -55,4 +55,69 @@ $( document ).ready( function(){
 			scrollTop: $( idLocation ).offset().top - 50
 		}, 500);
 	});
+
+	$( '#main .login [type=submit]' ).on('click', function( e ){
+		e.preventDefault(); //prevent the default submit action
+		var form = $( this ).closest( 'form' );
+		var data = $( form ).serializeArray();
+		var map = {};
+		jQuery.each( data, function ( i, field ) {
+			map[field.name] = field.value;
+		} ); //get form data for verify
+		//remove errors
+		$( 'li', form ).each(function( i, elem ){
+			$(elem ).removeClass('error');
+		} );
+		var hasError = false;
+		//verify data
+		if ( map['user'].length == 0 ) {
+			$( form ).find( 'input[name=user]' ).closest( 'li' ).addClass( 'error' );
+			hasError = true;
+		}
+		if ( map['password'].length == 0 ) {
+			$( form ).find( 'input[name=password]' ).closest( 'li' ).addClass( 'error' );
+			hasError = true;
+		}
+
+		if( !hasError ){
+			//ajax login
+			$.ajax({
+				type : 'POST',
+				url : 'rest/' + $( form ).attr('action'),
+				dataType : 'json',
+				data : {
+					user : map['user'],
+					password : sha512( map['password'] )
+				},
+				success : function( data ){
+					if( data.success ){
+						location.href = data.data.redirect;
+					} else {
+						alert( JSON.stringify( data ) );
+					}
+				}
+
+			})
+		}
+
+	} );
 });
+
+var regex = {};
+regex['password'] = /^((?=.*\d)(?=.*[A-Z])(?=.*\W).[\S]{7,50})$/g;
+regex['email'] = /[a-z\d]+([\.\_]?[a-z\d]+)+@[a-z\d]+(\.[a-z]+)+/g;
+function startTimer( element, fn ){
+	var time = parseInt( $( element ).attr( 'data-time' ) );
+	var interval = setInterval( function(){
+		$( element ).text( parseInt( $(element ).text() ) - 1 );
+	}, 1000 );
+	setTimeout( function(){
+		clearInterval( interval );
+		fn();
+	}, ( time * 1000 ) + 10 );
+}
+
+function adjustTextarea(h) {
+	h.style.height = "20px";
+	h.style.height = (h.scrollHeight)+"px";
+}
