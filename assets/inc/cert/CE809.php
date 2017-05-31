@@ -11,6 +11,7 @@
 	<div class="aligncenter">
 		<div class="clearfix margin10">
 			<p class="info">Certification Information <img class="floatright margin15Right back" data-to="top" width=20 src="<?=CORE_URL . 'assets/img/back.png'?>" /></p>
+			<p class="title">Java Programming Certificate (CE 809)</p>
 			<div class="alignjustify">
 				<p>Completion of this certificate provides the student with skills a new programmer would need to obtain employment programming Java applications.</p>
 				<p class="bold margin15Top">Program Learning Outcomes</p>
@@ -30,7 +31,6 @@
 				</ul>
 			</div>
 		</div>
-		<p>Java Programming Certificate (CE 809)</p>
 		<p>Completion in Two Years</p>
 	</div>
 	<table>
@@ -71,7 +71,6 @@
 
 
 	<div class="aligncenter margin25Top">
-		<p>Java Programming Certificate (CE 809)</p>
 		<p>Completion in One Year</p>
 	</div>
 	<table>

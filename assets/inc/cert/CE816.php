@@ -11,6 +11,7 @@
 	<div class="aligncenter">
 		<div class="clearfix margin10">
 			<p class="info">Certification Information <img class="floatright margin15Right back" data-to="top" width=20 src="<?=CORE_URL . 'assets/img/back.png'?>" /></p>
+			<p class="title">Relational Database Certificate (CE 816)</p>
 			<div class="alignjustify">
 				<p>Provides the skills necessary to present a view of data as a collection   of   rows   and   columns   and   manage    these relational databases based on a variety of data models.</p>
 				<p class="bold margin15Top">Program Learning Outcomes</p>
@@ -25,7 +26,6 @@
 				</ul>
 			</div>
 		</div>
-		<p>Relational Database Certificate (CE 816)</p>
 		<p>One Year Completion - Online</p>
 	</div>
 	<table>

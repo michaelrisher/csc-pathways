@@ -11,6 +11,7 @@
 	<div class="aligncenter">
 		<div class="clearfix margin10">
 			<p class="info">Certification Information <img class="floatright margin15Right back" data-to="top" width=20 src="<?=CORE_URL . 'assets/img/back.png'?>" /></p>
+			<p class="title">C++ Programming Certificate (CE 803)</p>
 			<div class="alignjustify">
 				<p>Create structured and Object code in C++ for business, gaming, mathematical and scientific problems by identifying  the information input requirements, synthesizing the algorithmic steps needed to transform the data input into the required output information, and organizing the output format to facilitate user communication.</p>
 				<p class="bold margin15Top">Program Learning Outcomes</p>
@@ -30,7 +31,6 @@
 				</ul>
 			</div>
 		</div>
-		<p>C++ Programming Certificate (CE 803)</p>
 		<p>Full Time Completion in 2 Years</p>
 	</div>
 	<table>
@@ -71,7 +71,6 @@
 
 
 	<div class="aligncenter margin25Top">
-		<p>C++ Programming Certificate (CE 803)</p>
 		<p>One Year Completion</p>
 	</div>
 	<table>

@@ -16,9 +16,9 @@
 	$row = null;
 	if( $result->num_rows == 1 ) {
 		$row = $result->fetch_assoc();
-		echo '<pre>';
-		print_r( $row );
-		echo '</pre>';
+//		echo '<pre>';
+//		print_r( $row );
+//		echo '</pre>';
 		?>
 		<div>
 			<div class="">

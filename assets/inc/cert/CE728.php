@@ -11,6 +11,7 @@
 	<div class="aligncenter">
 		<div class="clearfix margin10">
 			<p class="info">Certification Information <img class="floatright margin15Right back" data-to="top" width=20 src="<?=CORE_URL . 'assets/img/back.png'?>" /></p>
+			<p class="title">Programming Certificate (CE 728)</p>
 			<div class="alignjustify">
 				<p>This program focuses on the general writing and implementation of generic and customized programs to drive operating systems that generally prepare individuals to apply the methods and procedures of software design and programming to software installation and maintenance. This includes instruction in software design; low and high level languages and program writing; program customization and linking; prototype testing; troubleshooting; and related aspects of operating systems and networks.</p>
 				<p class="bold margin15Top">Program Learning Outcomes</p>
@@ -22,7 +23,6 @@
 				</ul>
 			</div>
 		</div>
-		<p>Programming Certificate (CE 728)</p>
 		<p>Full Time Completion in 2 Years - Fall Start</p>
 	</div>
 	<table>
@@ -70,7 +70,6 @@
 
 
 	<div class="aligncenter margin25Top">
-		<p>Programming Certificate (CE 728)</p>
 		<p>Part Time Completion in 2 Years</p>
 	</div>
 	<table>

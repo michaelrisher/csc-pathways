@@ -356,6 +356,7 @@ body {
 #wrapper #main #cert table td,
 #wrapper #main #class table td {
   border: 1px dotted black;
+  padding: 5px;
 }
 #wrapper #main #class a {
   display: inline;

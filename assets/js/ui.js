@@ -22,23 +22,10 @@ $( document ).ready( function(){
 			scrollTop: $( idLocation ).offset().top
 		}, 500);
 
-		//$.ajax( {
-		//	url: 'assets/inc/' + loc + '/' + goto + '.php',
-		//	type: 'GET',
-		//	success: function ( data ) {
-		//		$( idLocation ).html( data );
-		//		$( idLocation ).css( 'height', '' );
-		//	},
-		//	fail: function( data ){
-		//		failedAjax( idLocation );
-		//	},
-		//	error: function( data ){
-		//		failedAjax( idLocation );
-		//	}
-		//} );
-
+		//var url = loc == 'cert' ? ( 'assets/inc/' + loc + '/' + goto + '.php' ): ( loc + '/' + goto );
+		var url = 'assets/inc/' + loc + '/' + goto + '.php'
 		$.ajax( {
-			url: 'assets/inc/' + loc + '/' + goto + '.php',
+			url: url,
 			type: 'GET',
 			success: function ( data ) {
 				$( idLocation ).html( data );
