@@ -44,12 +44,16 @@
 	</div>
 </div>
 <?php include_once CORE_PATH . 'assets/inc/footer.php'; ?>
+<!--<div class="modal-shadow"></div>-->
+<div class="modal">
+
+</div>
 </body>
 </html>
 
 <?php
-	Core::debug( $_SESSION );
-	Core::debug( $_SERVER );
+//	Core::debug( $_SESSION );
+//	Core::debug( $_SERVER );
 ?>
 
 <!--

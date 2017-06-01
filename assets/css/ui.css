@@ -512,6 +512,13 @@ body {
   text-decoration: underline;
   cursor: pointer;
 }
+.modal-shadow {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  position: fixed;
+  height: 100%;
+  top: 0;
+}
 .padding30Bottom {
   padding-bottom: 30px;
 }

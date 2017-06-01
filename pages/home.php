@@ -93,7 +93,7 @@
 								<td>17</td>
 							</tr>
 							<tr>
-								<td class="aligncenter" colspan="3"><p class="padding15Top">Checkout <br> CSUSB CyberSecurity<br>Center</p></td>
+								<td class="aligncenter" colspan="3"><p class="padding15Top">Checkout <br> <a href="https://www.csusb.edu/cyber-security">CSUSB CyberSecurity<br>Center</a></p></td>
 							</tr>
 						</table>
 					</div>
@@ -121,9 +121,6 @@
 								<td><?=Core::fakeLink( 'cert','CE726','Computer Applications')?></td>
 								<td>AS/CE726</td>
 								<td>32.5</td>
-							</tr>
-							<tr>
-								<td class="aligncenter" colspan="3"><p class="padding15Top">* Not required but recommended</p></td>
 							</tr>
 						</table>
 					</div>
