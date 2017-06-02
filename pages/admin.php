@@ -42,12 +42,23 @@
 			stuff here
 		</div>
 	</div>
+	<input type="button" value="modal" onclick="createModal(  {title:'tester', footer:true, buttons:[{value:'test', name:'close', onclick:function(){ alert('itworked'); } } ] } )" />
 </div>
 <?php include_once CORE_PATH . 'assets/inc/footer.php'; ?>
 <!--<div class="modal-shadow"></div>-->
-<div class="modal">
-
-</div>
+<!--<div id="" class="modal">-->
+<!--	<div class="modalWrapper">-->
+<!--		<div class="modalHeader">-->
+<!--			<span class="close">&times;</span>-->
+<!--		</div>-->
+<!--		<div class="modalContent">-->
+<!--			<p>Some text in the Modal..</p>-->
+<!--		</div>-->
+<!--		<div class="modalFooter">-->
+<!--			<input type="button" value="Ok">-->
+<!--		</div>-->
+<!--	</div>-->
+<!--</div>-->
 </body>
 </html>
 

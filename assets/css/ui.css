@@ -512,12 +512,79 @@ body {
   text-decoration: underline;
   cursor: pointer;
 }
-.modal-shadow {
+input[type="text"],
+input[type="date"],
+input[type="datetime"],
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input[type="time"],
+input[type="url"],
+input[type="password"],
+textarea,
+select {
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
   width: 100%;
-  background: rgba(0, 0, 0, 0.6);
+  display: block;
+  outline: none;
+  border: none;
+  height: 35px;
+  line-height: 35px;
+  font-size: 16px;
+  padding: 0;
+  font-family: Georgia, "Times New Roman", Times, serif;
+}
+input[type="submit"],
+input[type="button"] {
+  background: #2471FF;
+  border: none;
+  padding: 10px 20px 10px 20px;
+  border-bottom: 3px solid #5994FF;
+  border-radius: 3px;
+  color: #D2E2FF;
+}
+/* The Modal (background) */
+.modal {
   position: fixed;
-  height: 100%;
+  /* Stay in place */
+  z-index: 100;
+  /* Sit on top */
+  padding-top: 100px;
+  /* Location of the box */
+  left: 0;
   top: 0;
+  width: 100%;
+  /* Full width */
+  height: 100%;
+  /* Full height */
+  overflow: auto;
+  /* Enable scroll if needed */
+  background-color: #000000;
+  /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.4);
+  /* Black w/ opacity */
+}
+/* Modal Content */
+.modalWrapper {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+}
+.modalWrapper .close {
+  color: #aaaaaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+.modalWrapper .close:hover,
+.modalWrapper .closefocus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
 }
 .padding30Bottom {
   padding-bottom: 30px;
