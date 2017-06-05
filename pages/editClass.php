@@ -2,8 +2,8 @@
 	/**
 	 * Created by IntelliJ IDEA.
 	 * User: Michael Risher
-	 * Date: 5/30/2017
-	 * Time: 09:47
+	 * Date: 6/5/2017
+	 * Time: 10:13
 	 */
 	if( !$GLOBALS['main']->users->isLoggedIn() ){
 		Core::errorPage( 404 );
@@ -30,7 +30,6 @@
 					<li><a href="admin">Admin Home</a></li>
 					<li><a href="editClass">Classes</a></li>
 					<li>Certificates</li>
-
 				</ul>
 				<div class="floatright">
 					<a href="logout">Logout</a>
@@ -41,18 +40,23 @@
 	<div id="main">
 		<div class="admin">
 			<div class="classes aligncenter">
-				<p>Audit Log</p>
+				<p>Classes</p>
 				<div class="listing alignleft">
 					<ul>
 					<?php
-						$GLOBALS['main']->loadModule( 'audit' );
-						$data = $GLOBALS['main']->audit->listing();
-						foreach ( $data as $event ) {
-							echo "<li>User ${event['username']}: ${event['event']}  <span class='floatright'>${event['date']}</span>";
+						$GLOBALS['main']->loadModule( 'classes' );
+						$data = $GLOBALS['main']->classes->listing();
+						foreach ( $data as $class ) {
+							echo "<li data-id='${class['id']}'>${class['title']}";
+							echo "<img class='delete' src='". CORE_URL ."assets/img/delete.png'/>";
+							echo "<img class='edit' src='". CORE_URL ."assets/img/edit.svg'/>";
 							echo "</li>";
 						}
 					?>
 					</ul>
+				</div>
+				<div class="margin25Top">
+					<input type="button" value="Create Class" name="createClass"/>
 				</div>
 			</div>
 		</div>
@@ -64,6 +68,6 @@
 </html>
 
 <?php
-//	Core::debug( $_SESSION );
-//	Core::debug( $_SERVER );
+	//	Core::debug( $_SESSION );
+	//	Core::debug( $_SERVER );
 ?>

@@ -13,8 +13,12 @@
 			$passwordHash = hash( 'sha512', $password[0] . $password[1] . $_POST['user'] );
 			$query = "SELECT * FROM users WHERE username = '${_POST['user']}' AND password = '$passwordHash'";
 
-			if(!$result = $this->db->query($query)){
-				die('There was an error running the query [' . $this->db->error . ']'); //todo better error code
+			$obj = array();
+			if( !$result = $this->db->query($query) ){
+//				die('There was an error running the query [' . $this->db->error . ']');
+				$obj['error'] = "An error occurred please try again";
+				echo Core::ajaxResponse( $obj, false );
+				return;
 			}
 			$row = null;
 			if( $result->num_rows == 1 ){
@@ -35,6 +39,7 @@
 					//update session to reflect login status
 					$_SESSION['session'] = array();
 					$_SESSION['session']['username'] = $row['username'];
+					$_SESSION['session']['id'] = $row['id'];
 					$_SESSION['session']['expires'] = time() + ( 60 * 10 ); //session set for 10 minutes
 					$_SESSION['session']['started'] = time();
 				}
