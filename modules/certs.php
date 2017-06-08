@@ -37,9 +37,6 @@
 			if ( $this->users->isLoggedIn() ) {
 				Core::queueStyle( 'assets/css/reset.css' );
 				Core::queueStyle( 'assets/css/ui.css' );
-				Core::queueStyle( 'assets/css/froala_editor.css' );
-				Core::queueStyle( 'assets/css/froala_style.css' );
-
 				//put the data onscreen
 				$data = $this->get( $id );
 				$data['categories'] = $this->listCategories();
@@ -112,23 +109,27 @@ EOD;
 				return $return;
 			}
 		}
-	}
 
-	/*
-	 *SELECT
-    certificateList.id,
-    certificateList.code,
-    certificateList.hasAs,
-    certificateList.hasCe,
-    certificateList.units,
-    certificateList.category,
-    certificateList.description AS title,
-    certificateList.sort,
-    certificateData.description,
-    certificateData.elo,
-    certificateData.schedule
-FROM
-    `certificateList`
-INNER JOIN enumCategories ON certificateList.category = enumCategories.id
-INNER JOIN certificateData ON certificateList.id = certificateData.cert
-	 */
+		public function save( $id ) {
+			$this->loadModule( 'users' );
+			if( $this->users->isLoggedIn() ){
+				$_POST['title'] = core::sanitize( $_POST['title'] );
+				$_POST['code'] = core::sanitize( $_POST['code'] );
+				$_POST['category'] = core::sanitize( $_POST['category'] );
+				$_POST['description'] = core::sanitize( $_POST['description'], true );
+				$_POST['elo'] = core::sanitize( $_POST['elo'], true );
+				$_POST['schedule'] = core::sanitize( $_POST['schedule'], true );
+
+				//seperate the two tables data
+				$query = <<<EOD
+INSERT INTO certificateList (id, code, category, description)
+VALUES (?,?,?,?)
+ON DUPLICATE KEY UPDATE
+code = VALUES( code ),
+category = VALUES( category ),
+description = VALUES( description )
+EOD;
+				$statement = $this->db->prepare($query);
+			}
+		}
+	}

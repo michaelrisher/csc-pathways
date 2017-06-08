@@ -15,14 +15,6 @@
 <head>
 	<?php
 		include_once CORE_PATH . 'assets/inc/header.php';
-		Core::queueStyle( 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css' );
-		Core::queueStyle( 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.25.0/codemirror.min.css' );
-//		Core::queueStyle( 'https://cdnjs.cloudflare.com/ajax/libs/froala-editor/2.6.1/css/froala_editor.min.css' );
-//		Core::queueStyle( 'https://cdnjs.cloudflare.com/ajax/libs/froala-editor/2.6.1/css/froala_style.min.css' );
-//		Core::queueStyle( 'assets/css/froala_editor.css');
-//		Core::queueStyle( 'assets/css/froala_style.css');
-		Core::queueStyle( 'assets/css/froala/table.min.css');
-		Core::queueStyle( 'assets/css/froala/code_view.min.css');
 		Core::includeStyles();
 	?>
 </head>
@@ -50,7 +42,8 @@
 		<div class="admin">
 			<div class="certs aligncenter margin15Bottom">
 				<p>Editing <?=$data['title']?></p>
-				<form>
+				<form action="certs/save/<?=$data['id']?>" method="post">
+					<input type="hidden" name="id" value="<?=$data['id']?>" />
 					<ul>
 						<li>
 							<label for="title">Title</label>
@@ -58,8 +51,8 @@
 							<span>Enter the certificate description</span>
 						</li>
 						<li>
-							<label for="title">Code</label>
-							<input type="text" name="title" value="<?=isset( $data['code'] ) ? $data['code'] : ''?>"/>
+							<label for="code">Code</label>
+							<input type="text" name="code" value="<?=isset( $data['code'] ) ? $data['code'] : ''?>"/>
 							<span>Enter the certificate code number</span>
 						</li>
 						<li>
@@ -76,37 +69,29 @@
 
 								?>
 							</select>
-							<span>Enter the certificate code number</span>
+							<span>Enter the certificate category</span>
 						</li>
 						<li>
 							<label for="description">Description</label>
-							<textarea class="froala-editor" name="description" ><?=isset( $data['description'] ) ? $data['description'] : ''?></textarea>
-							<span>Enter the certificate code number</span>
+							<textarea class="froala-editor" name="description" id="description" ><?=isset( $data['description'] ) ? $data['description'] : ''?></textarea>
+							<span>Enter the certificate description</span>
 						</li>
 						<li>
 							<label for="elo">Expected Learning Outcomes</label>
-							<textarea class="froala-editor" name="elo" ><?=isset( $data['elo'] ) ? $data['elo'] : ''?></textarea>
-							<span>Enter the certificate code number</span>
+							<textarea class="froala-editor" name="elo" id="elo" ><?=isset( $data['elo'] ) ? $data['elo'] : ''?></textarea>
+							<span>Enter the certificate expected learning outcome</span>
 						</li>
 						<li>
 							<label for="schedule">Schedule</label>
-							<textarea class="froala-editor" name="schedule" ><?=isset( $data['schedule'] ) ? $data['schedule'] : ''?></textarea>
-							<span>Enter the certificate code number</span>
+							<textarea class="froala-editor" name="schedule" id="schedule" ><?=isset( $data['schedule'] ) ? $data['schedule'] : ''?></textarea>
+							<span>Enter the certificate schedule</span>
 						</li>
 						<li>
-							<input type="button" value="Save" />
+							<input type="submit" value="Save" />
 						</li>
 
 					</ul>
 				</form>
-				<div class="listing alignleft">
-					<?php
-						Core::debug( $data );
-					?>
-				</div>
-				<div class="margin25Top">
-					<input type="button" value="Create Certificate" name="createCert"/>
-				</div>
 			</div>
 		</div>
 	</div>
@@ -114,39 +99,11 @@
 </div>
 <?php
 	Core::queueScript( 'assets/js/core.js');
-	Core::queueScript( 'assets/js/froala_editor.js');
-	Core::queueScript( 'assets/js/froala/table.min.js');
-	Core::queueScript( 'assets/js/froala/code_view.min.js');
-	Core::queueScript( "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.25.0/codemirror.min.js" );
-	Core::queueScript( "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.25.0/mode/xml/xml.min.js" );
+	Core::queueScript( "assets/tinymce/tinymce.min.js" );
 	Core::queueScript( 'assets/js/ui.js');
 	Core::includeScripts();
 ?>
 
-
-<!-- Include JS file. -->
-<script>
-//
-//	$.FroalaEditor.DefineIcon('insertClass', {NAME: 'plus'});
-//	$.FroalaEditor.RegisterCommand('insertClass', {
-//		title: 'Insert Class',
-//		focus: true,
-//		undo: true,
-//		refreshAfterCallback: true,
-//		callback: function () {
-//			this.html.insert('My New Class');
-//		}
-//	});
-//
-//	$('#froala-editor').froalaEditor({
-//		toolbarButtons: [
-//			'fullscreen', 'bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript', '|', 'fontFamily', 'fontSize', 'inlineStyle', 'paragraphStyle', '|',
-//			'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote','|', 'undo', 'redo', '|', 'help', 'html', '-', 'insertLink', 'insertImage', 'insertFile', 'insertTable',
-//			'|', 'specialCharacters', 'insertHR', 'selectAll', 'clearFormatting', '|', 'help', 'html', '|', 'insertClass'
-//		],
-//		charCounterCount: false,
-//	})
-</script>
 </body>
 </html>
 

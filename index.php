@@ -44,6 +44,11 @@
 	$main->loadModule( 'users' );
 	$main->users->checkExpiredSession(); //check for expired session
 
+	//set cookie with the core_url
+	$myDomain = ereg_replace('^[^.]*.([^.]*).(.*)', '1.2', $_SERVER['HTTP_HOST']);
+	$setDomain = ($_SERVER['HTTP_HOST']) != "localhost" ? ".$myDomain" : false;
+	setcookie ("url", CORE_URL, time()+3600*24*(2), '/', "$setDomain", 0 );
+
 	if ( /*IS_AJAX &&*/ isset( $_GET['rested'] ) ) { //calling a module
 		$GLOBALS['main']->loadModule( $uri['module'] );
 		if ( isset( $uri['params'] ) ) {

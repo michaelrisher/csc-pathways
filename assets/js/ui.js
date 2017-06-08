@@ -1,4 +1,5 @@
 $( document ).ready( function(){
+	CORE_URL = readCookie( 'url' );
 	$( 'html' ).on( 'click', '.fakeLink', function( e ){
 		e.preventDefault();
 		var loc = $( this ).attr( 'data-to' );//location we are going to
@@ -345,34 +346,151 @@ $( document ).ready( function(){
 	/******************************************************************************/
 	/****************************certification edit********************************/
 	/******************************************************************************/
+
 	//init the html editors
-	$.FroalaEditor.DefineIcon('insertClass', {NAME: 'plus'});
-	$.FroalaEditor.RegisterCommand('insertClass', {
-		title: 'Insert Class',
-		focus: true,
-		undo: true,
-		refreshAfterCallback: true,
-		callback: function () {
-			this.html.insert('My New Class');
+	try{
+		tinyMCE.init({
+			mode : "textareas",
+			branding : false,
+			plugins: "table, lists, code",
+			toolbar: 'undo redo | bold italic underline subscript superscript | fontselect fontsizeselect | alignleft aligncenter alignright alignjustify formatselect table ' +
+			' bullist addclass | code',
+			menubar : false,
+			setup: function (editor) {
+				editor.addButton( 'addclass', {
+					text: 'Add Class',
+					icon: false,
+					onclick: function () {
+						var classText = '';
+						$.ajax({
+							type : 'POST',
+							url : CORE_URL + '/rest/classes/listing',
+							dataType : 'json',
+							async : false,
+							success : function( data ){
+								if( data.success ){
+									var modal = createModal({
+										title: "Choose Class",
+										buttons : [{
+											value : 'Add',
+											onclick : function( id ){
+												var that = $( '.modal[data-id=' + id + ']');
+												var val = $( that ).find( 'select' ).val();
+												var classCode = $( 'option[value=' + val + ']', that ).html().match( /[a-zA-Z]{3}\-\d{1,4}/ )[0];
+												editor.insertContent( '[class id="' + $( that ).find( 'select' ).val() + '" text="' + classCode + '" /]' );
+												return true;
+											}
+										}, {
+											value : 'Cancel',
+											class : 'low'
+										}]
+									});
+									var html = '<form><ul><li><label for="class">Classes</label>' +
+										'<select name="class">';
+									for( var  i = 0; i < data.data.length; i++ ){
+										html += "<option value='" + data.data[i].id + "'>" + data.data[i].title + "</option>";
+									}
+									html += '</select><span>Pick a class to add</span></li>';
+									setModalContent( modal, html );
+									displayModal( modal );
+								}
+							},
+							fail: function( data ){
+								failedAjax();
+							},
+							error: function( data ){
+								failedAjax();
+							}
+						});
+
+						function failedAjax(){
+							var modal = createModal({title: 'Failed to Load', buttons: [{value : 'Ok'}]});
+							setModalContent( modal, "<p>Failed to load classes. Please try again</p><p>If the problem persits contact the administrator</p>" );
+							displayModal( modal );
+						}
+					}
+				} );
+			}
+		});
+	} catch( ignore ){}
+
+
+	/******************************************************************************/
+	/****************************certification save********************************/
+	/******************************************************************************/
+	$( '#main .admin .certs [type=submit]' ).on('click', function( e ){
+		e.preventDefault(); //prevent the default submit action
+		var form = $( this ).closest( 'form' );
+		var data = $( form ).serializeArray();
+		var map = {};
+		jQuery.each( data, function ( i, field ) {
+			map[field.name] = field.value;
+		} ); //get form data for verify
+		//remove errors
+		$( 'li', form ).each(function( i, elem ){
+			$(elem ).removeClass('error');
+		} );
+		var hasError = false;
+		//scroll to error
+		var scrollTo = null;
+		//verify data
+		if ( map['title'].length == 0 ) {
+			scrollTo = $( form ).find( 'input[name=title]' ).closest( 'li' );
+			scrollTo.addClass( 'error' );
+			hasError = true;
 		}
-	});
-/*
- 'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors', 'draggable', 'emoticons', 'entities', 'file', 'fontFamily', 'fontSize',
- 'fullscreen', 'image', 'imageManager', 'inlineStyle', 'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle', 'quickInsert',
- 'quote', 'save', 'table', 'url', 'video', 'wordPaste'
- */
-	$('.certs textarea.froala-editor').froalaEditor({
-		pluginsEnabled: ['align', 'codeBeautifier', 'codeView', 'colors', 'draggable', 'emoticons', 'entities', 'file', 'fontFamily', 'fontSize',
-			'fullscreen', 'image', 'imageManager', 'inlineStyle', 'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
-			'quote', 'save', 'table', 'url', 'video', 'wordPaste'],
-		toolbarButtons: [
-			'fullscreen', 'bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript', '|', 'fontFamily', 'fontSize', 'inlineStyle', 'paragraphStyle', '|',
-			'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent', 'indent','|', 'undo', 'redo', '|', 'help', 'html', '-', 'insertLink', 'insertImage', 'insertTable',
-			'|', 'specialCharacters', 'insertHR', 'clearFormatting', '|', 'help', 'html', '|', 'insertClass'
-		],
-		charCounterCount: false,
-		heightMin: 100,
-	});
+		if ( map['code'].length == 0 ) {
+			scrollTo = $( form ).find( 'input[name=code]' ).closest( 'li' );
+			scrollTo.addClass( 'error' );
+			hasError = true;
+		}
+		if ( map['description'].length == 0 ) {
+			scrollTo = $( form ).find( 'textarea[name=descriptio]' ).closest( 'li' );
+			scrollTo.addClass( 'error' );
+			hasError = true;
+		}
+		if ( map['elo'].length == 0 ) {
+			scrollTo = $( form ).find( 'textarea[name=elo]' ).closest( 'li' );
+			scrollTo.addClass( 'error' );
+			hasError = true;
+		}
+		if ( map['schedule'].length == 0 ) {
+			scrollTo = $( form ).find( 'textarea[name=schedule]' ).closest( 'li' );
+			scrollTo.addClass( 'error' );
+			hasError = true;
+		}
+
+		//get the html edit values
+		map.description = tinymce.get( 'description' ).getContent();
+		map.elo = tinymce.get( 'elo' ).getContent();
+		map.schedule = tinymce.get( 'schedule' ).getContent();
+
+		if( !hasError ){
+			//ajax login
+			$.ajax({
+				type : 'POST',
+				url : CORE_URL + 'rest/' + $( form ).attr('action'),
+				dataType : 'json',
+				data : map,
+				success : function( data ){
+					console.log( data );
+					//if( data.success ){
+					//	location.href = data.data.redirect;
+					//} else {
+					//	var modal = createModal( { title: 'Log in failed', buttons : [{ value : 'Ok' }] } );
+					//	setModalContent( modal, data.data.error );
+					//	displayModal( modal, true )
+					//}
+				}
+			})
+		} else{
+			//scroll to error
+			$('html, body').animate({
+				scrollTop: $( scrollTo ).offset().top
+			}, 500);
+		}
+	} );
+
 
 	//modal events
 	//$(document).on(event, selector, handler).
@@ -529,4 +647,16 @@ function modalLi( type, name, label, data, text, readOnly, addClass ){
 	html += "</li>";
 
 	return html;
+}
+
+function readCookie(name) {
+	var cookiename = name + "=";
+	var ca = document.cookie.split(';');
+	for(var i=0;i < ca.length;i++)
+	{
+		var c = ca[i];
+		while (c.charAt(0)==' ') c = c.substring(1,c.length);
+		if (c.indexOf(cookiename) == 0) return decodeURIComponent( c.substring(cookiename.length,c.length) );
+	}
+	return null;
 }
