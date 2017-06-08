@@ -51,7 +51,7 @@
 			<td>Year 2</td>
 			<td>&nbsp;</td>
 			<td>
-				<?=Core::fakeLink( 'class','c11','CSC/CIS 11A')?>
+				<?=Core::fakeLink( 'class','c11','CSC/CIS 11')?>
 				<?=Core::fakeLink( 'class','c17a','CSC/CIS 17A')?>and/or
 				<?=Core::fakeLink( 'class','c18a','CSC/CIS 18A')?>
 			</td>

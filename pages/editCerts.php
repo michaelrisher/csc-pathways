@@ -39,31 +39,33 @@
 	</div>
 	<div id="main">
 		<div class="admin">
-			<div class="classes aligncenter margin15Bottom">
-				<p>Classes</p>
+			<div class="certs aligncenter margin15Bottom">
+				<p>Certificates</p>
 				<div class="listing alignleft">
 					<ul>
 					<?php
-						$GLOBALS['main']->loadModule( 'classes' );
-						$data = $GLOBALS['main']->classes->listing();
-						foreach ( $data as $class ) {
-							echo "<li data-id='${class['id']}'>${class['title']}";
+						$GLOBALS['main']->loadModule( 'certs' );
+						$data = $GLOBALS['main']->certs->listing();
+						foreach ( $data as $cert ) {
+							echo "<li data-id='${cert['id']}'>${cert['code']} - ${cert['description']}";
 							echo "<img class='delete' src='". CORE_URL ."assets/img/delete.png'/>";
-							echo "<img class='edit' src='". CORE_URL ."assets/img/edit.svg'/>";
+							echo "<a href='certs/edit/${cert['id']}'><img class='edit' src='". CORE_URL ."assets/img/edit.svg'/></a>";
 							echo "</li>";
 						}
 					?>
 					</ul>
 				</div>
 				<div class="margin25Top">
-					<input type="button" value="Create Class" name="createClass"/>
+					<input type="button" value="Create Certificate" name="createCert"/>
 				</div>
 			</div>
 		</div>
 	</div>
 	<img id="loadOff" src="<?=CORE_URL?>assets/img/ajax-loader.gif" />
 </div>
-<?php include_once CORE_PATH . 'assets/inc/footer.php'; ?>
+<?php
+	include_once CORE_PATH . 'assets/inc/footer.php';
+?>
 
 </body>
 </html>

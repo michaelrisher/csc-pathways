@@ -254,6 +254,11 @@ body {
 #wrapper.admin #header {
   height: 80px !important;
 }
+#wrapper a {
+  color: #0000ee /* browser's internal value */;
+  text-decoration: underline;
+  cursor: pointer;
+}
 #wrapper #headerWrapper {
   background-color: #26354a;
 }
@@ -271,10 +276,15 @@ body {
 #wrapper #headerWrapper #header .title {
   text-align: center;
   color: #ffba00;
+  text-decoration: none;
   line-height: 26px;
   font: 24px Times New Roman, Time, serif;
   border-right: 2px #ffba00 solid;
   padding-right: 10px;
+}
+#wrapper #headerWrapper #header .title a {
+  color: #ffba00;
+  text-decoration: none;
 }
 #wrapper #headerWrapper #header .subtitle {
   padding: 15px;
@@ -522,30 +532,92 @@ body {
   overflow: scroll;
   height: 250px;
 }
-#wrapper #main .admin .classes > p {
+#wrapper #main .admin .classes > p,
+#wrapper #main .admin .certs > p {
   font-weight: bold;
   padding: 10px 0 10px 0;
 }
-#wrapper #main .admin .classes li {
+#wrapper #main .admin .classes li,
+#wrapper #main .admin .certs li {
   padding: 10px;
   list-style: none;
   border: 1px solid black;
   border-bottom: none;
 }
-#wrapper #main .admin .classes li:last-child {
+#wrapper #main .admin .classes li:last-child,
+#wrapper #main .admin .certs li:last-child {
   border-bottom: 1px solid #000000;
 }
-#wrapper #main .admin .classes li img {
+#wrapper #main .admin .classes li img,
+#wrapper #main .admin .certs li img {
   cursor: pointer;
   float: right;
   height: 20px;
   vertical-align: text-top;
   padding: 0 5px 0 5px;
 }
-#wrapper a {
-  color: #0000ee /* browser's internal value */;
-  text-decoration: underline;
-  cursor: pointer;
+#wrapper #main .admin .certs form {
+  margin: 50px auto;
+  background: #c1cad3;
+  border-radius: 2px;
+  padding: 20px;
+  font-family: Georgia, "Times New Roman", Times, serif;
+}
+#wrapper #main .admin .certs form h1 {
+  display: block;
+  text-align: center;
+  padding: 0;
+  margin: 0px 0px 20px 0px;
+  color: #5C5C5C;
+  font-size: x-large;
+}
+#wrapper #main .admin .certs form ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+#wrapper #main .admin .certs form ul li {
+  display: block;
+  padding: 9px;
+  border: 1px solid #a2aab2;
+  margin-bottom: 30px;
+  border-radius: 3px;
+}
+#wrapper #main .admin .certs form ul li.error {
+  border: 1px solid red !important;
+}
+#wrapper #main .admin .certs form ul li.error > span {
+  background: red !important;
+}
+#wrapper #main .admin .certs form ul li:last-child {
+  border: none;
+  margin-bottom: 0px;
+  text-align: center;
+}
+#wrapper #main .admin .certs form ul li > label {
+  display: block;
+  float: left;
+  margin-top: -19px;
+  background: #c1cad3;
+  height: 14px;
+  padding: 2px 5px 2px 5px;
+  color: #8d8c8c;
+  font-size: 14px;
+  overflow: hidden;
+  font-family: Arial, Helvetica, sans-serif;
+}
+#wrapper #main .admin .certs form ul li > span {
+  background: #a2aab2;
+  display: block;
+  padding: 3px;
+  margin: 0 -9px -9px -9px;
+  text-align: center;
+  color: #fafafa;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+}
+#wrapper #main .admin .certs form ul textarea {
+  resize: none;
 }
 input[disabled],
 input[readonly] {
@@ -588,6 +660,14 @@ input[type="submit"].low,
 input[type="button"].low {
   background: #8c8c8c;
   border-bottom: 3px solid #c8c8c8;
+}
+input[type="submit"].processing,
+input[type="button"].processing {
+  background-image: url('../img/ajax-loader.gif');
+  background-repeat: no-repeat;
+  background-position-x: 19px;
+  background-position-y: 3px;
+  color: rgba(0, 0, 0, 0);
 }
 /* The Modal (background) */
 .modal {
@@ -726,20 +806,16 @@ input[type="button"].low {
 }
 .modalWrapper form ul textarea {
   resize: none;
+  max-height: 365px;
 }
-.modalWrapper form ul input[type="submit"],
-.modalWrapper form ul input[type="button"] {
-  background: #2471FF;
-  border: none;
-  padding: 10px 20px 10px 20px;
-  border-bottom: 3px solid #5994FF;
-  border-radius: 3px;
-  color: #D2E2FF;
+.modalWrapper a {
+  color: #0000ee /* browser's internal value */;
+  text-decoration: underline;
+  cursor: pointer;
 }
-.modalWrapper form ul input[type="submit"]:hover,
-.modalWrapper form ul input[type="button"]:hover {
-  background: #6B9FFF;
-  color: #fff;
+#loadOff {
+  position: absolute;
+  top: -100px;
 }
 .padding30Bottom {
   padding-bottom: 30px;

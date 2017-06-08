@@ -44,7 +44,7 @@
 	$main->loadModule( 'users' );
 	$main->users->checkExpiredSession(); //check for expired session
 
-	if ( IS_AJAX && isset( $_GET['rested'] ) ) { //calling a module
+	if ( /*IS_AJAX &&*/ isset( $_GET['rested'] ) ) { //calling a module
 		$GLOBALS['main']->loadModule( $uri['module'] );
 		if ( isset( $uri['params'] ) ) {
 			$response = $GLOBALS['main']->$uri['module']->{$uri['function']}($uri['params']);

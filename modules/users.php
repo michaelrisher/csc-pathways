@@ -42,6 +42,8 @@
 					$_SESSION['session']['id'] = $row['id'];
 					$_SESSION['session']['expires'] = time() + ( 60 * 10 ); //session set for 10 minutes
 					$_SESSION['session']['started'] = time();
+					$this->loadModule( 'audit' );
+					$this->audit->newEvent( "Logged into administration" );
 				}
 			} else{
 				$obj['error'] = "Your username or email is incorrect";

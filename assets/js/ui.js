@@ -22,8 +22,8 @@ $( document ).ready( function(){
 			scrollTop: $( idLocation ).offset().top
 		}, 500);
 
-		//var url = loc == 'cert' ? ( 'assets/inc/' + loc + '/' + goto + '.php' ): ( loc + '/' + goto );
-		var url = 'assets/inc/' + loc + '/' + goto + '.php'
+		var url = loc == 'cert' ? ( 'assets/inc/' + loc + '/' + goto + '.php' ): ( loc + '/' + goto );
+		//var url = 'assets/inc/' + loc + '/' + goto + '.php'
 		$.ajax( {
 			url: url,
 			type: 'GET',
@@ -132,9 +132,10 @@ $( document ).ready( function(){
 					html += modalLi( 'text', 'id', 'ID', data.data.id, "Enter the class ID", true );
 					html += modalLi( 'text', 'title', 'Title', data.data.title, "Enter the class title", false );
 					html += modalLi( 'number', 'units', 'Units', data.data.units, "Enter the class units", false );
-					html += modalLi( 'text', 'advisory', 'Advisory', data.data.advisory ? data.data.advisory : '', "Enter the class advisory", false );
-					html += modalLi( 'text', 'prereq', 'Prerequisite', data.data.prereq ? data.data.prereq : '', "Enter the class prerequisite", false );
 					html += modalLi( 'text', 'transfer', 'Transfer', data.data.transfer ? data.data.transfer : '', "Enter the class transfer", false );
+					html += modalLi( 'text', 'advisory', 'Advisory', data.data.advisory ? data.data.advisory : '', "Enter the class advisory", false, true );
+					html += modalLi( 'text', 'prereq', 'Prerequisite', data.data.prereq ? data.data.prereq : '', "Enter the class prerequisite", false, true );
+					html += modalLi( 'text', 'coreq', 'Corequisite', data.data.coreq ? data.data.coreq : '', "Enter the class corequisite", false, true );
 					html += modalLi( 'textarea', 'description', 'Description', data.data.description, "Enter the class Description", false );
 					html += "</ul></form>";
 					setModalContent( modal, html );
@@ -149,10 +150,11 @@ $( document ).ready( function(){
 		});
 	});
 
-	function saveClass(){
+	function saveClass( id ){
 		//assume the only modal open is the one we are saving
 		var modal = $('.modal' ).eq(0);
 		var form = $( modal ).find( 'form' );
+		var saveBtn = $( modal ).find( 'input[name="save"]' );
 		var data = $( form ).serializeArray();
 		var map = {};
 		jQuery.each( data, function ( i, field ) {
@@ -177,9 +179,11 @@ $( document ).ready( function(){
 			hasError = true;
 		}
 
-		if( !hasError ){
+		if( !hasError && !window.processing ){
 			//ajax save
 			var successful = false;
+			window.processing = true;
+			saveBtn.addClass( 'processing' );
 			var url;
 			if( map['create'] ){
 				url = 'create';
@@ -201,15 +205,22 @@ $( document ).ready( function(){
 						successful = true;
 						if( url == 'create' ){
 							$( '.classes .listing ul' ).append('<li data-id="' + map['id'] + '">' +
-								map['title'] + '<img class="delete" src="http://localhost/lab/assets/img/delete.png"><img class="edit" src="http://localhost/lab/assets/img/edit.svg"></li>');
+								map['title'] + '<img class="delete" src="assets/img/delete.png"><img class="edit" src="assets/img/edit.svg"></li>');
 						}
+						window.processing = false;
 					} else{
+						var modal = createModal( { title: "Error Saving Class", buttons : [ { value : 'Ok'} ] } );
+						setModalContent( modal, data.data.error );
+						displayModal( modal );
 						successful = false;
+						window.processing = false;
+						saveBtn.removeClass( 'processing' );
 					}
 				}
 			});
 			return successful;
 		} else{
+			saveBtn.removeClass( 'processing');
 			return false;
 		}
 	}
@@ -222,7 +233,7 @@ $( document ).ready( function(){
 		var modal = createModal({title: 'Are you sure',
 			buttons : [ {
 				value : "Delete",
-				onclick : function(){
+				onclick : function(modalId){
 					var successful = false;
 					$.ajax({
 						type : 'POST',
@@ -280,15 +291,88 @@ $( document ).ready( function(){
 		html += modalLi( 'text', 'id', 'ID', '', "Enter the class ID", false );
 		html += modalLi( 'text', 'title', 'Title', '', "Enter the class title", false );
 		html += modalLi( 'number', 'units', 'Units', 0, "Enter the class units", false );
-		html += modalLi( 'text', 'advisory', 'Advisory', '', "Enter the class advisory", false );
-		html += modalLi( 'text', 'prereq', 'Prerequisite', '', "Enter the class prerequisite", false );
 		html += modalLi( 'text', 'transfer', 'Transfer', '', "Enter the class transfer", false );
+		html += modalLi( 'text', 'advisory', 'Advisory', '', "Enter the class advisory", false, true );
+		html += modalLi( 'text', 'prereq', 'Prerequisite', '', "Enter the class prerequisite", false, true );
+		html += modalLi( 'text', 'coreq', 'Corequisite', '', "Enter the class corequisite", false, true );
 		html += modalLi( 'textarea', 'description', 'Description', '', "Enter the class Description", false );
 		html += "</ul></form>";
 		setModalContent( modal, html );
 		displayModal( modal );
 		adjustTextarea( $( modal ).find( 'textarea' )[0] );
 	} );
+
+	$( document ).on( 'click', '.modal span a.addClass', function(){
+		var input = $( this ).closest( 'li' ).find( 'input' );
+		var prevModal = $(this ).closest('.modal');
+		var id = $( prevModal ).attr( 'data-id' );
+		$.ajax({
+			type : 'POST',
+			url : 'rest/classes/listing',
+			dataType : 'json',
+			//async : false,
+			success : function( data ){
+				if( data.success ){
+					var modal = createModal({
+						title: "Choose Class",
+						buttons : [{
+							value : 'Add',
+							onclick : function( id ){
+								var that = $( '.modal[data-id=' + id + ']');
+								//$( that ).find( 'select'.val())
+								$(input ).val( $(input ).val() + '~' + $( that ).find( 'select' ).val() + '~' );
+								return true;
+							}
+						}, {
+							value : 'Cancel',
+							class : 'low'
+						}]
+					});
+					var html = '<form><ul><li><label for="class">Classes</label>' +
+						'<select name="class">';
+					for( var  i = 0; i < data.data.length; i++ ){
+						html += "<option value='" + data.data[i].id + "'>" + data.data[i].title + "</option>";
+					}
+					html += '</select><span>Pick a class to add</span></li>';
+					setModalContent( modal, html );
+					displayModal( modal );
+				}
+			}
+		});
+	});
+
+
+	/******************************************************************************/
+	/****************************certification edit********************************/
+	/******************************************************************************/
+	//init the html editors
+	$.FroalaEditor.DefineIcon('insertClass', {NAME: 'plus'});
+	$.FroalaEditor.RegisterCommand('insertClass', {
+		title: 'Insert Class',
+		focus: true,
+		undo: true,
+		refreshAfterCallback: true,
+		callback: function () {
+			this.html.insert('My New Class');
+		}
+	});
+/*
+ 'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors', 'draggable', 'emoticons', 'entities', 'file', 'fontFamily', 'fontSize',
+ 'fullscreen', 'image', 'imageManager', 'inlineStyle', 'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle', 'quickInsert',
+ 'quote', 'save', 'table', 'url', 'video', 'wordPaste'
+ */
+	$('.certs textarea.froala-editor').froalaEditor({
+		pluginsEnabled: ['align', 'codeBeautifier', 'codeView', 'colors', 'draggable', 'emoticons', 'entities', 'file', 'fontFamily', 'fontSize',
+			'fullscreen', 'image', 'imageManager', 'inlineStyle', 'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
+			'quote', 'save', 'table', 'url', 'video', 'wordPaste'],
+		toolbarButtons: [
+			'fullscreen', 'bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript', '|', 'fontFamily', 'fontSize', 'inlineStyle', 'paragraphStyle', '|',
+			'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent', 'indent','|', 'undo', 'redo', '|', 'help', 'html', '-', 'insertLink', 'insertImage', 'insertTable',
+			'|', 'specialCharacters', 'insertHR', 'clearFormatting', '|', 'help', 'html', '|', 'insertClass'
+		],
+		charCounterCount: false,
+		heightMin: 100,
+	});
 
 	//modal events
 	//$(document).on(event, selector, handler).
@@ -307,11 +391,11 @@ $( document ).ready( function(){
 		//get data for modal
 		var data = window.modals.data[id].buttons;
 		for( i = 0; i < data.length; i++ ){
-			if( data[i].name == $(this).attr('name') ){
+			if( data[i].value == $(this).attr('value') ){
 				//run the onclick
 				var cleanExit = true;
 				if( data[i].onclick ){
-					cleanExit = data[i].onclick();
+					cleanExit = data[i].onclick( id );
 				}
 				if ( cleanExit ) {
 					closeModal( $(modal) );
@@ -410,6 +494,15 @@ function closeModal( modal ){
 	});
 }
 
+
+function modalLi( type, name, label, data, text ){
+	return modalLi( type, name, label, data, text, false, false );
+}
+
+function modalLi( type, name, label, data, text, readOnly ){
+	return modalLi( type, name, label, data, text, readOnly, false );
+}
+
 /**
  * create an li for a form in the modal
  * @param type input type
@@ -420,7 +513,7 @@ function closeModal( modal ){
  * @param readOnly set if readonly
  * @returns {string}
  */
-function modalLi( type, name, label, data, text, readOnly ){
+function modalLi( type, name, label, data, text, readOnly, addClass ){
 	var html = "<li>";
 	html += "<label for='" + name + "'>" + label +"</label>";
 	if ( type == 'textarea' ) {
@@ -428,7 +521,11 @@ function modalLi( type, name, label, data, text, readOnly ){
 	} else {
 		html += "<input name='" + name + "' type='" + type + "' value='" + data + "' " + ( readOnly ? 'readonly' : '' ) + "/>";
 	}
-	html += "<span>" + text + "</span>";
+	if( addClass ) {
+		html += "<span>" + text + "<a class='addClass floatright'>+ Add Class</a></span>";
+	} else {
+		html += "<span>" + text + "</span>";
+	}
 	html += "</li>";
 
 	return html;

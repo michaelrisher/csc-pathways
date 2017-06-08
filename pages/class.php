@@ -43,6 +43,9 @@
 							if ( $row['advisory'] != null || !empty( $row['advisory'] ) ) {
 								echo '<p class="italic">Advisory: ' . $row['advisory'] . '</p>';
 							}
+							if ( $row['coreq'] != null || !empty( $row['coreq'] ) ) {
+								echo '<p class="italic">Corequisite: ' . $row['coreq'] . '</p>';
+							}
 						?>
 						<br>
 

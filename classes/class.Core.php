@@ -10,6 +10,8 @@
 		public static function queueScript( $url ) {
 			if ( file_exists( CORE_PATH . $url ) ) {
 				$GLOBALS['scriptQueue'][$url] = CORE_URL . $url . '?' . filemtime( $url );
+			} elseif( substr( $url, 0, 4 ) === "http" ) {
+				$GLOBALS['scriptQueue'][$url] = $url;
 			}
 		}
 
@@ -31,6 +33,8 @@
 		public static function queueStyle( $url ) {
 			if ( file_exists( CORE_PATH . $url ) ) {
 				$GLOBALS['styleQueue'][$url] = CORE_URL . $url . '?' . filemtime( $url );
+			} elseif( substr( $url, 0, 4 ) === "http" ) {
+				$GLOBALS['styleQueue'][$url] = $url;
 			}
 		}
 
@@ -92,7 +96,7 @@
 		 */
 		public static function sanitize( $string, $allowhtml = false, $limit_range = false ) {
 			if( gettype($string) == "array" ){
-				return Core::sanitizePost( $string );
+				return Core::sanitizePost( $string, $allowhtml, $limit_range );
 			}
 			$string = (string)$string;
 
