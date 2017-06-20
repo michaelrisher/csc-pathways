@@ -5,6 +5,8 @@
 	 * Date: 5/22/2017
 	 * Time: 12:29
 	 */
+
+	//TODO update this to new code
 	$db = new DB();
 	$mysqli = $db->createConnection();
 	$data = Core::sanitize( $data );

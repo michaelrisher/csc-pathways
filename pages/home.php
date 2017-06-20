@@ -7,11 +7,20 @@
 	 */
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 	<?php
 		include_once CORE_PATH . 'assets/inc/header.php';
 		Core::includeStyles();
+		$GLOBALS['main']->loadModule('certs');
+		$data = $GLOBALS['main']->certs->listing('category, sort');
+		$category = array();
+		foreach( $data as $item ){
+			if( !@is_array( $category[$item['category']] ) ){ //@ means suppress warning
+				$category[$item['category']] = array();
+			}
+			array_push( $category[$item['category']], $item );
+		}
 	?>
 </head>
 <body>
@@ -27,7 +36,7 @@
 		<div id="main">
 			<div id="tree">
 				<div class="aligncenter treemap">
-					<img src="<?= CORE_URL . 'assets/img/tree.png'?>"/>
+					<img src="<?= CORE_URL . 'assets/img/tree.png'?>" alt="Picture of a path to follow, top class cis 1a, bottom left class csc or cis 5, bottom right class cis 17a/b"/>
 				</div>
 				<div class="certList clearfix">
 					<div class="floatleft">
@@ -40,36 +49,22 @@
 								<td>Cert #</td>
 								<td>Units</td>
 							</tr>
-							<tr class="treeCert">
-								<td><?=Core::fakeLink( 'cert','AS650','Computer Science AD-T')?></td>
-								<td>AS650</td>
-								<td>29</td>
-							</tr>
-							<tr class="treeCert">
-								<td><?=Core::fakeLink( 'cert','CE728','Computer Programming')?></td>
-								<td>AS/CE728</td>
-								<td>26.5</td>
-							</tr>
-							<tr class="treeCert">
-								<td><?=Core::fakeLink( 'cert','CE803','C++ Programming')?></td>
-								<td>CE803</td>
-								<td>13</td>
-							</tr>
-							<tr class="treeCert">
-								<td><?=Core::fakeLink( 'cert','CE809','Java Programming')?></td>
-								<td>CE809</td>
-								<td>13</td>
-							</tr>
-							<tr class="treeCert">
-								<td><?=Core::fakeLink( 'cert','CE816','Relational Database Technology')?></td>
-								<td>CE816</td>
-								<td>12</td>
-							</tr>
-							<tr class="treeCert">
-								<td><?=Core::fakeLink( 'cert','CE806','Systems Development')?></td>
-								<td>CE806</td>
-								<td>12</td>
-							</tr>
+							<?php
+								foreach( $category[1] as $item ){
+									echo "<tr class='treeCert'>";
+									echo "<td>" . Core::fakeLink( 'cert', $item['id'], $item['description']) . "</td>";
+									echo "<td>";
+									if( $item['hasAs'] ){
+										echo 'AS/';
+									}
+									if( $item['hasCe'] ){
+										echo 'CE';
+									}
+									echo $item['code'] . "</td>";
+									echo "<td>${item['units']}</td>";
+									echo "</tr>";
+								}
+							?>
 						</table>
 					</div>
 					<div class="middleTree floatleft">
@@ -82,16 +77,22 @@
 								<td>Cert #</td>
 								<td>Units</td>
 							</tr>
-							<tr class="treeCert">
-								<td><?=Core::fakeLink( 'cert','CE810','CISCO Networking')?></td>
-								<td>CE810</td>
-								<td>16</td>
-							</tr>
-							<tr class="treeCert">
-								<td><?=Core::fakeLink( 'cert','CEXXX','Information Security')?></td>
-								<td>CEXXX</td>
-								<td>17</td>
-							</tr>
+							<?php
+								foreach( $category[2] as $item ){
+									echo "<tr class='treeCert'>";
+									echo "<td>" . Core::fakeLink( 'cert', $item['id'], $item['description']) . "</td>";
+									echo "<td>";
+									if( $item['hasAs'] ){
+										echo 'AS/';
+									}
+									if( $item['hasCe'] ){
+										echo 'CE';
+									}
+									echo $item['code'] . "</td>";
+									echo "<td>${item['units']}</td>";
+									echo "</tr>";
+								}
+							?>
 							<tr>
 								<td class="aligncenter" colspan="3"><p class="padding15Top">Checkout <br> <a href="https://www.csusb.edu/cyber-security">CSUSB CyberSecurity<br>Center</a></p></td>
 							</tr>
@@ -107,21 +108,22 @@
 								<td>Cert #</td>
 								<td>Units</td>
 							</tr>
-							<tr class="treeCert">
-								<td><?=Core::fakeLink( 'cert','CE843','Web Developer')?></td>
-								<td>CE843</td>
-								<td>17</td>
-							</tr>
-							<tr class="treeCert">
-								<td><?=Core::fakeLink( 'cert','CE820','Web Designer')?></td>
-								<td>CE820</td>
-								<td>17</td>
-							</tr>
-							<tr class="treeCert">
-								<td><?=Core::fakeLink( 'cert','CE726','Computer Applications')?></td>
-								<td>AS/CE726</td>
-								<td>32.5</td>
-							</tr>
+							<?php
+								foreach( $category[3] as $item ){
+									echo "<tr class='treeCert'>";
+									echo "<td>" . Core::fakeLink( 'cert', $item['id'], $item['description']) . "</td>";
+									echo "<td>";
+									if( $item['hasAs'] ){
+										echo 'AS/';
+									}
+									if( $item['hasCe'] ){
+										echo 'CE';
+									}
+									echo $item['code'] . "</td>";
+									echo "<td>${item['units']}</td>";
+									echo "</tr>";
+								}
+							?>
 						</table>
 					</div>
 				</div>

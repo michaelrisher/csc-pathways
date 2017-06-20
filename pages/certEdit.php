@@ -56,6 +56,17 @@
 							<span>Enter the certificate code number</span>
 						</li>
 						<li>
+							<label for="units">Units</label>
+							<input type="number" name="units" value="<?=isset( $data['units'] ) ? $data['units'] : 0?>"/>
+							<span>Enter the certificate units</span>
+						</li>
+						<li class="alignleft">
+							<label for="">Certificate or associate program</label>
+							<div><input type="checkbox" name="hasCe" <?=$data['hasCe'] == 1 ? 'checked' : ''?>/>Has a Certificate</div>
+							<div><input type="checkbox" name="hasAs" <?=$data['hasAs'] == 1 ? 'checked' : ''?>/>Has an Associate</div>
+							<span>Check if the program has a certificate and/or associate</span>
+						</li>
+						<li>
 							<label for="category">Category</label>
 							<select name="category">
 								<?php
@@ -95,7 +106,7 @@
 			</div>
 		</div>
 	</div>
-	<img id="loadOff" src="<?=CORE_URL?>assets/img/ajax-loader.gif" />
+	<?php //Core::debug( $data ) ?>
 </div>
 <?php
 	Core::queueScript( 'assets/js/core.js');

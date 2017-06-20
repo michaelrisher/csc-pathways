@@ -23,14 +23,18 @@ $( document ).ready( function(){
 			scrollTop: $( idLocation ).offset().top
 		}, 500);
 
-		var url = loc == 'cert' ? ( 'assets/inc/' + loc + '/' + goto + '.php' ): ( loc + '/' + goto );
+		//var url = loc == 'cert' ? ( 'assets/inc/' + loc + '/' + goto + '.php' ): ( loc + '/' + goto );
 		//var url = 'assets/inc/' + loc + '/' + goto + '.php'
+		var url = loc + '/' + goto;
 		$.ajax( {
 			url: url,
 			type: 'GET',
 			success: function ( data ) {
 				$( idLocation ).html( data );
 				$( idLocation ).css( 'height', '' );
+				$('html, body').animate({ //update scroll once ajax finishes
+					scrollTop: $( idLocation ).offset().top
+				}, 500);
 			},
 			fail: function( data ){
 				failedAjax( idLocation );
@@ -352,15 +356,17 @@ $( document ).ready( function(){
 		tinyMCE.init({
 			mode : "textareas",
 			branding : false,
-			plugins: "table, lists, code",
+			plugins: "table, lists, code, autoresize",
 			toolbar: 'undo redo | bold italic underline subscript superscript | fontselect fontsizeselect | alignleft aligncenter alignright alignjustify formatselect table ' +
-			' bullist addclass | code',
+			' bullist | addclass shortClass scheduleTable | code',
 			menubar : false,
 			setup: function (editor) {
 				editor.addButton( 'addclass', {
 					text: 'Add Class',
 					icon: false,
+					tooltip: 'Insert a link to a class',
 					onclick: function () {
+						//TODO cache this less ajaxing
 						var classText = '';
 						$.ajax({
 							type : 'POST',
@@ -376,7 +382,7 @@ $( document ).ready( function(){
 											onclick : function( id ){
 												var that = $( '.modal[data-id=' + id + ']');
 												var val = $( that ).find( 'select' ).val();
-												var classCode = $( 'option[value=' + val + ']', that ).html().match( /[a-zA-Z]{3}\-\d{1,4}/ )[0];
+												var classCode = $( 'option[value=' + val + ']', that ).html().match( /[a-zA-Z]{3}\-\d{1,4}[a-zA-Z]*/ )[0];
 												editor.insertContent( '[class id="' + $( that ).find( 'select' ).val() + '" text="' + classCode + '" /]' );
 												return true;
 											}
@@ -405,15 +411,80 @@ $( document ).ready( function(){
 
 						function failedAjax(){
 							var modal = createModal({title: 'Failed to Load', buttons: [{value : 'Ok'}]});
-							setModalContent( modal, "<p>Failed to load classes. Please try again</p><p>If the problem persits contact the administrator</p>" );
+							setModalContent( modal, "<p>Failed to load classes. Please try again</p><p>If the problem persists contact the administrator</p>" );
 							displayModal( modal );
 						}
+					}
+				} );
+				editor.addButton( 'scheduleTable', {
+					text: 'Schedule Table',
+					icon: false,
+					tooltip: 'Create a table to plan classes',
+					onclick: function () {
+						var str = "<table>" +
+						"<tr><td>Year</td><td>Summer</td><td>Fall</td><td>Winter</td><td>Spring</td></tr>" +
+						"<tr><td>Year 1</td><td></td><td></td><td></td><td></td></tr>" +
+						"</table>";
+						editor.insertContent( str );
+					}
+				} );
+				editor.addButton( 'shortClass', {
+					text: '8 week class',
+					tooltip: 'Add the 8 week class text',
+					icon: false,
+					onclick: function () {
+						var str = "<span>8 Week Classes</span>";
+						editor.insertContent( str );
 					}
 				} );
 			}
 		});
 	} catch( ignore ){}
 
+	/******************************************************************************/
+	/***************************certification delete*******************************/
+	/******************************************************************************/
+	$( document ).on( 'click', '#main .certs li img.delete', function(){
+		var id = $( this ).closest( 'li' ).attr( 'data-id' );
+
+		var modal = createModal({title: 'Are you sure',
+			buttons : [ {
+				value : "Delete",
+				onclick : function(modalId){
+					var successful = false;
+					$.ajax({
+						type : 'POST',
+						url : 'rest/certs/delete/',
+						data : {
+							id : id
+						},
+						dataType : 'json',
+						async : false,
+						success : function( data ){
+							if( data.success ){
+								var modal = createModal( { title: "Certificate Deleted Successfully", buttons : [ { value : 'Ok'} ] } );
+								setModalContent( modal, data.data.msg );
+								displayModal( modal );
+								successful = true;
+								var that = $( '.certs .listing li[data-id=' + id + ']' );
+								that.slideUp( 400, function(){
+									that.remove();
+								});
+							} else {
+								successful = false;
+							}
+						}
+					});
+					return successful;
+				}
+			},{
+				value : "Cancel",
+				class : "low"
+			} ] } );
+
+		setModalContent( modal, "<p>Are you sure you want to delete. This can not be undone</p>");
+		displayModal( modal );
+	} );
 
 	/******************************************************************************/
 	/****************************certification save********************************/
@@ -426,6 +497,11 @@ $( document ).ready( function(){
 		jQuery.each( data, function ( i, field ) {
 			map[field.name] = field.value;
 		} ); //get form data for verify
+		//get the html edit values
+		map.description = tinymce.get( 'description' ).getContent();
+		map.elo = tinymce.get( 'elo' ).getContent();
+		map.schedule = tinymce.get( 'schedule' ).getContent();
+
 		//remove errors
 		$( 'li', form ).each(function( i, elem ){
 			$(elem ).removeClass('error');
@@ -460,11 +536,6 @@ $( document ).ready( function(){
 			hasError = true;
 		}
 
-		//get the html edit values
-		map.description = tinymce.get( 'description' ).getContent();
-		map.elo = tinymce.get( 'elo' ).getContent();
-		map.schedule = tinymce.get( 'schedule' ).getContent();
-
 		if( !hasError ){
 			//ajax login
 			$.ajax({
@@ -474,9 +545,16 @@ $( document ).ready( function(){
 				data : map,
 				success : function( data ){
 					console.log( data );
-					//if( data.success ){
-					//	location.href = data.data.redirect;
-					//} else {
+					if( data.success ){
+						var modal = createModal( {
+							title: 'Saved Successfully',
+							buttons : [
+								{ value : 'Finished', onclick : function(){ location.href = CORE_URL + 'editCerts'} },
+								{ value:'Edit Again', class: 'low' }
+							] } );
+						setModalContent( modal, data.data.msg );
+						displayModal( modal, true );
+					} else {}
 					//	var modal = createModal( { title: 'Log in failed', buttons : [{ value : 'Ok' }] } );
 					//	setModalContent( modal, data.data.error );
 					//	displayModal( modal, true )

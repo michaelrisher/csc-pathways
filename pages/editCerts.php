@@ -56,7 +56,9 @@
 					</ul>
 				</div>
 				<div class="margin25Top">
-					<input type="button" value="Create Certificate" name="createCert"/>
+					<a href="<?=CORE_URL?>certs/create">
+						<input type="button" value="Create Certificate" name="createCert"/>
+					</a>
 				</div>
 			</div>
 		</div>
