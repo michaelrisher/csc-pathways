@@ -397,6 +397,11 @@ body {
   border: 1px dotted black;
   padding: 5px;
 }
+#wrapper #main #cert table td > table td,
+#wrapper #main #class table td > table td {
+  border: none !important;
+  padding: 0 !important;
+}
 #wrapper #main #class a {
   display: inline;
 }
@@ -459,13 +464,13 @@ body {
   background: #c1cad3;
   height: 14px;
   padding: 2px 5px 2px 5px;
-  color: #8d8c8c;
+  color: #4e4e4e;
   font-size: 14px;
   overflow: hidden;
   font-family: Arial, Helvetica, sans-serif;
 }
 #wrapper #main .login form ul li > span {
-  background: #a2aab2;
+  background: #4e4e4e;
   display: block;
   padding: 3px;
   margin: 0 -9px -9px -9px;
@@ -548,6 +553,10 @@ body {
 #wrapper #main .admin .certs li:last-child {
   border-bottom: 1px solid #000000;
 }
+#wrapper #main .admin .classes li:nth-child(even),
+#wrapper #main .admin .certs li:nth-child(even) {
+  background: #b1bcc7;
+}
 #wrapper #main .admin .classes li img,
 #wrapper #main .admin .certs li img {
   cursor: pointer;
@@ -601,13 +610,13 @@ body {
   background: #c1cad3;
   height: 14px;
   padding: 2px 5px 2px 5px;
-  color: #8d8c8c;
+  color: #4e4e4e;
   font-size: 14px;
   overflow: hidden;
   font-family: Arial, Helvetica, sans-serif;
 }
 #wrapper #main .admin .certs form ul li > span {
-  background: #a2aab2;
+  background: #4e4e4e;
   display: block;
   padding: 3px;
   margin: 0 -9px -9px -9px;
@@ -748,7 +757,7 @@ input[type="button"].processing {
 .modalWrapper form ul li {
   display: block;
   padding: 9px;
-  border: 1px solid #ddd;
+  border: 1px solid #4e4e4e;
   margin-bottom: 30px;
   border-radius: 3px;
 }
@@ -765,13 +774,13 @@ input[type="button"].processing {
   background: #fff;
   height: 14px;
   padding: 2px 5px 2px 5px;
-  color: #b9b9b9;
+  color: #4e4e4e;
   font-size: 14px;
   overflow: hidden;
   font-family: Arial, Helvetica, sans-serif;
 }
 .modalWrapper form ul li > span {
-  background: #f3f3f3;
+  background: #4e4e4e;
   display: block;
   padding: 3px;
   margin: 0 -9px -9px -9px;
@@ -809,7 +818,7 @@ input[type="button"].processing {
   max-height: 365px;
 }
 .modalWrapper a {
-  color: #0000ee /* browser's internal value */;
+  color: #20c5f7;
   text-decoration: underline;
   cursor: pointer;
 }

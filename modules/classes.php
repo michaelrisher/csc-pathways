@@ -8,10 +8,16 @@
 	 */
 	class classes extends Main{
 
+		/**
+		 * get a simple listing of classes only id and title are returned
+		 * only allowed if the user is admin
+		 * @param int $page not used yet
+		 * @return array
+		 */
 		public function listing( $page = 1 ){
 			$this->loadModule( 'users' );
 			if( $this->users->isLoggedIn() ) {
-				$query = "SELECT * FROM classes ORDER BY id";//remove limit for a time LIMIT $page,50
+				$query = "SELECT * FROM classes ORDER BY sort";//remove limit for a time LIMIT $page,50
 
 				if ( !$result = $this->db->query( $query ) ) {
 					echo( 'There was an error running the query [' . $this->db->error . ']' );
@@ -30,6 +36,15 @@
 			}
 		}
 
+		/**
+		 * get the data from the database for a class
+		 * only allowed if the user is admin
+		 * echos json if ajaxed
+		 * returns an array if forced to return
+		 * @param $id string id of the class
+		 * @param bool|false $forceReturn force a return if the get is not called through ajax
+		 * @return array|void array if forceReturn is true echos echos json otherwise
+		 */
 		public function get( $id, $forceReturn = false ){
 			$this->loadModule( 'users' );
 			if( $this->users->isLoggedIn() ) {
@@ -62,6 +77,10 @@
 			}
 		}
 
+		/**
+		 * save a class from the admin page
+		 * only allowed if the user is admin
+		 */
 		public function save(){
 			$this->loadModule( 'users' );
 			$this->loadModule( 'audit' );
@@ -108,7 +127,10 @@
 			}
 		}
 
-
+		/**
+		 * delete a class from the admin page
+		 * only allowed if the user is admin
+		 */
 		public function delete(){
 			$this->loadModule( 'users' );
 			$this->loadModule( 'audit' );
@@ -139,6 +161,10 @@
 			}
 		}
 
+		/**
+		 * Create a class from the admin page
+		 * only allowed if the user is admin
+		 */
 		public function create(){
 			$this->loadModule( 'users' );
 			$this->loadModule( 'audit' );
@@ -183,5 +209,25 @@
 				$obj['error'] = "Session expired.<br>Please log in again";
 				echo Core::ajaxResponse( $obj, false );
 			}
+		}
+
+		/**
+		 * adding a sort column keeping for future reference
+		 * @deprecated
+		 */
+		private function update(){
+			$classes = $this->listing();
+			foreach ( $classes as $class ) {
+				$data = $this->get( $class['id'] );
+				$code = explode( ' - ', $data['title'] )[0];
+				$code = preg_replace( '/\D/', '', $code );
+
+				$statement = $this->db->prepare("UPDATE classes SET sort=? WHERE id=?");
+				$statement->bind_param( "is", $code, $data['id'] );
+				if( $statement->execute() ){
+					echo $data['title'] . ' sort updated ' . $code . '<br>';
+				}
+			}
+
 		}
 	}

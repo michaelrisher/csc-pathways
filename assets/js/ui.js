@@ -357,6 +357,7 @@ $( document ).ready( function(){
 			mode : "textareas",
 			branding : false,
 			plugins: "table, lists, code, autoresize",
+			autoresize_max_height: 600,
 			toolbar: 'undo redo | bold italic underline subscript superscript | fontselect fontsizeselect | alignleft aligncenter alignright alignjustify formatselect table ' +
 			' bullist | addclass shortClass scheduleTable | code',
 			menubar : false,
@@ -366,53 +367,26 @@ $( document ).ready( function(){
 					icon: false,
 					tooltip: 'Insert a link to a class',
 					onclick: function () {
-						//TODO cache this less ajaxing
 						var classText = '';
-						$.ajax({
-							type : 'POST',
-							url : CORE_URL + '/rest/classes/listing',
-							dataType : 'json',
-							async : false,
-							success : function( data ){
-								if( data.success ){
-									var modal = createModal({
-										title: "Choose Class",
-										buttons : [{
-											value : 'Add',
-											onclick : function( id ){
-												var that = $( '.modal[data-id=' + id + ']');
-												var val = $( that ).find( 'select' ).val();
-												var classCode = $( 'option[value=' + val + ']', that ).html().match( /[a-zA-Z]{3}\-\d{1,4}[a-zA-Z]*/ )[0];
-												editor.insertContent( '[class id="' + $( that ).find( 'select' ).val() + '" text="' + classCode + '" /]' );
-												return true;
-											}
-										}, {
-											value : 'Cancel',
-											class : 'low'
-										}]
-									});
-									var html = '<form><ul><li><label for="class">Classes</label>' +
-										'<select name="class">';
-									for( var  i = 0; i < data.data.length; i++ ){
-										html += "<option value='" + data.data[i].id + "'>" + data.data[i].title + "</option>";
-									}
-									html += '</select><span>Pick a class to add</span></li>';
-									setModalContent( modal, html );
-									displayModal( modal );
-								}
-							},
-							fail: function( data ){
-								failedAjax();
-							},
-							error: function( data ){
-								failedAjax();
+						if( getStorage( "invalidateCache" ) && getStorage( 'classes' ) ){
+							var time = parseInt( getStorage( "invalidateCache" ) );
+							var curr = + new Date(); //gives unix time
+							if( curr >= time ){
+								delete localStorage.classes;
 							}
-						});
-
-						function failedAjax(){
-							var modal = createModal({title: 'Failed to Load', buttons: [{value : 'Ok'}]});
-							setModalContent( modal, "<p>Failed to load classes. Please try again</p><p>If the problem persists contact the administrator</p>" );
-							displayModal( modal );
+						}
+						if( ( data = getStorageJSON( 'classes' ) ) != null ){
+							loadClassModal( data );
+						} else{
+							requestClassListing( function( data ){
+								if( data.success ){
+									//store classes in cache
+									setStorageJSON( 'classes', data.data );
+									var t = + new Date(); //gives unix time
+									setStorage( 'invalidateCache', ( t + ( 5 * 60 * 1000 ) ) );
+									loadClassModal( data.data );
+								}
+							} );
 						}
 					}
 				} );
@@ -433,10 +407,81 @@ $( document ).ready( function(){
 					tooltip: 'Add the 8 week class text',
 					icon: false,
 					onclick: function () {
-						var str = "<span>8 Week Classes</span>";
+						var str = "<table><tr><td colspan='2' style='text-align: center;'>8 Week Classes</td></tr>" +
+							'<tr><td>class1</td><td style="text-align: right;">class2</td></table>';
 						editor.insertContent( str );
 					}
 				} );
+
+
+				//function for class listing request
+				//onSuccess is the callback function to the success
+				function requestClassListing( onSuccess ){
+					$.ajax({
+						type : 'POST',
+						url : CORE_URL + '/rest/classes/listing',
+						dataType : 'json',
+						async : false,
+						success : function( data ){
+							onSuccess( data );
+						},
+						fail: function( data ){
+							failedAjax();
+						},
+						error: function( data ){
+							failedAjax();
+						}
+					});
+				}
+
+				//still in setup function for editor
+				function loadClassModal( data, is8Week ){
+					if( is8Week == undefined ) { is8Week = false;}
+					//this either uses the cached copy of the classes or requests it from the network
+					//will re-validate the cached copy every 5 minutes or after when you save the page
+					var modal = createModal({
+						title: "Choose Class",
+						buttons : [{
+							value : 'Add',
+							onclick : function( id ){
+								var that = $( '.modal[data-id=' + id + ']');
+								var val = $( that ).find( 'select' ).val();
+								var classCode = $( 'option[value=' + val + ']', that ).html().match( /[a-zA-Z]{3}\-\d{1,4}[a-zA-Z]*/ )[0];
+								var float = $('input[name=float]:checked', that ).val();
+								if( float ){
+									editor.insertContent( '[class f="'+float.substr(0,1) + '" id="' + $( that ).find( 'select' ).val() + '" text="' + classCode + '" /]' );
+								}else {
+									editor.insertContent( '[class id="' + $( that ).find( 'select' ).val() + '" text="' + classCode + '" /]' );
+								}
+								return true;
+							}
+						}, {
+							value : 'Cancel',
+							class : 'low'
+						}]
+					});
+					var html = '<form><ul><li><label for="class">Classes</label>' +
+						'<select name="class">';
+					for( var  i = 0; i < data.length; i++ ){
+						html += "<option value='" + data[i].id + "'>" + data[i].title + "</option>";
+					}
+					html += '</select><span>Pick a class to add</span></li>';
+					if( is8Week ) {
+						html += '<li><label>8 Week Alignment</label>' +
+							'<div><input type="radio" name="float" value="left"/>Left Side</div>' +
+							'<div><input type="radio" name="float" value="right"/>Right Side</div>' +
+							'<span>Only check if making an 8 week class</span></li>';
+					}
+					html += '</ul></form>';
+					setModalContent( modal, html );
+					displayModal( modal );
+				}
+
+				function failedAjax(){
+					var modal = createModal({title: 'Failed to Load', buttons: [{value : 'Ok'}]});
+					setModalContent( modal, "<p>Failed to load classes. Please try again</p><p>If the problem persists contact the administrator</p>" );
+					displayModal( modal );
+				}
 			}
 		});
 	} catch( ignore ){}
@@ -521,7 +566,7 @@ $( document ).ready( function(){
 			hasError = true;
 		}
 		if ( map['description'].length == 0 ) {
-			scrollTo = $( form ).find( 'textarea[name=descriptio]' ).closest( 'li' );
+			scrollTo = $( form ).find( 'textarea[name=description]' ).closest( 'li' );
 			scrollTo.addClass( 'error' );
 			hasError = true;
 		}
@@ -737,4 +782,38 @@ function readCookie(name) {
 		if (c.indexOf(cookiename) == 0) return decodeURIComponent( c.substring(cookiename.length,c.length) );
 	}
 	return null;
+}
+
+function setStorageJSON( key, data ){
+	if (typeof(Storage) !== "undefined") {
+		localStorage.setItem( key, JSON.stringify( data ) );
+		return true;
+	} else {
+		return false;
+	}
+}
+
+function getStorageJSON( key ){
+	if (typeof(Storage) !== "undefined") {
+		return JSON.parse( localStorage.getItem( key ) );
+	} else {
+		return false;
+	}
+}
+
+function setStorage( key, data ){
+	if (typeof(Storage) !== "undefined") {
+		localStorage.setItem( key, ( data ) );
+		return true;
+	} else {
+		return false;
+	}
+}
+
+function getStorage( key ){
+	if (typeof(Storage) !== "undefined") {
+		return localStorage.getItem( key );
+	} else {
+		return false;
+	}
 }

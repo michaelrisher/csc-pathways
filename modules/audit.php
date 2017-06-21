@@ -7,16 +7,11 @@
 	 * Time: 14:12
 	 */
 	class audit extends Main{
-		public function newEvent( $event ){
-			$this->loadModule('users');
-			if( $this->users->isLoggedIn() ){
-				$statement = $this->db->prepare("INSERT INTO audit( user, event) VALUES (?,?)");
-				$statement->bind_param( "is", $_SESSION['session']['id'], $event );
-				$statement->execute();
-			}
-		}
-
-
+		/**
+		 * get a full listing of the db
+		 * @param int $page not used yet
+		 * @return array
+		 */
 		public function listing( $page = 1 ){
 			$this->loadModule( 'users' );
 			if( $this->users->isLoggedIn() ) {
@@ -36,6 +31,19 @@
 					array_push( $return, $a );
 				}
 				return $return;
+			}
+		}
+
+		/**
+		 * create a new event in the audit log
+		 * @param $event
+		 */
+		public function newEvent( $event ){
+			$this->loadModule('users');
+			if( $this->users->isLoggedIn() ){
+				$statement = $this->db->prepare("INSERT INTO audit( user, event) VALUES (?,?)");
+				$statement->bind_param( "is", $_SESSION['session']['id'], $event );
+				$statement->execute();
 			}
 		}
 	}

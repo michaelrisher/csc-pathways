@@ -7,36 +7,43 @@
 	 * Time: 12:22
 	 */
 	class certs extends Main {
+		/**
+		 * get a simple-ish listing of the certificate
+		 * @param string $order any custom sort you want to run with the query
+		 * @return array
+		 */
 		public function listing( $order = 'id' ) {
-//			$this->loadModule( 'users' );
-//			if ( $this->users->isLoggedIn() ) {
-				$query = "SELECT * FROM certificateList ORDER BY $order";//remove limit for a time LIMIT $page,50
+			$query = "SELECT * FROM certificateList ORDER BY $order";//remove limit for a time LIMIT $page,50
 
-				if ( !$result = $this->db->query( $query ) ) {
-					echo( 'There was an error running the query [' . $this->db->error . ']' );
-				}
+			if ( !$result = $this->db->query( $query ) ) {
+				echo( 'There was an error running the query [' . $this->db->error . ']' );
+			}
 
-				$return = array();
-				while ( $row = $result->fetch_assoc() ) {
-					$a = array(
-						'id' => $row['id'],
-						'code' => $row['code'],
-						'description' => $row['description'],
-						'category' => $row['category'],
-						'hasAs' => $row['hasAs'],
-						'hasCe' => $row['hasCe'],
-						'units' => $row['units'],
-						'sort' => $row['sort'],
-					);
-					array_push( $return, $a );
-				}
-				if ( IS_AJAX ) {
-					echo Core::ajaxResponse( $return );
-				}
-				return $return;
-//			}
+			$return = array();
+			while ( $row = $result->fetch_assoc() ) {
+				$a = array(
+					'id' => $row['id'],
+					'code' => $row['code'],
+					'description' => $row['description'],
+					'category' => $row['category'],
+					'hasAs' => $row['hasAs'],
+					'hasCe' => $row['hasCe'],
+					'units' => $row['units'],
+					'sort' => $row['sort'],
+				);
+				array_push( $return, $a );
+			}
+			if ( IS_AJAX ) {
+				echo Core::ajaxResponse( $return );
+			}
+			return $return;
 		}
 
+		/**
+		 * edit cert action from the admin page
+		 * only allowed if the user is admin
+		 * @param $id
+		 */
 		public function edit( $id ) {
 			$this->loadModule( 'users' );
 			if ( $this->users->isLoggedIn() ) {
@@ -52,45 +59,54 @@
 		}
 
 
+		/**
+		 * get a specific cert from an id
+		 * echos JSON to the user
+		 * returns an array if forceReturn is true
+		 * @param $id int id which is not the three digit code
+		 * @param bool|false $forceReturn forces a array return
+		 * @return array|null
+		 */
 		public function get( $id, $forceReturn = false ) {
 			$this->loadModule( 'users' );
-//			if ( $this->users->isLoggedIn() ) {  //guests should be able to get
-				$query = <<<EOD
+			$query = <<<EOD
 SELECT
-    certificateList.id,
-    certificateList.code,
-    certificateList.hasAs,
-    certificateList.hasCe,
-    certificateList.units,
-    certificateList.category,
-    certificateList.description AS title,
-    certificateList.sort,
-    certificateData.description,
-    certificateData.elo,
-    certificateData.schedule
+certificateList.id,
+certificateList.code,
+certificateList.hasAs,
+certificateList.hasCe,
+certificateList.units,
+certificateList.category,
+certificateList.description AS title,
+certificateList.sort,
+certificateData.description,
+certificateData.elo,
+certificateData.schedule
 FROM
-    `certificateList`
+certificateList
 INNER JOIN enumCategories ON certificateList.category = enumCategories.id
 INNER JOIN certificateData ON certificateList.id = certificateData.cert
 WHERE certificateList.id = ${id}
 EOD;
-				if ( !$result = $this->db->query( $query ) ) {
-					echo Core::ajaxResponse( array( 'error' => "An error occurred please try again" ), false );
-					return null;
-				}
-				$row = $result->fetch_assoc();
-				$return = $row;
+			if ( !$result = $this->db->query( $query ) ) {
+				echo Core::ajaxResponse( array( 'error' => "An error occurred please try again" ), false );
+				return null;
+			}
+			$row = $result->fetch_assoc();
+			$return = $row;
 
-				if ( IS_AJAX && !$forceReturn ) {
-					echo Core::ajaxResponse( $return );
-				} else {
-					return $return;
-				}
-//			} else {
-//				echo Core::ajaxResponse( array( 'error' => 'Session expired.<br>Please log in again' ), false );
-//			}
+			if ( IS_AJAX && !$forceReturn ) {
+				echo Core::ajaxResponse( $return );
+			} else {
+				return $return;
+			}
 		}
 
+		/**
+		 * get a listing of all the categories
+		 * only allowed if the user is admin
+		 * @return array
+		 */
 		public function listCategories(){
 			$this->loadModule( 'users' );
 			if ( $this->users->isLoggedIn() ) {
@@ -115,6 +131,11 @@ EOD;
 			}
 		}
 
+		/**
+		 * save from the admin page
+		 * only allowed if the user is admin
+		 * @param $id
+		 */
 		public function save( $id ) {
 			$this->loadModule( 'users' );
 			$obj = array();
@@ -128,21 +149,23 @@ EOD;
 				$_POST['description'] = core::sanitize( $_POST['description'], true );
 				$_POST['elo'] = core::sanitize( $_POST['elo'], true );
 				$_POST['schedule'] = core::sanitize( $_POST['schedule'], true );
+				$_POST['sort'] = core::sanitize( $_POST['sort'] );
 				$hasCe = isset( $_POST['hasCe'] ) ? 1 : 0; //js returns something like hasCe=on if its on else its not set
 				$hasAs = isset( $_POST['hasAs'] ) ? 1 : 0; //js returns something like hasCe=on if its on else its not set
 
 
-				//seperate the two tables data
+				//separate the two tables data
 				$query = <<<EOD
-INSERT INTO certificateList (id, code, hasAs, hasCe, category, units, description)
-VALUES (?,?,?,?,?,?,?)
+INSERT INTO certificateList (id, code, hasAs, hasCe, category, units, description, sort)
+VALUES (?,?,?,?,?,?,?,?)
 ON DUPLICATE KEY UPDATE
 code = VALUES( code ),
 hasAs = VALUES( hasAs ),
 hasCe = VALUES( hasCe ),
 category = VALUES( category ),
 units = VALUES( units ),
-description = VALUES( description )
+description = VALUES( description ),
+sort = VALUES( sort )
 EOD;
 				$queryData = <<<EOD
 INSERT INTO certificateData (cert, description, elo, schedule )
@@ -154,7 +177,7 @@ schedule = VALUES( schedule )
 EOD;
 				//cert list update statement
 				$statement = $this->db->prepare($query);
-				$statement->bind_param( 'isiiiis', $id, $_POST['code'], $hasAs, $hasCe, $_POST['category'], $_POST['units'], $_POST['title'] );
+				$statement->bind_param( 'isiiiisi', $id, $_POST['code'], $hasAs, $hasCe, $_POST['category'], $_POST['units'], $_POST['title'], $_POST['sort'] );
 				//cert data update statement
 				$statementData = $this->db->prepare($queryData);
 				$statementData->bind_param( 'isss', $id, $_POST['description'], $_POST['elo'], $_POST['schedule'] );
@@ -172,6 +195,10 @@ EOD;
 			}
 		}
 
+		/**
+		 * create from the admin page
+		 * only allowed if the user is admin
+		 */
 		public function create(){
 			Core::queueStyle( 'assets/css/reset.css' );
 			Core::queueStyle( 'assets/css/ui.css' );
@@ -193,12 +220,19 @@ EOD;
 					'description' => '',
 					'elo' => '',
 					'schedule' => '',
+					'sort' => 0,
 					'categories' => $this->listCategories()
 				);
 			}
+			$result->close();
 			include( CORE_PATH . 'pages/certEdit.php' );
 		}
 
+		/**
+		 * delete a cert from the admin page
+		 * only allowed if the user is admin
+		 * @param $id
+		 */
 		public function delete( $id ){
 			$this->loadModule( 'users' );
 			$this->loadModule( 'audit' );
@@ -211,7 +245,7 @@ EOD;
 					$event = $_POST['id'];
 				}
 				$row = $result->fetch_assoc();
-				$event = $row['title'];
+				$event = $row['description'];
 
 				$statement = $this->db->prepare("DELETE FROM certificateList WHERE id=?");
 				$statement->bind_param( "s", $_POST['id']);
@@ -225,6 +259,9 @@ EOD;
 					$obj['error'] = $statement->error;
 					echo Core::ajaxResponse( $obj, false );
 				}
+				$result->close();
+				$statement->close();
+				$statementData->close();
 			} else{
 				$obj['error'] = "Session expired.<br>Please log in again";
 				echo Core::ajaxResponse( $obj, false );
