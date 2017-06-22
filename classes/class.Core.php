@@ -144,6 +144,16 @@
 			return sha1( $str );
 		}
 
+		public static function userFriendlyId( $len ){
+			$string = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ123456789";
+			$size = strlen( $string ) - 1;
+			$result = '';
+			for( $i = 0; $i < $len; $i++ ){
+				$result .= $string[rand(0, $size )];
+			}
+			return $result;
+		}
+
 		/**
 		 * Give data to turn into a json response
 		 * @param $data
@@ -186,5 +196,17 @@
 
 		public static function createTimer( $time ){
 			return "<span class='timer' data-time='$time'>$time</span>";
+		}
+
+		/**
+		 * parse the class link from the html editor into a link for user
+		 * @param $string
+		 * @return mixed
+		 */
+		public static function replaceClassLink( $string ){
+			return preg_replace( '/\[class\s*id=[\'|\"](.+?)[\'|\"]\s*text=[\'|\"](.+?)[\'|\"]\s*\/\]/',
+				"<a class='fakeLink' data-to='class' data-code='$1'>$2</a>",
+				$string
+			);//regex to match the link string
 		}
 	}

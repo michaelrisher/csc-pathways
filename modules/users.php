@@ -6,8 +6,205 @@
 	 * Time: 11:05
 	 */
 	class users extends Main{
+
+		public function listing( $order = 'username' ){
+			if( $this->isAdmin() ){
+				$query = "SELECT * FROM users ORDER BY " . $order;//remove limit for a time LIMIT $page,50
+
+				if ( !$result = $this->db->query( $query ) ) {
+					echo( 'There was an error running the query [' . $this->db->error . ']' );
+				}
+
+				$return = array();
+				while ( $row = $result->fetch_assoc() ) {
+					$a = array(
+						'id' => $row['id'],
+						'username' => $row['username']
+					);
+					array_push( $return, $a );
+				}
+				if( IS_AJAX ){ echo Core::ajaxResponse( $return ); }
+				return $return;
+			}
+		}
+
 		/**
-		 * hass the password and the username check the database and login
+		 * get the data from the database for a class
+		 * only allowed if the user is admin
+		 * echos json if ajaxed
+		 * returns an array if forced to return
+		 * @param $id string id of the class
+		 * @param bool|false $forceReturn force a return if the get is not called through ajax
+		 * @return array|void array if forceReturn is true echos echos json otherwise
+		 */
+		public function get( $id, $forceReturn = false ){
+			$this->loadModule( 'users' );
+			if( $this->users->isAdmin() ) {
+				$query = "SELECT * FROM users WHERE id = '$id'";
+
+				if ( !$result = $this->db->query( $query ) ) {
+					echo Core::ajaxResponse( array( 'error' => "An error occurred please try again" ), false );
+					return;
+				}
+				$row = $result->fetch_assoc();
+				$return = array(
+					'id' => $row['id'],
+					'username' => $row['username'],
+					'isAdmin' => $row['isAdmin'],
+					'active' => $row['active']
+				);
+
+				if ( IS_AJAX  && !$forceReturn) {
+					echo Core::ajaxResponse( $return );
+				} else {
+					return $return;
+				}
+			} else {
+				echo Core::ajaxResponse( array( 'error' => 'Session expired.<br>Please log in again'), false );
+			}
+		}
+
+		/**
+		 * save a class from the admin page
+		 * only allowed if the user is admin
+		 */
+		public function save(){
+			$this->loadModule( 'audit' );
+			$obj = array();
+			$_POST = Core::sanitize( $_POST, true );
+			if( isset( $_POST['create'] ) && $_POST['create'] == 'create' ){
+				$this->create( $_POST );
+				return; //to break out before other stuff is done
+			}
+			if( $this->isAdmin() ) {
+				$statement = $this->db->prepare("UPDATE users SET username=?, isAdmin=?, active=? WHERE id=?");
+				$statement->bind_param( "siii", $_POST['username'], $_POST['isAdmin'], $_POST['active'], $_POST['id']);
+				if( $statement->execute() ){
+					$obj['msg'] = "Saved successfully.";
+					$this->audit->newEvent( "Updated User: " . $_POST['username'] );
+					echo Core::ajaxResponse( $obj );
+				} else{
+					$obj['error'] = $statement->error;
+					echo Core::ajaxResponse( $obj, false );
+				}
+			} else{
+				$obj['error'] = "Session expired.<br>Please log in again";
+				echo Core::ajaxResponse( $obj, false );
+			}
+		}
+
+		/**
+		 * get the next unused id in the table
+		 */
+		private function create( $data ){
+			if( $this->isAdmin() ) {
+				$query = "SHOW TABLE STATUS LIKE 'users'";
+				$id = -1;
+				if ( !$result = $this->db->query( $query ) ) {
+					die( 'There was an error running the query [' . $this->db->error . ']' );
+				}
+				$row = null;
+				if ( $result->num_rows ) {
+					$row = $result->fetch_assoc();
+					$id = $row['Auto_increment'];
+				}
+				$result->close();
+
+			}
+		}
+
+		/**
+		 * delete a class from the admin page
+		 * only allowed if the user is admin
+		 */
+		public function delete(){
+			$this->loadModule( 'audit' );
+			$obj = array();
+			$_POST = Core::sanitize( $_POST, true );
+			if( $this->isAdmin() ) {
+				$query = "SELECT username FROM users WHERE id = '${_POST['id']}'";
+				$event = '';
+				if ( !$result = $this->db->query( $query ) ) {
+					$event = $_POST['id'];
+				}
+				$row = $result->fetch_assoc();
+				$event = $row['username'];
+
+				$statement = $this->db->prepare("DELETE FROM users WHERE id=?");
+				$statement->bind_param( "s", $_POST['id']);
+				if( $statement->execute() ){
+					$obj['msg'] = "Deleted successfully.";
+					$this->audit->newEvent( "Deleted user: " . $event );
+					echo Core::ajaxResponse( $obj );
+				} else{
+					$obj['error'] = $statement->error;
+					echo Core::ajaxResponse( $obj, false );
+				}
+			} else{
+				$obj['error'] = "Session expired.<br>Please log in again";
+				echo Core::ajaxResponse( $obj, false );
+			}
+		}
+
+		/**
+		 * create a reset password token
+		 * @param $id
+		 */
+		public function createResetPassword( $id ){
+			//TODO should we set active = 0 when we do this????
+			$this->loadModule( 'audit' );
+			if( $this->isAdmin() ) {
+				$id = Core::sanitize( $id );
+				//create the token
+				$token = Core::userFriendlyId( 15 );
+				$statement = $this->db->prepare("INSERT INTO tokens(token, forUser, byUser) VALUES (?,?,?)");
+				$statement->bind_param( "sii", $token, $id, $_SESSION['session']['id'] );
+				if( $statement->execute() ){
+					$obj['msg'] = "Give the user this link so they can set their password<br>";
+					$obj['msg'] .= CORE_URL . 'users/resetpassword&token=' . $token;
+					$this->audit->newEvent( "Reset User: " . $_POST['username'] . ' made by ' . $_SESSION['session']['username'] );
+					echo Core::ajaxResponse( $obj );
+				} else{
+					$obj['error'] = $statement->error;
+					echo Core::ajaxResponse( $obj, false );
+				}
+			}
+		}
+
+		/**
+		 * displays the reset password
+		 */
+		public function resetPassword(){
+			Core::queueStyle( 'assets/css/reset.css' );
+			Core::queueStyle( 'assets/css/ui.css' );
+			//put the data onscreen
+			include( CORE_PATH . 'pages/resetPassword.php' );
+		}
+
+		public function verifyToken(){
+			$_POST = Core::sanitize( $_POST );
+			$query = "SELECT * FROM tokens WHERE token = '" . $_POST['token'] . "'";
+
+			$obj = array();
+			if( !$result = $this->db->query($query) ){
+				$obj['error'] = "An error occurred please try again";
+				echo Core::ajaxResponse( $obj, false );
+				return;
+			}
+
+			$row = null;
+			//if there was a user matching
+			if( $result->num_rows == 1 ){
+				echo Core::ajaxResponse( $obj, true );
+
+			} else {
+				$obj['error'] = "Invalid token";
+				echo Core::ajaxResponse( $obj, false );
+			}
+		}
+
+		/**
+		 * has the password and the username check the database and login
 		 */
 		public function login(){
 			//clean the post of any injects
@@ -104,6 +301,29 @@
 					return true;
 				}
 			}
+			return false;
+		}
+
+		/**
+		 * check if user is a global admin used to create users and manage them
+		 */
+		public function isAdmin(){
+			if( $this->isLoggedIn() ){
+				$query = "SELECT id, isAdmin FROM users WHERE username = '" . $_SESSION['session']['username'] . "'";
+				if( !$result = $this->db->query($query) ){
+					return false;
+				}
+				$row = null;
+				//if there was a user matching
+				if( $result->num_rows == 1 ) {
+					$row = $result->fetch_assoc();
+					if( $row['isAdmin'] == 1 ){
+						return true;
+					}
+				}
+				$result->close();
+			}
+
 			return false;
 		}
 	}

@@ -408,17 +408,21 @@ body {
 #wrapper #main #cert {
   padding-bottom: 20px;
 }
-#wrapper #main .login {
+#wrapper #main .login,
+#wrapper #main .resetPassword {
   margin: 30px;
 }
-#wrapper #main .login .loginWrapper {
+#wrapper #main .login .loginWrapper,
+#wrapper #main .resetPassword .loginWrapper {
   max-width: 400px;
   margin: 50px auto;
 }
-#wrapper #main .login .loginWrapper p {
+#wrapper #main .login .loginWrapper p,
+#wrapper #main .resetPassword .loginWrapper p {
   font-size: larger;
 }
-#wrapper #main .login form {
+#wrapper #main .login form,
+#wrapper #main .resetPassword form {
   max-width: 400px;
   margin: 50px auto;
   background: #c1cad3;
@@ -426,7 +430,8 @@ body {
   padding: 20px;
   font-family: Georgia, "Times New Roman", Times, serif;
 }
-#wrapper #main .login form h1 {
+#wrapper #main .login form h1,
+#wrapper #main .resetPassword form h1 {
   display: block;
   text-align: center;
   padding: 0;
@@ -434,30 +439,36 @@ body {
   color: #5C5C5C;
   font-size: x-large;
 }
-#wrapper #main .login form ul {
+#wrapper #main .login form ul,
+#wrapper #main .resetPassword form ul {
   list-style: none;
   padding: 0;
   margin: 0;
 }
-#wrapper #main .login form ul li {
+#wrapper #main .login form ul li,
+#wrapper #main .resetPassword form ul li {
   display: block;
   padding: 9px;
   border: 1px solid #a2aab2;
   margin-bottom: 30px;
   border-radius: 3px;
 }
-#wrapper #main .login form ul li.error {
+#wrapper #main .login form ul li.error,
+#wrapper #main .resetPassword form ul li.error {
   border: 1px solid red !important;
 }
-#wrapper #main .login form ul li.error > span {
+#wrapper #main .login form ul li.error > span,
+#wrapper #main .resetPassword form ul li.error > span {
   background: red !important;
 }
-#wrapper #main .login form ul li:last-child {
+#wrapper #main .login form ul li:last-child,
+#wrapper #main .resetPassword form ul li:last-child {
   border: none;
   margin-bottom: 0px;
   text-align: center;
 }
-#wrapper #main .login form ul li > label {
+#wrapper #main .login form ul li > label,
+#wrapper #main .resetPassword form ul li > label {
   display: block;
   float: left;
   margin-top: -19px;
@@ -469,7 +480,8 @@ body {
   overflow: hidden;
   font-family: Arial, Helvetica, sans-serif;
 }
-#wrapper #main .login form ul li > span {
+#wrapper #main .login form ul li > span,
+#wrapper #main .resetPassword form ul li > span {
   background: #4e4e4e;
   display: block;
   padding: 3px;
@@ -480,16 +492,27 @@ body {
   font-size: 11px;
 }
 #wrapper #main .login form ul input[type="text"],
+#wrapper #main .resetPassword form ul input[type="text"],
 #wrapper #main .login form ul input[type="date"],
+#wrapper #main .resetPassword form ul input[type="date"],
 #wrapper #main .login form ul input[type="datetime"],
+#wrapper #main .resetPassword form ul input[type="datetime"],
 #wrapper #main .login form ul input[type="email"],
+#wrapper #main .resetPassword form ul input[type="email"],
 #wrapper #main .login form ul input[type="number"],
+#wrapper #main .resetPassword form ul input[type="number"],
 #wrapper #main .login form ul input[type="search"],
+#wrapper #main .resetPassword form ul input[type="search"],
 #wrapper #main .login form ul input[type="time"],
+#wrapper #main .resetPassword form ul input[type="time"],
 #wrapper #main .login form ul input[type="url"],
+#wrapper #main .resetPassword form ul input[type="url"],
 #wrapper #main .login form ul input[type="password"],
+#wrapper #main .resetPassword form ul input[type="password"],
 #wrapper #main .login form ul textarea,
-#wrapper #main .login form ul select {
+#wrapper #main .resetPassword form ul textarea,
+#wrapper #main .login form ul select,
+#wrapper #main .resetPassword form ul select {
   box-sizing: border-box;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -503,11 +526,14 @@ body {
   padding: 0;
   font-family: Georgia, "Times New Roman", Times, serif;
 }
-#wrapper #main .login form ul textarea {
+#wrapper #main .login form ul textarea,
+#wrapper #main .resetPassword form ul textarea {
   resize: none;
 }
 #wrapper #main .login form ul input[type="submit"],
-#wrapper #main .login form ul input[type="button"] {
+#wrapper #main .resetPassword form ul input[type="submit"],
+#wrapper #main .login form ul input[type="button"],
+#wrapper #main .resetPassword form ul input[type="button"] {
   background: #2471FF;
   border: none;
   padding: 10px 20px 10px 20px;
@@ -516,7 +542,9 @@ body {
   color: #D2E2FF;
 }
 #wrapper #main .login form ul input[type="submit"]:hover,
-#wrapper #main .login form ul input[type="button"]:hover {
+#wrapper #main .resetPassword form ul input[type="submit"]:hover,
+#wrapper #main .login form ul input[type="button"]:hover,
+#wrapper #main .resetPassword form ul input[type="button"]:hover {
   background: #6B9FFF;
   color: #fff;
 }
@@ -538,27 +566,32 @@ body {
   height: 250px;
 }
 #wrapper #main .admin .classes > p,
-#wrapper #main .admin .certs > p {
+#wrapper #main .admin .certs > p,
+#wrapper #main .admin .users > p {
   font-weight: bold;
   padding: 10px 0 10px 0;
 }
 #wrapper #main .admin .classes li,
-#wrapper #main .admin .certs li {
+#wrapper #main .admin .certs li,
+#wrapper #main .admin .users li {
   padding: 10px;
   list-style: none;
   border: 1px solid black;
   border-bottom: none;
 }
 #wrapper #main .admin .classes li:last-child,
-#wrapper #main .admin .certs li:last-child {
+#wrapper #main .admin .certs li:last-child,
+#wrapper #main .admin .users li:last-child {
   border-bottom: 1px solid #000000;
 }
 #wrapper #main .admin .classes li:nth-child(even),
-#wrapper #main .admin .certs li:nth-child(even) {
+#wrapper #main .admin .certs li:nth-child(even),
+#wrapper #main .admin .users li:nth-child(even) {
   background: #b1bcc7;
 }
 #wrapper #main .admin .classes li img,
-#wrapper #main .admin .certs li img {
+#wrapper #main .admin .certs li img,
+#wrapper #main .admin .users li img {
   cursor: pointer;
   float: right;
   height: 20px;
@@ -831,4 +864,7 @@ input[type="button"].processing {
 }
 .margin25Top {
   margin-top: 25px;
+}
+.noneImportant {
+  display: none !important;
 }
