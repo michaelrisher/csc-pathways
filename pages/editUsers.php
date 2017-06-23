@@ -72,8 +72,3 @@
 
 </body>
 </html>
-
-<?php
-	Core::debug( Core::userFriendlyId( 15 ) );
-	Core::debug( $_SESSION );
-?>

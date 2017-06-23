@@ -1,27 +1,27 @@
-$( document ).ready( function(){
+$( document ).ready( function () {
 	CORE_URL = readCookie( 'url' );
-	$( 'html' ).on( 'click', '.fakeLink', function( e ){
+	$( 'html' ).on( 'click', '.fakeLink', function ( e ) {
 		e.preventDefault();
 		var loc = $( this ).attr( 'data-to' );//location we are going to
 		var idLocation = '#' + loc; //the class to look up
-		var goto = $( this ).attr( 'data-code'); //the code for the filename eg CE803
+		var goto = $( this ).attr( 'data-code' ); //the code for the filename eg CE803
 
-		if ( loc == 'cert' && !$('#class' ).hasClass('none') ) {
-			$( "#class" ).toggleClass( 'none' ) ;
+		if ( loc == 'cert' && !$( '#class' ).hasClass( 'none' ) ) {
+			$( "#class" ).toggleClass( 'none' );
 		}
 
-		if( $(idLocation ).hasClass( 'none' ) ){
-			$(idLocation ).toggleClass( 'none' );
+		if ( $( idLocation ).hasClass( 'none' ) ) {
+			$( idLocation ).toggleClass( 'none' );
 		}
-		var height = parseInt( $( idLocation ).css('height'), 10);
+		var height = parseInt( $( idLocation ).css( 'height' ), 10 );
 		$( idLocation ).html( "<div class='aligncenter'><img src='assets/img/ajax-loader.gif' /><p>Loading</p></div>" );
-		var newHeight = parseInt( $( idLocation ).css('height'), 10);
-		if( newHeight < height ){
-			$( idLocation ).css( 'height', height +'px' );
+		var newHeight = parseInt( $( idLocation ).css( 'height' ), 10 );
+		if ( newHeight < height ) {
+			$( idLocation ).css( 'height', height + 'px' );
 		}
-		$('html, body').animate({
+		$( 'html, body' ).animate( {
 			scrollTop: $( idLocation ).offset().top
-		}, 500);
+		}, 500 );
 
 		//var url = loc == 'cert' ? ( 'assets/inc/' + loc + '/' + goto + '.php' ): ( loc + '/' + goto );
 		//var url = 'assets/inc/' + loc + '/' + goto + '.php'
@@ -32,36 +32,36 @@ $( document ).ready( function(){
 			success: function ( data ) {
 				$( idLocation ).html( data );
 				$( idLocation ).css( 'height', '' );
-				$('html, body').animate({ //update scroll once ajax finishes
+				$( 'html, body' ).animate( { //update scroll once ajax finishes
 					scrollTop: $( idLocation ).offset().top
-				}, 500);
+				}, 500 );
 			},
-			fail: function( data ){
+			fail: function ( data ) {
 				failedAjax( idLocation );
 			},
-			error: function( data ){
+			error: function ( data ) {
 				failedAjax( idLocation );
 			}
 		} );
 
-		function failedAjax( idLocation ){
-			$( idLocation ).html( "<div class='aligncenter'><p>Failed to load page.<br>Try reloading the page.</p></div>")
+		function failedAjax( idLocation ) {
+			$( idLocation ).html( "<div class='aligncenter'><p>Failed to load page.<br>Try reloading the page.</p></div>" )
 		}
-	});
+	} );
 
-	$( 'html' ).on( 'click', 'img.back', function( e ){ //back button
+	$( 'html' ).on( 'click', 'img.back', function ( e ) { //back button
 		var loc = $( this ).attr( 'data-to' );//location we are going to
-		if( loc == 'top'){
+		if ( loc == 'top' ) {
 			loc = "wrapper";
 		}
-		var idLocation ='#' + loc;
+		var idLocation = '#' + loc;
 
-		$('html, body').animate({
+		$( 'html, body' ).animate( {
 			scrollTop: $( idLocation ).offset().top - 50
-		}, 500);
-	});
+		}, 500 );
+	} );
 
-	$( '#main .login [type=submit]' ).on('click', function( e ){
+	$( '#main .login [type=submit]' ).on( 'click', function ( e ) {
 		e.preventDefault(); //prevent the default submit action
 		var form = $( this ).closest( 'form' );
 		var data = $( form ).serializeArray();
@@ -70,8 +70,8 @@ $( document ).ready( function(){
 			map[field.name] = field.value;
 		} ); //get form data for verify
 		//remove errors
-		$( 'li', form ).each(function( i, elem ){
-			$(elem ).removeClass('error');
+		$( 'li', form ).each( function ( i, elem ) {
+			$( elem ).removeClass( 'error' );
 		} );
 		var hasError = false;
 		//verify data
@@ -84,54 +84,54 @@ $( document ).ready( function(){
 			hasError = true;
 		}
 
-		if( !hasError ){
+		if ( !hasError ) {
 			//ajax login
-			$.ajax({
-				type : 'POST',
-				url : 'rest/' + $( form ).attr('action'),
-				dataType : 'json',
-				data : {
-					user : map['user'],
-					password : sha512( map['password'] )
+			$.ajax( {
+				type: 'POST',
+				url: 'rest/' + $( form ).attr( 'action' ),
+				dataType: 'json',
+				data: {
+					user: map['user'],
+					password: sha512( map['password'] )
 				},
-				success : function( data ){
-					if( data.success ){
+				success: function ( data ) {
+					if ( data.success ) {
 						location.href = data.data.redirect;
 					} else {
-						var modal = createModal( { title: 'Log in failed', buttons : [{ value : 'Ok' }] } );
+						var modal = createModal( { title: 'Log in failed', buttons: [{ value: 'Ok' }] } );
 						setModalContent( modal, data.data.error );
 						displayModal( modal, true )
 					}
 				}
-			})
+			} )
 		}
 	} );
 
 	//classes edit option
-	$( document ).on( 'click', '#main .classes li img.edit', function(){
+	$( document ).on( 'click', '#main .classes li img.edit', function () {
 		//get the class info
 		var id = $( this ).closest( 'li' ).attr( 'data-id' );
-		$.ajax({
-			type : 'POST',
-			url : 'rest/classes/get/' + id,
-			dataType : 'json',
-			success : function( data ){
-				if( data.success ){
+		$.ajax( {
+			type: 'POST',
+			url: 'rest/classes/get/' + id,
+			dataType: 'json',
+			success: function ( data ) {
+				if ( data.success ) {
 					//alert( JSON.stringify( data ) );
-					var modal = createModal({
-						title : 'Edit Class',
+					var modal = createModal( {
+						title: 'Edit Class',
 						buttons: [
 							{
 								value: 'Save',
-								name:'save',
+								name: 'save',
 								onclick: saveClass
 							},
 							{
 								value: 'Cancel',
-								class : 'low'
+								class: 'low'
 							}
 						]
-					});
+					} );
 					var html = "<form><ul>";
 					//type, name, label, data, text
 					html += modalLi( 'text', 'id', 'ID', data.data.id, "Enter the class ID", true );
@@ -147,17 +147,17 @@ $( document ).ready( function(){
 					displayModal( modal );
 					adjustTextarea( $( modal ).find( 'textarea' )[0] );
 				} else {
-					var modal = createModal( { title: 'Failed to load class', buttons : [{ value : 'Ok' }] } );
+					var modal = createModal( { title: 'Failed to load class', buttons: [{ value: 'Ok' }] } );
 					setModalContent( modal, data.data.error );
 					displayModal( modal, true )
 				}
 			}
-		});
-	});
+		} );
+	} );
 
-	function saveClass( id ){
+	function saveClass( id ) {
 		//assume the only modal open is the one we are saving
-		var modal = $('.modal' ).eq(0);
+		var modal = $( '.modal' ).eq( 0 );
 		var form = $( modal ).find( 'form' );
 		var saveBtn = $( modal ).find( 'input[name="save"]' );
 		var data = $( form ).serializeArray();
@@ -166,8 +166,8 @@ $( document ).ready( function(){
 			map[field.name] = field.value;
 		} ); //get form data for verify
 		//remove errors
-		$( 'li', form ).each(function( i, elem ){
-			$(elem ).removeClass('error');
+		$( 'li', form ).each( function ( i, elem ) {
+			$( elem ).removeClass( 'error' );
 		} );
 		var hasError = false;
 		//verify data
@@ -184,37 +184,37 @@ $( document ).ready( function(){
 			hasError = true;
 		}
 
-		if( !hasError && !window.processing ){
+		if ( !hasError && !window.processing ) {
 			//ajax save
 			var successful = false;
 			window.processing = true;
 			saveBtn.addClass( 'processing' );
 			var url;
-			if( map['create'] ){
+			if ( map['create'] ) {
 				url = 'create';
 			} else {
 				url = 'save';
 			}
-			$.ajax({
-				type : 'POST',
-				url : 'rest/classes/' + url,
-				dataType : 'json',
-				data : map,
+			$.ajax( {
+				type: 'POST',
+				url: 'rest/classes/' + url,
+				dataType: 'json',
+				data: map,
 				async: false,
-				success : function( data ){
+				success: function ( data ) {
 					//alert( JSON.stringify( data ) );
-					if( data.success ){
-						var modal = createModal( { title: "Saved Class Successfully", buttons : [ { value : 'Ok'} ] } );
+					if ( data.success ) {
+						var modal = createModal( { title: "Saved Class Successfully", buttons: [{ value: 'Ok' }] } );
 						setModalContent( modal, data.data.msg );
 						displayModal( modal );
 						successful = true;
-						if( url == 'create' ){
-							$( '.classes .listing ul' ).append('<li data-id="' + map['id'] + '">' +
-								map['title'] + '<img class="delete" src="assets/img/delete.png"><img class="edit" src="assets/img/edit.svg"></li>');
+						if ( url == 'create' ) {
+							$( '.classes .listing ul' ).append( '<li data-id="' + map['id'] + '">' +
+								map['title'] + '<img class="delete" src="assets/img/delete.png"><img class="edit" src="assets/img/edit.svg"></li>' );
 						}
 						window.processing = false;
-					} else{
-						var modal = createModal( { title: "Error Saving Class", buttons : [ { value : 'Ok'} ] } );
+					} else {
+						var modal = createModal( { title: "Error Saving Class", buttons: [{ value: 'Ok' }] } );
 						setModalContent( modal, data.data.error );
 						displayModal( modal );
 						successful = false;
@@ -222,74 +222,79 @@ $( document ).ready( function(){
 						saveBtn.removeClass( 'processing' );
 					}
 				}
-			});
+			} );
 			return successful;
-		} else{
-			saveBtn.removeClass( 'processing');
+		} else {
+			saveBtn.removeClass( 'processing' );
 			return false;
 		}
 	}
 
 	//classes edit option
-	$( document ).on( 'click', '#main .classes li img.delete', function(){
+	$( document ).on( 'click', '#main .classes li img.delete', function () {
 		//get the class info
 		var id = $( this ).closest( 'li' ).attr( 'data-id' );
 
-		var modal = createModal({title: 'Are you sure',
-			buttons : [ {
-				value : "Delete",
-				onclick : function(modalId){
+		var modal = createModal( {
+			title: 'Are you sure',
+			buttons: [{
+				value: "Delete",
+				onclick: function ( modalId ) {
 					var successful = false;
-					$.ajax({
-						type : 'POST',
-						url : 'rest/classes/delete/',
-						data : {
-							id : id
+					$.ajax( {
+						type: 'POST',
+						url: 'rest/classes/delete/',
+						data: {
+							id: id
 						},
-						dataType : 'json',
-						async : false,
-						success : function( data ){
-							if( data.success ){
-								var modal = createModal( { title: "Class Deleted Successfully", buttons : [ { value : 'Ok'} ] } );
+						dataType: 'json',
+						async: false,
+						success: function ( data ) {
+							if ( data.success ) {
+								var modal = createModal( {
+									title: "Class Deleted Successfully",
+									buttons: [{ value: 'Ok' }]
+								} );
 								setModalContent( modal, data.data.msg );
 								displayModal( modal );
 								successful = true;
 								var that = $( '.classes .listing li[data-id=' + id + ']' );
-								that.slideUp( 400, function(){
+								that.slideUp( 400, function () {
 									that.remove();
-								});
+								} );
 							} else {
 								successful = false;
 							}
 						}
-					});
+					} );
 					return successful;
 				}
-			},{
-				value : "Cancel",
-				class : "low"
-			} ] } );
+			}, {
+				value: "Cancel",
+				class: "low"
+			}]
+		} );
 
-		setModalContent( modal, "<p>Are you sure you want to delete. This can not be undone</p>");
+		setModalContent( modal, "<p>Are you sure you want to delete. This can not be undone</p>" );
 		displayModal( modal );
-	});
+	} );
 
 	//create class
-	$('.classes input[name=createClass]' ).on( 'click', function(){
-		var modal = createModal({
-			title : 'Create Class',
+	$( '.classes input[name=createClass]' ).on( 'click', function () {
+		var modal = createModal( {
+			title: 'Create Class',
 			buttons: [
 				{
 					value: 'Save',
-					name:'save',
+					name: 'save',
 					onclick: saveClass
 				},
 				{
 					value: 'Cancel',
-					class : 'low'
+					class: 'low'
 				}
 			]
-		});
+		} );
 		var html = "<form><ul>";
 		//type, name, label, data, text
 		html += "<input type='hidden' name='create' value='create' />";
@@ -307,35 +312,35 @@ $( document ).ready( function(){
 		adjustTextarea( $( modal ).find( 'textarea' )[0] );
 	} );
 
-	$( document ).on( 'click', '.modal span a.addClass', function(){
+	$( document ).on( 'click', '.modal span a.addClass', function () {
 		var input = $( this ).closest( 'li' ).find( 'input' );
-		var prevModal = $(this ).closest('.modal');
+		var prevModal = $( this ).closest( '.modal' );
 		var id = $( prevModal ).attr( 'data-id' );
-		$.ajax({
-			type : 'POST',
-			url : 'rest/classes/listing',
-			dataType : 'json',
+		$.ajax( {
+			type: 'POST',
+			url: 'rest/classes/listing',
+			dataType: 'json',
 			//async : false,
-			success : function( data ){
-				if( data.success ){
-					var modal = createModal({
+			success: function ( data ) {
+				if ( data.success ) {
+					var modal = createModal( {
 						title: "Choose Class",
-						buttons : [{
-							value : 'Add',
-							onclick : function( id ){
-								var that = $( '.modal[data-id=' + id + ']');
+						buttons: [{
+							value: 'Add',
+							onclick: function ( id ) {
+								var that = $( '.modal[data-id=' + id + ']' );
 								//$( that ).find( 'select'.val())
-								$(input ).val( $(input ).val() + '~' + $( that ).find( 'select' ).val() + '~' );
+								$( input ).val( $( input ).val() + '~' + $( that ).find( 'select' ).val() + '~' );
 								return true;
 							}
 						}, {
-							value : 'Cancel',
-							class : 'low'
+							value: 'Cancel',
+							class: 'low'
 						}]
-					});
+					} );
 					var html = '<form><ul><li><label for="class">Classes</label>' +
 						'<select name="class">';
-					for( var  i = 0; i < data.data.length; i++ ){
+					for ( var i = 0; i < data.data.length; i++ ) {
 						html += "<option value='" + data.data[i].id + "'>" + data.data[i].title + "</option>";
 					}
 					html += '</select><span>Pick a class to add</span></li>';
@@ -343,8 +348,8 @@ $( document ).ready( function(){
 					displayModal( modal );
 				}
 			}
-		});
-	});
+		} );
+	} );
 
 
 	/******************************************************************************/
@@ -352,37 +357,37 @@ $( document ).ready( function(){
 	/******************************************************************************/
 
 	//init the html editors
-	try{
-		tinyMCE.init({
-			mode : "textareas",
-			branding : false,
+	try {
+		tinyMCE.init( {
+			mode: "textareas",
+			branding: false,
 			plugins: "table, lists, code, autoresize",
 			autoresize_max_height: 600,
 			toolbar: 'undo redo | bold italic underline subscript superscript | fontselect fontsizeselect | alignleft aligncenter alignright alignjustify formatselect table ' +
 			' bullist | addclass shortClass scheduleTable | code',
-			menubar : false,
-			setup: function (editor) {
+			menubar: false,
+			setup: function ( editor ) {
 				editor.addButton( 'addclass', {
 					text: 'Add Class',
 					icon: false,
 					tooltip: 'Insert a link to a class',
 					onclick: function () {
 						var classText = '';
-						if( getStorage( "invalidateCache" ) && getStorage( 'classes' ) ){
+						if ( getStorage( "invalidateCache" ) && getStorage( 'classes' ) ) {
 							var time = parseInt( getStorage( "invalidateCache" ) );
-							var curr = + new Date(); //gives unix time
-							if( curr >= time ){
+							var curr = +new Date(); //gives unix time
+							if ( curr >= time ) {
 								delete localStorage.classes;
 							}
 						}
-						if( ( data = getStorageJSON( 'classes' ) ) != null ){
+						if ( ( data = getStorageJSON( 'classes' ) ) != null ) {
 							loadClassModal( data );
-						} else{
-							requestClassListing( function( data ){
-								if( data.success ){
+						} else {
+							requestClassListing( function ( data ) {
+								if ( data.success ) {
 									//store classes in cache
 									setStorageJSON( 'classes', data.data );
-									var t = + new Date(); //gives unix time
+									var t = +new Date(); //gives unix time
 									setStorage( 'invalidateCache', ( t + ( 5 * 60 * 1000 ) ) );
 									loadClassModal( data.data );
 								}
@@ -396,9 +401,9 @@ $( document ).ready( function(){
 					tooltip: 'Create a table to plan classes',
 					onclick: function () {
 						var str = "<table>" +
-						"<tr><td>Year</td><td>Summer</td><td>Fall</td><td>Winter</td><td>Spring</td></tr>" +
-						"<tr><td>Year 1</td><td></td><td></td><td></td><td></td></tr>" +
-						"</table>";
+							"<tr><td>Year</td><td>Summer</td><td>Fall</td><td>Winter</td><td>Spring</td></tr>" +
+							"<tr><td>Year 1</td><td></td><td></td><td></td><td></td></tr>" +
+							"</table>";
 						editor.insertContent( str );
 					}
 				} );
@@ -416,57 +421,59 @@ $( document ).ready( function(){
 
 				//function for class listing request
 				//onSuccess is the callback function to the success
-				function requestClassListing( onSuccess ){
-					$.ajax({
-						type : 'POST',
-						url : CORE_URL + '/rest/classes/listing',
-						dataType : 'json',
-						async : false,
-						success : function( data ){
+				function requestClassListing( onSuccess ) {
+					$.ajax( {
+						type: 'POST',
+						url: CORE_URL + '/rest/classes/listing',
+						dataType: 'json',
+						async: false,
+						success: function ( data ) {
 							onSuccess( data );
 						},
-						fail: function( data ){
+						fail: function ( data ) {
 							failedAjax();
 						},
-						error: function( data ){
+						error: function ( data ) {
 							failedAjax();
 						}
-					});
+					} );
 				}
 
 				//still in setup function for editor
-				function loadClassModal( data, is8Week ){
-					if( is8Week == undefined ) { is8Week = false;}
+				function loadClassModal( data, is8Week ) {
+					if ( is8Week == undefined ) {
+						is8Week = false;
+					}
 					//this either uses the cached copy of the classes or requests it from the network
 					//will re-validate the cached copy every 5 minutes or after when you save the page
-					var modal = createModal({
+					var modal = createModal( {
 						title: "Choose Class",
-						buttons : [{
-							value : 'Add',
-							onclick : function( id ){
-								var that = $( '.modal[data-id=' + id + ']');
+						buttons: [{
+							value: 'Add',
+							onclick: function ( id ) {
+								var that = $( '.modal[data-id=' + id + ']' );
 								var val = $( that ).find( 'select' ).val();
 								var classCode = $( 'option[value=' + val + ']', that ).html().match( /[a-zA-Z]{3}\-\d{1,4}[a-zA-Z]*/ )[0];
-								var float = $('input[name=float]:checked', that ).val();
-								if( float ){
-									editor.insertContent( '[class f="'+float.substr(0,1) + '" id="' + $( that ).find( 'select' ).val() + '" text="' + classCode + '" /]' );
-								}else {
+								var float = $( 'input[name=float]:checked', that ).val();
+								if ( float ) {
+									editor.insertContent( '[class f="' + float.substr( 0, 1 ) + '" id="' + $( that ).find( 'select' ).val() + '" text="' + classCode + '" /]' );
+								} else {
 									editor.insertContent( '[class id="' + $( that ).find( 'select' ).val() + '" text="' + classCode + '" /]' );
 								}
 								return true;
 							}
 						}, {
-							value : 'Cancel',
-							class : 'low'
+							value: 'Cancel',
+							class: 'low'
 						}]
-					});
+					} );
 					var html = '<form><ul><li><label for="class">Classes</label>' +
 						'<select name="class">';
-					for( var  i = 0; i < data.length; i++ ){
+					for ( var i = 0; i < data.length; i++ ) {
 						html += "<option value='" + data[i].id + "'>" + data[i].title + "</option>";
 					}
 					html += '</select><span>Pick a class to add</span></li>';
-					if( is8Week ) {
+					if ( is8Week ) {
 						html += '<li><label>8 Week Alignment</label>' +
 							'<div><input type="radio" name="float" value="left"/>Left Side</div>' +
 							'<div><input type="radio" name="float" value="right"/>Right Side</div>' +
@@ -477,64 +484,70 @@ $( document ).ready( function(){
 					displayModal( modal );
 				}
 
-				function failedAjax(){
-					var modal = createModal({title: 'Failed to Load', buttons: [{value : 'Ok'}]});
+				function failedAjax() {
+					var modal = createModal( { title: 'Failed to Load', buttons: [{ value: 'Ok' }] } );
 					setModalContent( modal, "<p>Failed to load classes. Please try again</p><p>If the problem persists contact the administrator</p>" );
 					displayModal( modal );
 				}
 			}
-		});
-	} catch( ignore ){}
+		} );
+	} catch ( ignore ) {
+	}
 
 	/******************************************************************************/
 	/***************************certification delete*******************************/
 	/******************************************************************************/
-	$( document ).on( 'click', '#main .certs li img.delete', function(){
+	$( document ).on( 'click', '#main .certs li img.delete', function () {
 		var id = $( this ).closest( 'li' ).attr( 'data-id' );
 
-		var modal = createModal({title: 'Are you sure',
-			buttons : [ {
-				value : "Delete",
-				onclick : function(modalId){
+		var modal = createModal( {
+			title: 'Are you sure',
+			buttons: [{
+				value: "Delete",
+				onclick: function ( modalId ) {
 					var successful = false;
-					$.ajax({
-						type : 'POST',
-						url : 'rest/certs/delete/',
-						data : {
-							id : id
+					$.ajax( {
+						type: 'POST',
+						url: 'rest/certs/delete/',
+						data: {
+							id: id
 						},
-						dataType : 'json',
-						async : false,
-						success : function( data ){
-							if( data.success ){
-								var modal = createModal( { title: "Certificate Deleted Successfully", buttons : [ { value : 'Ok'} ] } );
+						dataType: 'json',
+						async: false,
+						success: function ( data ) {
+							if ( data.success ) {
+								var modal = createModal( {
+									title: "Certificate Deleted Successfully",
+									buttons: [{ value: 'Ok' }]
+								} );
 								setModalContent( modal, data.data.msg );
 								displayModal( modal );
 								successful = true;
 								var that = $( '.certs .listing li[data-id=' + id + ']' );
-								that.slideUp( 400, function(){
+								that.slideUp( 400, function () {
 									that.remove();
-								});
+								} );
 							} else {
 								successful = false;
 							}
 						}
-					});
+					} );
 					return successful;
 				}
-			},{
-				value : "Cancel",
-				class : "low"
-			} ] } );
+			}, {
+				value: "Cancel",
+				class: "low"
+			}]
+		} );
 
-		setModalContent( modal, "<p>Are you sure you want to delete. This can not be undone</p>");
+		setModalContent( modal, "<p>Are you sure you want to delete. This can not be undone</p>" );
 		displayModal( modal );
 	} );
 
 	/******************************************************************************/
 	/****************************certification save********************************/
 	/******************************************************************************/
-	$( '#main .admin .certs [type=submit]' ).on('click', function( e ){
+	$( '#main .admin .certs [type=submit]' ).on( 'click', function ( e ) {
 		e.preventDefault(); //prevent the default submit action
 		var form = $( this ).closest( 'form' );
 		var data = $( form ).serializeArray();
@@ -548,8 +561,8 @@ $( document ).ready( function(){
 		map.schedule = tinymce.get( 'schedule' ).getContent();
 
 		//remove errors
-		$( 'li', form ).each(function( i, elem ){
-			$(elem ).removeClass('error');
+		$( 'li', form ).each( function ( i, elem ) {
+			$( elem ).removeClass( 'error' );
 		} );
 		var hasError = false;
 		//scroll to error
@@ -581,36 +594,42 @@ $( document ).ready( function(){
 			hasError = true;
 		}
 
-		if( !hasError ){
+		if ( !hasError ) {
 			//ajax login
-			$.ajax({
-				type : 'POST',
-				url : CORE_URL + 'rest/' + $( form ).attr('action'),
-				dataType : 'json',
-				data : map,
-				success : function( data ){
+			$.ajax( {
+				type: 'POST',
+				url: CORE_URL + 'rest/' + $( form ).attr( 'action' ),
+				dataType: 'json',
+				data: map,
+				success: function ( data ) {
 					console.log( data );
-					if( data.success ){
+					if ( data.success ) {
 						var modal = createModal( {
 							title: 'Saved Successfully',
-							buttons : [
-								{ value : 'Finished', onclick : function(){ location.href = CORE_URL + 'editCerts'} },
-								{ value:'Edit Again', class: 'low' }
-							] } );
+							buttons: [
+								{
+									value: 'Finished', onclick: function () {
+									location.href = CORE_URL + 'editCerts'
+								}
+								},
+								{ value: 'Edit Again', class: 'low' }
+							]
+						} );
 						setModalContent( modal, data.data.msg );
 						displayModal( modal, true );
-					} else {}
+					} else {
+					}
 					//	var modal = createModal( { title: 'Log in failed', buttons : [{ value : 'Ok' }] } );
 					//	setModalContent( modal, data.data.error );
 					//	displayModal( modal, true )
 					//}
 				}
-			})
-		} else{
+			} )
+		} else {
 			//scroll to error
-			$('html, body').animate({
+			$( 'html, body' ).animate( {
 				scrollTop: $( scrollTo ).offset().top
-			}, 500);
+			}, 500 );
 		}
 	} );
 
@@ -618,38 +637,38 @@ $( document ).ready( function(){
 	/******************************************************************************/
 	/*******************************User Edit/Create*******************************/
 	/******************************************************************************/
-	$( document ).on( 'click', '#main .users li img.edit', function(){
+	$( document ).on( 'click', '#main .users li img.edit', function () {
 		//get the class info
 		var id = $( this ).closest( 'li' ).attr( 'data-id' );
-		$.ajax({
-			type : 'POST',
-			url : 'rest/users/get/' + id,
-			dataType : 'json',
-			success : function( data ){
-				if( data.success ){
+		$.ajax( {
+			type: 'POST',
+			url: 'rest/users/get/' + id,
+			dataType: 'json',
+			success: function ( data ) {
+				if ( data.success ) {
 					createUserModal( data, false );
 				} else {
-					var modal = createModal( { title: 'Failed to load class', buttons : [{ value : 'Ok' }] } );
+					var modal = createModal( { title: 'Failed to load class', buttons: [{ value: 'Ok' }] } );
 					setModalContent( modal, data.data.error );
 					displayModal( modal, true )
 				}
 			}
-		});
-	});
+		} );
+	} );
 
-	$( '.users input[name=createUser]' ).on( 'click', function(){
+	$( '.users input[name=createUser]' ).on( 'click', function () {
 		var data = {};
-		data.data = { id: -1, username: '', isAdmin : 0, active : 0 };
+		data.data = { id: -1, username: '', isAdmin: 0, active: 0 };
 		createUserModal( data, true );
 	} );
 
-	function createUserModal( data, create ){
+	function createUserModal( data, create ) {
 		var modalData = {
-			title : 'Edit User',
+			title: 'Edit User',
 			buttons: [
 				{
 					value: 'Save',
-					name:'save',
+					name: 'save',
 					onclick: saveUser
 				},
 				{
@@ -659,19 +678,19 @@ $( document ).ready( function(){
 				},
 				{
 					value: 'Cancel',
-					class : 'low'
+					class: 'low'
 				}
 			]
 		};
-		if( create ){
-			modalData.buttons.splice(1, 1);
+		if ( create ) {
+			modalData.buttons.splice( 1, 1 );
 			modalData.title = "Create User";
 		}
 		var modal = createModal( modalData );
 		var html = "<form><ul>";
 		//type, name, label, data, text
-		html += "<input type='hidden' name='id' value='" + ( data.data.id ? data.data.id : -1 )+ "'/>";
-		if( create ) {
+		html += "<input type='hidden' name='id' value='" + ( data.data.id ? data.data.id : -1 ) + "'/>";
+		if ( create ) {
 			html += "<input type='hidden' name='create' value='create'/>";
 		}
 		html += modalLi( 'text', 'username', 'User name', data.data.username, "Enter the username", false );
@@ -682,8 +701,8 @@ $( document ).ready( function(){
 		displayModal( modal );
 	}
 
-	function saveUser( id ){
-		var modal = $('.modal[data-id=' + id + ']' );
+	function saveUser( id ) {
+		var modal = $( '.modal[data-id=' + id + ']' );
 		var form = $( modal ).find( 'form' );
 		var saveBtn = $( modal ).find( 'input[name="save"]' );
 		var data = $( form ).serializeArray();
@@ -692,8 +711,8 @@ $( document ).ready( function(){
 			map[field.name] = field.value;
 		} ); //get form data for verify
 		//remove errors
-		$( 'li', form ).each(function( i, elem ){
-			$(elem ).removeClass('error');
+		$( 'li', form ).each( function ( i, elem ) {
+			$( elem ).removeClass( 'error' );
 		} );
 		var hasError = false;
 		//verify data
@@ -701,36 +720,37 @@ $( document ).ready( function(){
 			$( form ).find( 'input[name=username]' ).closest( 'li' ).addClass( 'error' );
 			hasError = true;
 		}
-		if( !hasError && !window.processing ){
+		if ( !hasError && !window.processing ) {
 			//ajax save
 			var successful = false;
 			window.processing = true;
 			saveBtn.addClass( 'processing' );
-			$.ajax({
-				type : 'POST',
-				url : 'rest/users/save',
-				dataType : 'json',
-				data : {
+			$.ajax( {
+				type: 'POST',
+				url: 'rest/users/save',
+				dataType: 'json',
+				data: {
 					id: map.id,
+					create: (map.create) ? map.create : 0,
 					username: map.username,
 					isAdmin: ( map.isAdmin ) ? map.isAdmin : 0,
 					active: ( map.active ) ? map.active : 0
 				},
 				async: false,
-				success : function( data ){
+				success: function ( data ) {
 					//alert( JSON.stringify( data ) );
-					if( data.success ){
-						var modal = createModal( { title: "Saved User Successfully", buttons : [ { value : 'Ok'} ] } );
+					if ( data.success ) {
+						var modal = createModal( { title: "Saved User Successfully", buttons: [{ value: 'Ok' }] } );
 						setModalContent( modal, data.data.msg );
 						displayModal( modal );
 						successful = true;
-						//if( url == 'create' ){
-						//	$( '.users .listing ul' ).append('<li data-id="' + map['id'] + '">' +
-						//		map['username'] + '<img class="delete" src="assets/img/delete.png"><img class="edit" src="assets/img/edit.svg"></li>');
-						//}
+						if ( map.create ) {
+							$( '.users .listing ul' ).append( '<li data-id="' + data.data['id'] + '">' +
+								map['username'] + '<img class="delete" src="assets/img/delete.png"><img class="edit" src="assets/img/edit.svg"></li>' );
+						}
 						window.processing = false;
-					} else{
-						var modal = createModal( { title: "Error Saving User", buttons : [ { value : 'Ok'} ] } );
+					} else {
+						var modal = createModal( { title: "Error Saving User", buttons: [{ value: 'Ok' }] } );
 						setModalContent( modal, data.data.error );
 						displayModal( modal );
 						successful = false;
@@ -738,79 +758,84 @@ $( document ).ready( function(){
 						saveBtn.removeClass( 'processing' );
 					}
 				}
-			});
+			} );
 			return successful;
-		} else{
-			saveBtn.removeClass( 'processing');
+		} else {
+			saveBtn.removeClass( 'processing' );
 			return false;
 		}
 	}
 
 	function resetUser( id ) {
-		var modal = $('.modal[data-id=' + id + ']' );
+		var modal = $( '.modal[data-id=' + id + ']' );
 		var userId = modal.find( 'input[name=id]' ).val();
-		$.ajax({
-			type : 'POST',
-			url : 'rest/users/createResetPassword/' + userId,
-			dataType : 'json',
+		$.ajax( {
+			type: 'POST',
+			url: 'rest/users/createResetPassword/' + userId,
+			dataType: 'json',
 			async: false,
-			success : function( data ){
+			success: function ( data ) {
 				//alert( JSON.stringify( data ) );
-				if( data.success ){
-					var modal = createModal( { title: "Reset Password", buttons : [ { value : 'Ok'} ] } );
+				if ( data.success ) {
+					var modal = createModal( { title: "Reset Password", buttons: [{ value: 'Ok' }] } );
 					setModalContent( modal, data.data.msg );
 					displayModal( modal );
-				} else{
-					var modal = createModal( { title: "Error Saving User", buttons : [ { value : 'Ok'} ] } );
+				} else {
+					var modal = createModal( { title: "Error Saving User", buttons: [{ value: 'Ok' }] } );
 					setModalContent( modal, data.data.error );
 					displayModal( modal );
 				}
 			}
-		});
+		} );
 	}
 
 
 	/******************************************************************************/
 	/********************************User Delete***********************************/
 	/******************************************************************************/
-	$( document ).on( 'click', '#main .users li img.delete', function(){
+	$( document ).on( 'click', '#main .users li img.delete', function () {
 		var id = $( this ).closest( 'li' ).attr( 'data-id' );
-		var modal = createModal({title: 'Are you sure',
-			buttons : [ {
-				value : "Delete",
-				onclick : function(modalId){
+		var modal = createModal( {
+			title: 'Are you sure',
+			buttons: [{
+				value: "Delete",
+				onclick: function ( modalId ) {
 					var successful = false;
-					$.ajax({
-						type : 'POST',
-						url : 'rest/users/delete/',
-						data : {
-							id : id
+					$.ajax( {
+						type: 'POST',
+						url: 'rest/users/delete/',
+						data: {
+							id: id
 						},
-						dataType : 'json',
-						async : false,
-						success : function( data ){
-							if( data.success ){
-								var modal = createModal( { title: "Users Deleted Successfully", buttons : [ { value : 'Ok'} ] } );
+						dataType: 'json',
+						async: false,
+						success: function ( data ) {
+							if ( data.success ) {
+								var modal = createModal( {
+									title: "Users Deleted Successfully",
+									buttons: [{ value: 'Ok' }]
+								} );
 								setModalContent( modal, data.data.msg );
 								displayModal( modal );
 								successful = true;
 								var that = $( '.users .listing li[data-id=' + id + ']' );
-								that.slideUp( 400, function(){
+								that.slideUp( 400, function () {
 									that.remove();
-								});
+								} );
 							} else {
 								successful = false;
 							}
 						}
-					});
+					} );
 					return successful;
 				}
-			},{
-				value : "Cancel",
-				class : "low"
-			} ] } );
+			}, {
+				value: "Cancel",
+				class: "low"
+			}]
+		} );
 
-		setModalContent( modal, "<p>Are you sure you want to delete. This can not be undone</p>");
+		setModalContent( modal, "<p>Are you sure you want to delete. This can not be undone</p>" );
 		displayModal( modal );
 	} );
 
@@ -818,7 +843,7 @@ $( document ).ready( function(){
 	/******************************************************************************/
 	/******************************Password Reset**********************************/
 	/******************************************************************************/
-	$( '.resetPassword input[type=submit]' ).on( 'click', function(e){
+	$( '.resetPassword input[type=submit]' ).on( 'click', function ( e ) {
 		e.preventDefault();
 		var form = $( this ).closest( 'form' );
 		var data = $( form ).serializeArray();
@@ -827,8 +852,8 @@ $( document ).ready( function(){
 			map[field.name] = field.value;
 		} ); //get form data for verify
 		//remove errors
-		$( 'li', form ).each(function( i, elem ){
-			$(elem ).removeClass('error');
+		$( 'li', form ).each( function ( i, elem ) {
+			$( elem ).removeClass( 'error' );
 		} );
 		var hasError = false;
 
@@ -838,28 +863,104 @@ $( document ).ready( function(){
 			hasError = true;
 		}
 
-		if( !hasError ){
-			//ajax login
-			$.ajax({
-				type : 'POST',
-				url : 'rest/' + $( form ).attr('action'),
-				dataType : 'json',
-				data : {
-					token : map['token'],
-					user : map['user']
-				},
-				success : function( data ){
-					if( data.success ){
-						alert( JSON.stringify( data ) );
-					} else {
-						var modal = createModal( { title: 'Log in failed', buttons : [{ value : 'Ok' }] } );
-						setModalContent( modal, data.data.error );
-						displayModal( modal, true )
-					}
+		if ( map['stage'] == 1 ) {
+			if ( map['password'].length == 0 ) {
+				$( form ).find( 'input[name=password]' ).closest( 'li' ).addClass( 'error' );
+				hasError = true;
+			}
+
+			if ( map['password2'].length == 0 ) {
+				$( form ).find( 'input[name=password2]' ).closest( 'li' ).addClass( 'error' );
+				hasError = true;
+			}
+
+			if ( map['password'] != map['password2'] ) {
+				$( form ).find( 'input[name=password]' ).closest( 'li' ).addClass( 'error' );
+				$( form ).find( 'input[name=password2]' ).closest( 'li' ).addClass( 'error' );
+				var modal = createModal( { title: 'Error', buttons: [{ value: 'Ok' }] } );
+				setModalContent( modal, "You passwords do not match" );
+				displayModal( modal, true );
+				hasError = true;
+			}
+
+			if ( !window.modals.displaying ) {
+				if ( !regex['password'].test( $( form ).find( 'input[name=password]' ).val() ) ) {
+					$( form ).find( 'input[name=password]' ).closest( 'li' ).addClass( 'error' );
+					var modal = createModal( { title: 'Error', buttons: [{ value: 'Ok' }] } );
+					setModalContent( modal, "Your passwords must have at least:<br> one lowercase letter<br>" +
+						"one uppercase letter<br>" +
+						"one digit<br>" +
+						"and one symbol" );
+					displayModal( modal, true );
+					hasError = true;
 				}
-			})
+			}
+
+
 		}
-	});
+
+		if ( !hasError ) {
+			//ajax login
+			if ( map['stage'] == 0 ) {
+				$.ajax( {
+					type: 'POST',
+					url: CORE_URL + 'rest/' + $( form ).attr( 'action' ),
+					dataType: 'json',
+					data: {
+						token: map['token'],
+						user: map['user']
+					},
+					success: function ( data ) {
+						if ( data.success ) {
+							var modal = createModal( { title: 'Reset Your Password', buttons: [{ value: 'Ok' }] } );
+							setModalContent( modal, data.data.msg );
+							displayModal( modal, true );
+							$( 'input[name=stage]', form ).val( 1 );
+							$( 'input[name=user]', form ).attr( 'readonly' );
+							$( 'input[name=user]', form ).closest( 'li' ).slideUp();
+							$( 'input[name=password]', form ).closest( 'li' ).removeClass( 'noneImportant' );
+							$( 'input[name=password2]', form ).closest( 'li' ).removeClass( 'noneImportant' );
+							$( form ).attr( 'action', 'users/setPassword' );
+						} else {
+							var modal = createModal( { title: 'Log in failed', buttons: [{ value: 'Ok' }] } );
+							setModalContent( modal, data.data.error );
+							displayModal( modal, true )
+						}
+					}
+				} );
+			} else if ( map['stage'] == 1 ) {
+				$.ajax( {
+					type: 'POST',
+					url: CORE_URL + 'rest/' + $( form ).attr( 'action' ),
+					dataType: 'json',
+					data: {
+						token: map['token'],
+						user: map['user'],
+						password: sha512( map['password'] )
+					},
+					success: function ( data ) {
+						if ( data.success ) {
+							var modal = createModal( {
+								title: 'Success', buttons: [
+									{
+										value: 'Ok',
+										onclick: function () {
+											location.href = CORE_URL + data.data.redirect;
+										}
+									}]
+							} );
+							setModalContent( modal, data.data.msg );
+							displayModal( modal, true );
+						} else {
+							var modal = createModal( { title: 'Log in failed', buttons: [{ value: 'Ok' }] } );
+							setModalContent( modal, data.data.error );
+							displayModal( modal, true )
+						}
+					}
+				} );
+			}
+		}
+	} );
 
 	/******************************************************************************/
 	/*******************************Modal Events***********************************/
@@ -867,53 +968,59 @@ $( document ).ready( function(){
 	//$(document).on(event, selector, handler).
 	//bind to future event
 	//default close x option
-	$( document ).on( 'click', '.modal .close', function(){
-		var modal = $(this).closest( '.modal' );
-		var id = $( modal ).attr( 'data-id' ) ;
+	$( document ).on( 'click', '.modal .close', function () {
+		var modal = $( this ).closest( '.modal' );
+		var id = $( modal ).attr( 'data-id' );
 		closeModal( modal );
 	} );
-	
+
 	//modal button events
-	$( document ).on( 'click', '.modal input[type=button]', function(){
-		var modal = $(this).closest( '.modal' );
-		var id = $( modal ).attr( 'data-id' ) ;
+	$( document ).on( 'click', '.modal input[type=button]', function () {
+		var modal = $( this ).closest( '.modal' );
+		var id = $( modal ).attr( 'data-id' );
 		//get data for modal
 		var data = window.modals.data[id].buttons;
-		for( i = 0; i < data.length; i++ ){
-			if( data[i].value == $(this).attr('value') ){
+		for ( i = 0; i < data.length; i++ ) {
+			if ( data[i].value == $( this ).attr( 'value' ) ) {
 				//run the onclick
 				var cleanExit = true;
-				if( data[i].onclick ){
+				if ( data[i].onclick ) {
 					cleanExit = data[i].onclick( id );
 				}
 				if ( cleanExit ) {
-					closeModal( $(modal) );
+					closeModal( $( modal ) );
 				}
 			}
 		}
 	} );
-});
+	//modal esc key event
+	$( document ).on( 'keyup', function ( e ) {
+		if ( window.modals.displaying ) {
+			if ( e.keyCode == 27 ) {
+				closeModal( $( '.modal[data-id=' + window.modals.displaying + ']' ) );
+			}
+		}
+	} );
+} );
 
-var regex = {};
-regex['password'] = /^((?=.*\d)(?=.*[A-Z])(?=.*\W).[\S]{7,50})$/g;
-regex['email'] = /[a-z\d]+([\.\_]?[a-z\d]+)+@[a-z\d]+(\.[a-z]+)+/g;
-function startTimer( element, fn ){
+
+function startTimer( element, fn ) {
 	var time = parseInt( $( element ).attr( 'data-time' ) );
-	var interval = setInterval( function(){
-		$( element ).text( parseInt( $(element ).text() ) - 1 );
+	var interval = setInterval( function () {
+		$( element ).text( parseInt( $( element ).text() ) - 1 );
 	}, 1000 );
-	setTimeout( function(){
+	setTimeout( function () {
 		clearInterval( interval );
 		fn();
 	}, ( time * 1000 ) + 10 );
 }
 
-function adjustTextarea(h) {//
+function adjustTextarea( h ) {//
 	h.style.height = "20px";
-	h.style.height = (h.scrollHeight)+"px";
+	h.style.height = (h.scrollHeight) + "px";
 }
 
-window.modals = { ids : [], data : {} };
+window.modals = { ids: [], data: {}, displaying: false };
 /**
  * options structure
  * {
@@ -929,66 +1036,73 @@ window.modals = { ids : [], data : {} };
  *  ]
  * @param options
  */
-function createModal( options ){
+function createModal( options ) {
 	var id = 0;
-	if( window.modals.ids.length == 0 ){
+	if ( window.modals.ids.length == 0 ) {
 		id = 1;
-	}else {
+	} else {
 		id = window.modals.ids[window.modals.ids.length - 1] + 1;
 	}
-	var html = '<div data-id="'+ id + '" class="modal none">' +
+	var html = '<div data-id="' + id + '" class="modal none">' +
 		'<div class="modalWrapper">'
-	if( options.title ){ //insert the header
-		html += '<div class="modalHeader clearfix">'+
+	if ( options.title ) { //insert the header
+		html += '<div class="modalHeader clearfix">' +
 			'<span class="title">' + options.title + '</span>' +
-			'<span class="close">&times;</span>'+
-		'</div>';
+			'<span class="close">&times;</span>' +
+			'</div>';
 	}
 	//insert the content section
-	html+='<div class="modalContent"></div>';
+	html += '<div class="modalContent"></div>';
 
-	if( options.footer || options.buttons ){ //insert the header
+	if ( options.footer || options.buttons ) { //insert the header
 		html += '<div class="modalFooter">';
-		if( options.buttons ){
-			for( i = 0; i < options.buttons.length; i++ ){
+		if ( options.buttons ) {
+			for ( i = 0; i < options.buttons.length; i++ ) {
 				var x = options.buttons[i];
 				x.class = x.class ? x.class : '';
 				x.name = x.name ? x.name : '';
 				html += "<input type='button' value='" + x.value + "' class='" + x.class + "' name='" + x.name + "'/>";
 			}
 		}
-		html+= '</div>';
+		html += '</div>';
 	}
-	$('body' ).append( html );
+	$( 'body' ).append( html );
 	window.modals.data[id] = options
-	window.modals.ids.push(id);
-	return $('.modal[data-id=' + id +']');
+	window.modals.ids.push( id );
+	return $( '.modal[data-id=' + id + ']' );
 }
 
-function setModalContent( modal, html ){
+function setModalContent( modal, html ) {
 	$( modal ).find( '.modalContent' ).html( html );
 }
 
-function displayModal( modal, shake ){
+function displayModal( modal, shake ) {
 	$( modal ).fadeIn( 300 );
+	window.modals.displaying = $( modal ).attr( 'data-id' );
 }
 
-function closeModal( modal ){
+function closeModal( modal ) {
 	modal.find( '.modalWrapper' ).hide();
-	var id = $( modal ).attr('data-id');
-	$( modal ).fadeOut( 300, function(){
-		$(modal).remove();
+	var id = $( modal ).attr( 'data-id' );
+	$( modal ).fadeOut( 300, function () {
+		$( modal ).remove();
 		delete window.modals.data[id];
 		window.modals.ids.splice( window.modals.ids.indexOf( id ), 1 );
-	});
+		if ( $( '.modal' ).last().length ) {
+			window.modals.displaying = $( '.modal' ).last().attr( 'data-id' );
+		} else {
+			window.modals.displaying = false;
+		}
+
+	} );
 }
 
 
-function modalLi( type, name, label, data, text ){
+function modalLi( type, name, label, data, text ) {
 	return modalLi( type, name, label, data, text, false, false );
 }
 
-function modalLi( type, name, label, data, text, readOnly ){
+function modalLi( type, name, label, data, text, readOnly ) {
 	return modalLi( type, name, label, data, text, readOnly, false );
 }
 
@@ -1002,17 +1116,17 @@ function modalLi( type, name, label, data, text, readOnly ){
  * @param readOnly set if readonly
  * @returns {string}
  */
-function modalLi( type, name, label, data, text, readOnly, addClass ){
+function modalLi( type, name, label, data, text, readOnly, addClass ) {
 	var html = "<li>";
-	html += "<label for='" + name + "'>" + label +"</label>";
+	html += "<label for='" + name + "'>" + label + "</label>";
 	if ( type == 'textarea' ) {
 		html += "<textarea onkeyup='adjustTextarea(this)' name='" + name + "' type='" + type + "' " + ( readOnly ? 'readonly' : '' ) + ">" + data + "</textarea>";
-	} else if( type == "checkbox" ){
+	} else if ( type == "checkbox" ) {
 		html += "<input name='" + name + "' type='" + type + "' value='1'" + ( data == 1 ? 'checked' : '' ) + " " + ( readOnly ? 'readonly' : '' ) + "/>" + text;
 	} else {
 		html += "<input name='" + name + "' type='" + type + "' value='" + data + "' " + ( readOnly ? 'readonly' : '' ) + "/>";
 	}
-	if( addClass ) {
+	if ( addClass ) {
 		html += "<span>" + text + "<a class='addClass floatright'>+ Add Class</a></span>";
 	} else {
 		html += "<span>" + text + "</span>";
@@ -1022,20 +1136,19 @@ function modalLi( type, name, label, data, text, readOnly, addClass ){
 	return html;
 }
 
-function readCookie(name) {
+function readCookie( name ) {
 	var cookiename = name + "=";
-	var ca = document.cookie.split(';');
-	for(var i=0;i < ca.length;i++)
-	{
+	var ca = document.cookie.split( ';' );
+	for ( var i = 0; i < ca.length; i++ ) {
 		var c = ca[i];
-		while (c.charAt(0)==' ') c = c.substring(1,c.length);
-		if (c.indexOf(cookiename) == 0) return decodeURIComponent( c.substring(cookiename.length,c.length) );
+		while ( c.charAt( 0 ) == ' ' ) c = c.substring( 1, c.length );
+		if ( c.indexOf( cookiename ) == 0 ) return decodeURIComponent( c.substring( cookiename.length, c.length ) );
 	}
 	return null;
 }
 
-function setStorageJSON( key, data ){
-	if (typeof(Storage) !== "undefined") {
+function setStorageJSON( key, data ) {
+	if ( typeof(Storage) !== "undefined" ) {
 		localStorage.setItem( key, JSON.stringify( data ) );
 		return true;
 	} else {
@@ -1043,16 +1156,16 @@ function setStorageJSON( key, data ){
 	}
 }
 
-function getStorageJSON( key ){
-	if (typeof(Storage) !== "undefined") {
+function getStorageJSON( key ) {
+	if ( typeof(Storage) !== "undefined" ) {
 		return JSON.parse( localStorage.getItem( key ) );
 	} else {
 		return false;
 	}
 }
 
-function setStorage( key, data ){
-	if (typeof(Storage) !== "undefined") {
+function setStorage( key, data ) {
+	if ( typeof(Storage) !== "undefined" ) {
 		localStorage.setItem( key, ( data ) );
 		return true;
 	} else {
@@ -1060,10 +1173,15 @@ function setStorage( key, data ){
 	}
 }
 
-function getStorage( key ){
-	if (typeof(Storage) !== "undefined") {
+function getStorage( key ) {
+	if ( typeof(Storage) !== "undefined" ) {
 		return localStorage.getItem( key );
 	} else {
 		return false;
 	}
 }
+
+var regex = {};
+regex['password'] = /.*(?=.{10,})(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[&"'(\-_)=~#{[|`\\^@\]}^$*иг╡%,;:!?./з+]).*/g;
+regex['strongPassword'] = /^(?!.*(.)\1{1})(?=(.*[\d]){2,})(?=(.*[a-z]){2,})(?=(.*[A-Z]){2,})(?=(.*[@#$%!]){2,})(?:[\da-zA-Z@#$%!]){15,100}$/g;
+regex['email'] = /[a-z\d]+([\.\_]?[a-z\d]+)+@[a-z\d]+(\.[a-z]+)+/g;

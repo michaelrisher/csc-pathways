@@ -64,6 +64,19 @@
 			}
 		}
 
+		private function find( $username ){
+			$query = "SELECT * FROM users WHERE username = '$username'";
+
+			if ( !$result = $this->db->query( $query ) ) {
+				return false;
+			}
+			$row = $result->fetch_assoc();
+			$return = $row;
+
+			$result->close();
+			return $return;
+		}
+
 		/**
 		 * save a class from the admin page
 		 * only allowed if the user is admin
@@ -74,22 +87,22 @@
 			$_POST = Core::sanitize( $_POST, true );
 			if( isset( $_POST['create'] ) && $_POST['create'] == 'create' ){
 				$this->create( $_POST );
-				return; //to break out before other stuff is done
-			}
-			if( $this->isAdmin() ) {
-				$statement = $this->db->prepare("UPDATE users SET username=?, isAdmin=?, active=? WHERE id=?");
-				$statement->bind_param( "siii", $_POST['username'], $_POST['isAdmin'], $_POST['active'], $_POST['id']);
-				if( $statement->execute() ){
-					$obj['msg'] = "Saved successfully.";
-					$this->audit->newEvent( "Updated User: " . $_POST['username'] );
-					echo Core::ajaxResponse( $obj );
+			} else{
+				if( $this->isAdmin() ) {
+					$statement = $this->db->prepare("UPDATE users SET username=?, isAdmin=?, active=? WHERE id=?");
+					$statement->bind_param( "siii", $_POST['username'], $_POST['isAdmin'], $_POST['active'], $_POST['id']);
+					if( $statement->execute() ){
+						$obj['msg'] = "Saved successfully.";
+						$this->audit->newEvent( "Updated user: " . $_POST['username'] );
+						echo Core::ajaxResponse( $obj );
+					} else{
+						$obj['error'] = $statement->error;
+						echo Core::ajaxResponse( $obj, false );
+					}
 				} else{
-					$obj['error'] = $statement->error;
+					$obj['error'] = "Session expired.<br>Please log in again";
 					echo Core::ajaxResponse( $obj, false );
 				}
-			} else{
-				$obj['error'] = "Session expired.<br>Please log in again";
-				echo Core::ajaxResponse( $obj, false );
 			}
 		}
 
@@ -98,6 +111,7 @@
 		 */
 		private function create( $data ){
 			if( $this->isAdmin() ) {
+				$this->loadModule( 'audit' );
 				$query = "SHOW TABLE STATUS LIKE 'users'";
 				$id = -1;
 				if ( !$result = $this->db->query( $query ) ) {
@@ -107,9 +121,26 @@
 				if ( $result->num_rows ) {
 					$row = $result->fetch_assoc();
 					$id = $row['Auto_increment'];
+					$statement = $this->db->prepare( "INSERT INTO users( username, password, isAdmin, active ) VALUES( ?,' ',?,? )" );
+					$statement->bind_param( 'sii', $_POST['username'], $_POST['isAdmin'], $_POST['active'] );
+					if( $statement->execute() ){
+						$token = $this->createResetPassword( $id, true, false );
+						$obj['msg'] = "Created User successfully<br>";
+						$obj['msg'] .= "Give the user this link so they can set their password<br>";
+						$obj['msg'] .= '<a href="' . CORE_URL . 'users/resetPassword&token=' . $token . '">';
+						$obj['msg'] .= CORE_URL . 'users/resetPassword&token=' . $token . "</a>";
+						$obj['id'] = $id;
+						echo Core::ajaxResponse( $obj, true );
+						$this->audit->newEvent( 'Created user: ' . $_POST['username']);
+					} else{
+						$obj['error'] = $statement->error;
+						echo Core::ajaxResponse( $obj, false );
+					}
 				}
 				$result->close();
-
+			} else{
+				$obj['error'] = "Session expired.<br>Please log in again";
+				echo Core::ajaxResponse( $obj, false );
 			}
 		}
 
@@ -149,24 +180,59 @@
 		/**
 		 * create a reset password token
 		 * @param $id
+		 * @param $forceReturn
+		 * @return string
 		 */
-		public function createResetPassword( $id ){
+		public function createResetPassword( $id, $forceReturn = false, $noLog = false ){
 			//TODO should we set active = 0 when we do this????
 			$this->loadModule( 'audit' );
 			if( $this->isAdmin() ) {
+				$hasToken = false;
 				$id = Core::sanitize( $id );
-				//create the token
-				$token = Core::userFriendlyId( 15 );
-				$statement = $this->db->prepare("INSERT INTO tokens(token, forUser, byUser) VALUES (?,?,?)");
-				$statement->bind_param( "sii", $token, $id, $_SESSION['session']['id'] );
-				if( $statement->execute() ){
-					$obj['msg'] = "Give the user this link so they can set their password<br>";
-					$obj['msg'] .= CORE_URL . 'users/resetpassword&token=' . $token;
-					$this->audit->newEvent( "Reset User: " . $_POST['username'] . ' made by ' . $_SESSION['session']['username'] );
-					echo Core::ajaxResponse( $obj );
-				} else{
-					$obj['error'] = $statement->error;
-					echo Core::ajaxResponse( $obj, false );
+				//check if token already exists
+				$query = "SELECT * FROM tokens WHERE forUser = " . (int)$id . " AND used = 0";
+				if( $result = $this->db->query($query) ){
+					$row = null;
+					//if there was a user matching
+					if( $result->num_rows == 1 ){
+						$row = $result->fetch_assoc();
+						$token = $row['token'];
+						$hasToken = true;
+					}
+				}
+
+				if( !$hasToken ) {
+					//create the token since none exist
+					$token = Core::userFriendlyId( 15 );
+					$statement = $this->db->prepare( "INSERT INTO tokens(token, forUser, byUser) VALUES (?,?,?)" );
+					$statement->bind_param( "sii", $token, $id, $_SESSION['session']['id'] );
+					if ( $statement->execute() ) {
+						$obj['msg'] = "Give the user this link so they can set their password<br>";
+						$obj['msg'] .= '<a href="' . CORE_URL . 'users/resetPassword&token=' . $token . '">';
+						$obj['msg'] .= CORE_URL . 'users/resetPassword&token=' . $token . "</a>";
+						if( !$noLog ) $this->audit->newEvent( "Reset password for user: " . $_POST['username'] );
+						if( !$forceReturn ){
+							echo Core::ajaxResponse( $obj );
+						} else {
+							return $token;
+						}
+					} else {
+						$obj['error'] = $statement->error;
+						if( !$forceReturn ){
+							echo Core::ajaxResponse( $obj, false );
+						} else {
+							return $token;
+						}
+					}
+				} else {
+					$obj['msg'] = "User already has an existing unused token<br>Give the user this link so they can set their password<br>";
+					$obj['msg'] .= '<a href="' . CORE_URL . 'users/resetPassword&token=' . $token . '">';
+					$obj['msg'] .= CORE_URL . 'users/resetPassword&token=' . $token . "</a>";
+					if( !$forceReturn ){
+						echo Core::ajaxResponse( $obj );
+					} else {
+						return $token;
+					}
 				}
 			}
 		}
@@ -181,6 +247,9 @@
 			include( CORE_PATH . 'pages/resetPassword.php' );
 		}
 
+		/**
+		 * verify that the user and the token match up
+		 */
 		public function verifyToken(){
 			$_POST = Core::sanitize( $_POST );
 			$query = "SELECT * FROM tokens WHERE token = '" . $_POST['token'] . "'";
@@ -195,12 +264,58 @@
 			$row = null;
 			//if there was a user matching
 			if( $result->num_rows == 1 ){
-				echo Core::ajaxResponse( $obj, true );
-
+				$row = $result->fetch_assoc();
+				$user = $this->find( $_POST['user'] );
+				if( $row['forUser'] == $user['id'] ){
+					if( $row['used'] == 0 ){
+						$obj['msg'] = 'Enter a new password';
+						echo Core::ajaxResponse( $obj );
+					} else {
+						$obj['error'] = 'Token has already been used';
+						echo Core::ajaxResponse( $obj, false );
+					}
+				} else {
+					$obj['error'] = "Token doesn't match for the username";
+					echo Core::ajaxResponse( $obj, false );
+				}
+				$result->close();
 			} else {
 				$obj['error'] = "Invalid token";
 				echo Core::ajaxResponse( $obj, false );
 			}
+		}
+
+		/**
+		 *
+		 */
+		public function setPassword(){
+			$_POST = Core::sanitize($_POST);
+			$user = $this->find( $_POST['user'] );
+			$obj = array();
+			if( $user ){
+				$statement = $this->db->prepare( "UPDATE users SET password=? WHERE id = ?" );
+				$pass = $this->hashPassword( $_POST['password'], $_POST['user'] );
+				$uid = (int)$user['id'];
+				$statement->bind_param( "si", $pass, $uid );
+				if ( $statement->execute() ) {
+					$obj['msg'] = "Password changed successfully";
+					$obj['redirect'] = 'login';
+					echo Core::ajaxResponse( $obj );
+					if ( isset( $_POST['token'] ) ) {
+						$statement = $this->db->prepare( "UPDATE tokens SET used=1 WHERE token = ?" );
+						$statement->bind_param( "s", $_POST['token'] );
+						$statement->execute();
+						$statement->close();
+					}
+				} else {
+					$obj['error'] = "An error occurred please try again";
+					echo Core::ajaxResponse( $obj );
+				}
+			} else{
+				$obj['error'] = 'Username does not exist';
+				echo Core::ajaxResponse( $obj, false );
+			}
+
 		}
 
 		/**
@@ -210,9 +325,7 @@
 			//clean the post of any injects
 			$_POST = Core::sanitize( $_POST );
 			//hash the password and username to salt the password
-			$password[0] = hash( 'sha512', substr($_POST['password'], 0, 64 ) );
-			$password[1] = hash( 'sha512', substr($_POST['password'], 64 ) );
-			$passwordHash = hash( 'sha512', $password[0] . $password[1] . $_POST['user'] );
+			$passwordHash = $this->hashPassword( $_POST['password'], $_POST['user'] );
 			//create the query to check if the user exists and to verify hashs
 			$query = "SELECT * FROM users WHERE username = '${_POST['user']}' AND password = '$passwordHash'";
 
@@ -325,5 +438,12 @@
 			}
 
 			return false;
+		}
+
+		private function hashPassword( $inPass, $inUser ){
+			$password[0] = hash( 'sha512', substr( $inPass, 0, 64 ) );
+			$password[1] = hash( 'sha512', substr( $inPass, 64 ) );
+			$passwordHash = hash( 'sha512', $password[0] . $password[1] . $inUser );
+			return $passwordHash;
 		}
 	}
