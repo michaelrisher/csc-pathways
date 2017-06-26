@@ -23,7 +23,7 @@
 		define( 'CORE_PATH', '/home/michael_risher/public_html/' . CORE_DIR );//$_SERVER['DOCUMENT_ROOT'] . substr( $_SERVER['SCRIPT_NAME'], 0, -9 ) );
 		define( 'CORE_ROOT', '/home/michael_risher/public_html/' );//$_SERVER['DOCUMENT_ROOT'] . substr( $_SERVER['SCRIPT_NAME'], 0, ( -9 - strlen( CORE_DIR ) ) ) );
 		define( 'CORE_REQUEST_TYPE', $_SERVER['REQUEST_METHOD'] );
-		define( 'CORE_URL', ( isset( $_SERVER['HTTPS'] ) ? 'https' : 'http' ) . '://' . $_SERVER[ 'HTTP_HOST' ] . '/~michael_risher/' . CORE_DIR . '/' );
+		define( 'CORE_URL', ( isset( $_SERVER['HTTPS'] ) ? 'https' : 'http' ) . '://' . $_SERVER[ 'HTTP_HOST' ] . '/' );
 		define( 'DB_IP', 'localhost' );
 		define( 'DB_USER', 'pathways' );
 		define( 'DB_PASS', 'S0larF0r3st!' );
