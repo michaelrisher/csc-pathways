@@ -87,30 +87,6 @@
 			$obj = array();
 			$_POST = Core::sanitize( $_POST, true );
 			if( $this->users->isLoggedIn() ) {
-				$classes = array();
-				preg_match_all("/~.+?~/", $_POST['advisory'], $classes );
-				for( $j = 0; $j < count( $classes[0] ); $j++ ){
-					$classData = $this->get( str_replace( '~', '', $classes[0][$j] ), true );
-					$code = explode( ' - ', $classData['title'] );
-					$_POST['advisory'] = str_replace( $classes[0][$j], '<a class="fakeLink" data-to="class" data-code="' . $classData['id'] . '">' . $code[0] .'</a>', $_POST['advisory'] );
-				}
-
-				$classes = array();
-				preg_match_all("/~.+?~/", $_POST['prereq'], $classes );
-				for( $j = 0; $j < count( $classes[0] ); $j++ ){
-					$classData = $this->get( str_replace( '~', '', $classes[0][$j] ), true );
-					$code = explode( ' - ', $classData['title'] );
-					$_POST['prereq'] = str_replace( $classes[0][$j], '<a class="fakeLink" data-to="class" data-code="' . $classData['id'] . '">' . $code[0] .'</a>', $_POST['prereq'] );
-				}
-
-				$classes = array();
-				preg_match_all("/~.+?~/", $_POST['coreq'], $classes );
-				for( $j = 0; $j < count( $classes[0] ); $j++ ){
-					$classData = $this->get( str_replace( '~', '', $classes[$j] ), true );
-					$code = explode( ' - ', $classData['title'] );
-					$_POST['coreq'] = str_replace( $classes[$j], '<a class="fakeLink" data-to="class" data-code="' . $classData['id'] . '">' . $code[0] .'</a>', $_POST['coreq'] );
-				}
-
 				$statement = $this->db->prepare("UPDATE classes SET title=?, units=?, transfer=?, prereq=?, advisory=?, coreq=?, description=? WHERE id=?");
 				$statement->bind_param( "sdssssss", $_POST['title'], $_POST['units'], $_POST['transfer'], $_POST['prereq'], $_POST['advisory'], $_POST['coreq'], $_POST['description'], $_POST['id']);
 				if( $statement->execute() ){
@@ -171,30 +147,6 @@
 			$obj = array();
 			$_POST = Core::sanitize( $_POST );
 			if( $this->users->isLoggedIn() ) {
-				$classes = array();
-				preg_match("/~.+?~/", $_POST['advisory'], $classes );
-				for( $j = 0; $j < count( $classes ); $j++ ){
-					$classData = $this->get( str_replace( '~', '', $classes[$j] ), true );
-					$code = explode( ' - ', $classData['title'] );
-					$_POST['advisory'] = str_replace( $classes[$j], '<a class="fakeLink" data-to="class" data-code="' . $classData['id'] . '">' . $code[0] .'</a>', $_POST['advisory'] );
-				}
-
-				$classes = array();
-				preg_match("/~.+?~/", $_POST['prereq'], $classes );
-				for( $j = 0; $j < count( $classes ); $j++ ){
-					$classData = $this->get( str_replace( '~', '', $classes[$j] ), true );
-					$code = explode( ' - ', $classData['title'] );
-					$_POST['prereq'] = str_replace( $classes[$j], '<a class="fakeLink" data-to="class" data-code="' . $classData['id'] . '">' . $code[0] .'</a>', $_POST['prereq'] );
-				}
-
-				$classes = array();
-				preg_match("/~.+?~/", $_POST['coreq'], $classes );
-				for( $j = 0; $j < count( $classes ); $j++ ){
-					$classData = $this->get( str_replace( '~', '', $classes[$j] ), true );
-					$code = explode( ' - ', $classData['title'] );
-					$_POST['coreq'] = str_replace( $classes[$j], '<a class="fakeLink" data-to="class" data-code="' . $classData['id'] . '">' . $code[0] .'</a>', $_POST['coreq'] );
-				}
-
 				$statement = $this->db->prepare("INSERT INTO classes(id, title, units, transfer, prereq, advisory, coreq, description) VALUES (?,?,?,?,?,?,?,?)");
 				$statement->bind_param( "ssdsssss", $_POST['id'], $_POST['title'], $_POST['units'], $_POST['transfer'], $_POST['prereq'], $_POST['advisory'], $_POST['coreq'], $_POST['description'] );
 				if( $statement->execute() ){
@@ -216,6 +168,7 @@
 		 * @deprecated
 		 */
 		private function update(){
+			if( !$this->users->isLoggedIn() ) return;
 			$classes = $this->listing();
 			foreach ( $classes as $class ) {
 				$data = $this->get( $class['id'] );
@@ -228,6 +181,26 @@
 					echo $data['title'] . ' sort updated ' . $code . '<br>';
 				}
 			}
+		}
 
+		/**
+		 * replacing old class link with new standard keeping for future reference
+		 * @deprecated
+		 */
+		private function updateClassLink(){
+			if( !$this->users->isLoggedIn() ) return;
+			$classes = $this->listing();
+			foreach ( $classes as $class ) {
+				$data = $this->get( $class['id'] );
+				$data['prereq'] = preg_replace( '/<a.+?data-code="(.+?)">(.+?)<\/a>/', '[class id="$1" text="$2" /]', $data['prereq'] );
+				$data['coreq'] = preg_replace( '/<a.+?data-code="(.+?)">(.+?)<\/a>/', '[class id="$1" text="$2" /]', $data['coreq'] );
+				$data['advisory'] = preg_replace( '/<a.+?data-code="(.+?)">(.+?)<\/a>/', '[class id="$1" text="$2" /]', $data['advisory'] );
+				$statement = $this->db->prepare("UPDATE classes SET prereq=?, coreq=?, advisory=? WHERE id=?");
+				$statement->bind_param( "ssss", $data['prereq'], $data['coreq'], $data['advisory'], $data['id'] );
+				$i = 0;
+				if( $statement->execute() ){
+					echo ++$i . '       ' . $data['title'] . ' fixed' . print_r( $data ) . '<br><br>';
+				}
+			}
 		}
 	}

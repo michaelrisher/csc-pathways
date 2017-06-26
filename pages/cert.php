@@ -26,14 +26,14 @@
 				?></p>
 
 			<div class="alignjustify">
-				<p><?= $data['description'] ?></p>
+				<p><?= Core::replaceClassLink( $data['description'] ) ?></p>
 
 				<p class="bold margin15Top">Program Learning Outcomes</p>
 
 				<p>Upon successful completion of this program, students should be able to:</p>
-				<?= $data['elo'] ?>
+				<?= Core::replaceClassLink( $data['elo'] ) ?>
 			</div>
 		</div>
 	</div>
-	<?= $GLOBALS['main']->certs->replaceClassLink($data['schedule']); ?>
+	<?= Core::replaceClassLink($data['schedule']); ?>
 </div>

@@ -107,7 +107,9 @@ $( document ).ready( function () {
 		}
 	} );
 
-	//classes edit option
+	/******************************************************************************/
+	/*****************************Class functions**********************************/
+	/******************************************************************************/
 	$( document ).on( 'click', '#main .classes li img.edit', function () {
 		//get the class info
 		var id = $( this ).closest( 'li' ).attr( 'data-id' );
@@ -211,6 +213,10 @@ $( document ).ready( function () {
 						if ( url == 'create' ) {
 							$( '.classes .listing ul' ).append( '<li data-id="' + map['id'] + '">' +
 								map['title'] + '<img class="delete" src="assets/img/delete.png"><img class="edit" src="assets/img/edit.svg"></li>' );
+						}
+						//remove the class cache
+						if ( getStorage( 'invalidateCache' ) ) {
+							setStorage( 'invalidateCache', +new Date() );
 						}
 						window.processing = false;
 					} else {
@@ -316,39 +322,59 @@ $( document ).ready( function () {
 		var input = $( this ).closest( 'li' ).find( 'input' );
 		var prevModal = $( this ).closest( '.modal' );
 		var id = $( prevModal ).attr( 'data-id' );
-		$.ajax( {
-			type: 'POST',
-			url: 'rest/classes/listing',
-			dataType: 'json',
-			//async : false,
-			success: function ( data ) {
-				if ( data.success ) {
-					var modal = createModal( {
-						title: "Choose Class",
-						buttons: [{
-							value: 'Add',
-							onclick: function ( id ) {
-								var that = $( '.modal[data-id=' + id + ']' );
-								//$( that ).find( 'select'.val())
-								$( input ).val( $( input ).val() + '~' + $( that ).find( 'select' ).val() + '~' );
-								return true;
-							}
-						}, {
-							value: 'Cancel',
-							class: 'low'
-						}]
-					} );
-					var html = '<form><ul><li><label for="class">Classes</label>' +
-						'<select name="class">';
-					for ( var i = 0; i < data.data.length; i++ ) {
-						html += "<option value='" + data.data[i].id + "'>" + data.data[i].title + "</option>";
-					}
-					html += '</select><span>Pick a class to add</span></li>';
-					setModalContent( modal, html );
-					displayModal( modal );
-				}
+		if ( getStorage( "invalidateCache" ) && getStorage( 'classes' ) ) {
+			var time = parseInt( getStorage( "invalidateCache" ) );
+			var curr = +new Date(); //gives unix time
+			if ( curr >= time ) {
+				delete localStorage.classes;
 			}
-		} );
+		}
+		if ( ( data = getStorageJSON( 'classes' ) ) != null ) {
+			createClassModal( data );
+		} else {
+			$.ajax( {
+				type: 'POST',
+				url: 'rest/classes/listing',
+				dataType: 'json',
+				//async : false,
+				success: function ( data ) {
+					if ( data.success ) {
+						setStorageJSON( 'classes', data.data );
+						var t = +new Date(); //gives unix time
+						setStorage( 'invalidateCache', ( t + ( 5 * 60 * 1000 ) ) );
+						createClassModal( data.data );
+					}
+				}
+			} );
+		}
+
+		function createClassModal( data ){
+			var modal = createModal( {
+				title: "Choose Class",
+				buttons: [{
+					value: 'Add',
+					onclick: function ( id ) {
+						var that = $( '.modal[data-id=' + id + ']' );
+						var val = $( that ).find( 'select').val();
+						//$( input ).val( $( input ).val() + '~' + $( that ).find( 'select' ).val() + '~' );
+						var classCode = $( 'option[value=' + val + ']', that ).html().match( /[a-zA-Z]{3}\-\d{1,4}[a-zA-Z]*/ )[0];
+						$( input ).val( $( input ).val() + '[class id="' + $( that ).find( 'select' ).val() + '" text="' + classCode + '" /]' );
+						return true;
+					}
+				}, {
+					value: 'Cancel',
+					class: 'low'
+				}]
+			} );
+			var html = '<form><ul><li><label for="class">Classes</label>' +
+				'<select name="class">';
+			for ( var i = 0; i < data.length; i++ ) {
+				html += "<option value='" + data[i].id + "'>" + data[i].title + "</option>";
+			}
+			html += '</select><span>Pick a class to add</span></li>';
+			setModalContent( modal, html );
+			displayModal( modal );
+		}
 	} );
 
 
@@ -440,10 +466,7 @@ $( document ).ready( function () {
 				}
 
 				//still in setup function for editor
-				function loadClassModal( data, is8Week ) {
-					if ( is8Week == undefined ) {
-						is8Week = false;
-					}
+				function loadClassModal( data ) {
 					//this either uses the cached copy of the classes or requests it from the network
 					//will re-validate the cached copy every 5 minutes or after when you save the page
 					var modal = createModal( {
@@ -455,11 +478,7 @@ $( document ).ready( function () {
 								var val = $( that ).find( 'select' ).val();
 								var classCode = $( 'option[value=' + val + ']', that ).html().match( /[a-zA-Z]{3}\-\d{1,4}[a-zA-Z]*/ )[0];
 								var float = $( 'input[name=float]:checked', that ).val();
-								if ( float ) {
-									editor.insertContent( '[class f="' + float.substr( 0, 1 ) + '" id="' + $( that ).find( 'select' ).val() + '" text="' + classCode + '" /]' );
-								} else {
-									editor.insertContent( '[class id="' + $( that ).find( 'select' ).val() + '" text="' + classCode + '" /]' );
-								}
+								editor.insertContent( '[class id="' + $( that ).find( 'select' ).val() + '" text="' + classCode + '" /]' );
 								return true;
 							}
 						}, {
@@ -473,12 +492,6 @@ $( document ).ready( function () {
 						html += "<option value='" + data[i].id + "'>" + data[i].title + "</option>";
 					}
 					html += '</select><span>Pick a class to add</span></li>';
-					if ( is8Week ) {
-						html += '<li><label>8 Week Alignment</label>' +
-							'<div><input type="radio" name="float" value="left"/>Left Side</div>' +
-							'<div><input type="radio" name="float" value="right"/>Right Side</div>' +
-							'<span>Only check if making an 8 week class</span></li>';
-					}
 					html += '</ul></form>';
 					setModalContent( modal, html );
 					displayModal( modal );
@@ -895,8 +908,6 @@ $( document ).ready( function () {
 					hasError = true;
 				}
 			}
-
-
 		}
 
 		if ( !hasError ) {
@@ -963,6 +974,29 @@ $( document ).ready( function () {
 	} );
 
 	/******************************************************************************/
+	/*******************************ToolTip Events*********************************/
+	/******************************************************************************/
+	//tooltip from http://www.alessioatzeni.com/blog/simple-tooltip-with-jquery-only-text/
+	$('.tooltip').hover(function(){
+		// Hover over code
+		var title = $(this).attr('title');
+		$(this).data('tipText', title).removeAttr('title');
+		$('<p class="tip"></p>')
+			.text(title)
+			.appendTo('body')
+			.fadeIn('slow');
+	}, function() {
+		// Hover out code
+		$(this).attr('title', $(this).data('tipText'));
+		$('.tip').remove();
+	}).mousemove(function(e) {
+		var mousex = e.pageX + 20; //Get X coordinates
+		var mousey = e.pageY + 10; //Get Y coordinates
+		$('.tip')
+			.css({ top: mousey, left: mousex })
+	});
+
+	/******************************************************************************/
 	/*******************************Modal Events***********************************/
 	/******************************************************************************/
 	//$(document).on(event, selector, handler).
@@ -993,6 +1027,7 @@ $( document ).ready( function () {
 			}
 		}
 	} );
+
 	//modal esc key event
 	$( document ).on( 'keyup', function ( e ) {
 		if ( window.modals.displaying ) {

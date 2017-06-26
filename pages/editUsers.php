@@ -51,8 +51,8 @@
 							$data = $GLOBALS['main']->users->listing();
 							foreach ( $data as $user ) {
 								echo "<li data-id='${user['id']}'>${user['username']}";
-								echo "<img class='delete' src='". CORE_URL ."assets/img/delete.png'/>";
-								echo "<img class='edit' src='". CORE_URL ."assets/img/edit.svg'/>";
+								echo "<img class='delete tooltip' src='". CORE_URL ."assets/img/delete.png' title='Delete User'/>";
+								echo "<img class='edit tooltip' src='". CORE_URL ."assets/img/edit.svg' title='Edit User'/>";
 								echo "</li>";
 							}
 						?>

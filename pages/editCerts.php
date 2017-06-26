@@ -51,8 +51,8 @@
 						$data = $GLOBALS['main']->certs->listing();
 						foreach ( $data as $cert ) {
 							echo "<li data-id='${cert['id']}'>${cert['code']} - ${cert['description']}";
-							echo "<img class='delete' src='". CORE_URL ."assets/img/delete.png'/>";
-							echo "<a href='certs/edit/${cert['id']}'><img class='edit' src='". CORE_URL ."assets/img/edit.svg'/></a>";
+							echo "<img class='delete tooltip' title='Delete certificate' src='". CORE_URL ."assets/img/delete.png'/>";
+							echo "<a href='certs/edit/${cert['id']}'><img class='edit tooltip' title='Edit certificate' src='". CORE_URL ."assets/img/edit.svg'/></a>";
 							echo "</li>";
 						}
 					?>

@@ -33,7 +33,7 @@
 					<li><a href="<?= CORE_URL ?>editCerts">Certificates</a></li>
 				</ul>
 				<div class="floatright">
-					<a href="logout">Logout</a>
+					<a href="<?= CORE_URL ?>logout">Logout</a>
 				</div>
 			</div>
 		</div>

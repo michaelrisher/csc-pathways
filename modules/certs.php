@@ -52,9 +52,9 @@
 				//put the data onscreen
 				$data = $this->get( $id );
 				$data['categories'] = $this->listCategories();
-
 				include( CORE_PATH . 'pages/certEdit.php' );
-
+			} else {
+				Core::errorPage( 404 );
 			}
 		}
 
@@ -266,17 +266,5 @@ EOD;
 				$obj['error'] = "Session expired.<br>Please log in again";
 				echo Core::ajaxResponse( $obj, false );
 			}
-		}
-
-		/**
-		 * parse the class link from the html editor into a link for user
-		 * @param $string
-		 * @return mixed
-		 */
-		public function replaceClassLink( $string ){
-			return preg_replace( '/\[class\s*id=[\'|\"](.+?)[\'|\"]\s*text=[\'|\"](.+?)[\'|\"]\s*\/\]/',
-				"<a class='fakeLink' data-to='class' data-code='$1'>$2</a>",
-				$string
-				);//regex to match the link string
 		}
 	}

@@ -40,13 +40,13 @@
 								echo '<p>' . $row['transfer'] . '</p>';
 							}
 							if ( $row['prereq'] != null || !empty( $row['prereq'] ) ) {
-								echo '<p class="italic">Prerequisite: ' . $row['prereq'] . '</p>';
+								echo '<p class="italic">Prerequisite: ' . Core::replaceClassLink( $row['prereq'] ) . '</p>';
 							}
 							if ( $row['advisory'] != null || !empty( $row['advisory'] ) ) {
-								echo '<p class="italic">Advisory: ' . $row['advisory'] . '</p>';
+								echo '<p class="italic">Advisory: ' . Core::replaceClassLink( $row['advisory'] ) . '</p>';
 							}
 							if ( $row['coreq'] != null || !empty( $row['coreq'] ) ) {
-								echo '<p class="italic">Corequisite: ' . $row['coreq'] . '</p>';
+								echo '<p class="italic">Corequisite: ' . Core::replaceClassLink( $row['coreq'] ) . '</p>';
 							}
 						?>
 						<br>

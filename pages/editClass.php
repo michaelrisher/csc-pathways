@@ -51,8 +51,8 @@
 						$data = $GLOBALS['main']->classes->listing();
 						foreach ( $data as $class ) {
 							echo "<li data-id='${class['id']}'>${class['title']}";
-							echo "<img class='delete' src='". CORE_URL ."assets/img/delete.png'/>";
-							echo "<img class='edit' src='". CORE_URL ."assets/img/edit.svg'/>";
+							echo "<img class='delete tooltip' title='Delete class' src='". CORE_URL ."assets/img/delete.png'/>";
+							echo "<img class='edit tooltip' title='Edit class' src='". CORE_URL ."assets/img/edit.svg'/>";
 							echo "</li>";
 						}
 					?>

@@ -424,129 +424,10 @@ body {
 #wrapper #main .login form,
 #wrapper #main .resetPassword form {
   max-width: 400px;
-  margin: 50px auto;
-  background: #c1cad3;
-  border-radius: 2px;
-  padding: 20px;
-  font-family: Georgia, "Times New Roman", Times, serif;
-}
-#wrapper #main .login form h1,
-#wrapper #main .resetPassword form h1 {
-  display: block;
-  text-align: center;
-  padding: 0;
-  margin: 0px 0px 20px 0px;
-  color: #5C5C5C;
-  font-size: x-large;
-}
-#wrapper #main .login form ul,
-#wrapper #main .resetPassword form ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-#wrapper #main .login form ul li,
-#wrapper #main .resetPassword form ul li {
-  display: block;
-  padding: 9px;
-  border: 1px solid #a2aab2;
-  margin-bottom: 30px;
-  border-radius: 3px;
-}
-#wrapper #main .login form ul li.error,
-#wrapper #main .resetPassword form ul li.error {
-  border: 1px solid red !important;
-}
-#wrapper #main .login form ul li.error > span,
-#wrapper #main .resetPassword form ul li.error > span {
-  background: red !important;
-}
-#wrapper #main .login form ul li:last-child,
-#wrapper #main .resetPassword form ul li:last-child {
-  border: none;
-  margin-bottom: 0px;
-  text-align: center;
-}
-#wrapper #main .login form ul li > label,
-#wrapper #main .resetPassword form ul li > label {
-  display: block;
-  float: left;
-  margin-top: -19px;
-  background: #c1cad3;
-  height: 14px;
-  padding: 2px 5px 2px 5px;
-  color: #4e4e4e;
-  font-size: 14px;
-  overflow: hidden;
-  font-family: Arial, Helvetica, sans-serif;
-}
-#wrapper #main .login form ul li > span,
-#wrapper #main .resetPassword form ul li > span {
-  background: #4e4e4e;
-  display: block;
-  padding: 3px;
-  margin: 0 -9px -9px -9px;
-  text-align: center;
-  color: #fafafa;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 11px;
-}
-#wrapper #main .login form ul input[type="text"],
-#wrapper #main .resetPassword form ul input[type="text"],
-#wrapper #main .login form ul input[type="date"],
-#wrapper #main .resetPassword form ul input[type="date"],
-#wrapper #main .login form ul input[type="datetime"],
-#wrapper #main .resetPassword form ul input[type="datetime"],
-#wrapper #main .login form ul input[type="email"],
-#wrapper #main .resetPassword form ul input[type="email"],
-#wrapper #main .login form ul input[type="number"],
-#wrapper #main .resetPassword form ul input[type="number"],
-#wrapper #main .login form ul input[type="search"],
-#wrapper #main .resetPassword form ul input[type="search"],
-#wrapper #main .login form ul input[type="time"],
-#wrapper #main .resetPassword form ul input[type="time"],
-#wrapper #main .login form ul input[type="url"],
-#wrapper #main .resetPassword form ul input[type="url"],
-#wrapper #main .login form ul input[type="password"],
-#wrapper #main .resetPassword form ul input[type="password"],
-#wrapper #main .login form ul textarea,
-#wrapper #main .resetPassword form ul textarea,
-#wrapper #main .login form ul select,
-#wrapper #main .resetPassword form ul select {
-  box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  width: 100%;
-  display: block;
-  outline: none;
-  border: none;
-  height: 35px;
-  line-height: 35px;
-  font-size: 16px;
-  padding: 0;
-  font-family: Georgia, "Times New Roman", Times, serif;
 }
 #wrapper #main .login form ul textarea,
 #wrapper #main .resetPassword form ul textarea {
   resize: none;
-}
-#wrapper #main .login form ul input[type="submit"],
-#wrapper #main .resetPassword form ul input[type="submit"],
-#wrapper #main .login form ul input[type="button"],
-#wrapper #main .resetPassword form ul input[type="button"] {
-  background: #2471FF;
-  border: none;
-  padding: 10px 20px 10px 20px;
-  border-bottom: 3px solid #5994FF;
-  border-radius: 3px;
-  color: #D2E2FF;
-}
-#wrapper #main .login form ul input[type="submit"]:hover,
-#wrapper #main .resetPassword form ul input[type="submit"]:hover,
-#wrapper #main .login form ul input[type="button"]:hover,
-#wrapper #main .resetPassword form ul input[type="button"]:hover {
-  background: #6B9FFF;
-  color: #fff;
 }
 #wrapper #main .errorPage div,
 #wrapper #main .logout div {
@@ -571,6 +452,11 @@ body {
   font-weight: bold;
   padding: 10px 0 10px 0;
 }
+#wrapper #main .admin .classes .listing li:nth-child(even),
+#wrapper #main .admin .certs .listing li:nth-child(even),
+#wrapper #main .admin .users .listing li:nth-child(even) {
+  background: #b1bcc7;
+}
 #wrapper #main .admin .classes li,
 #wrapper #main .admin .certs li,
 #wrapper #main .admin .users li {
@@ -584,11 +470,6 @@ body {
 #wrapper #main .admin .users li:last-child {
   border-bottom: 1px solid #000000;
 }
-#wrapper #main .admin .classes li:nth-child(even),
-#wrapper #main .admin .certs li:nth-child(even),
-#wrapper #main .admin .users li:nth-child(even) {
-  background: #b1bcc7;
-}
 #wrapper #main .admin .classes li img,
 #wrapper #main .admin .certs li img,
 #wrapper #main .admin .users li img {
@@ -598,14 +479,22 @@ body {
   vertical-align: text-top;
   padding: 0 5px 0 5px;
 }
-#wrapper #main .admin .certs form {
+#wrapper #main .admin .certs form ul li {
+  border: 1px solid #a2aab2;
+}
+#wrapper #main .admin .certs form ul li:last-child {
+  border: none;
+  margin-bottom: 0px;
+  text-align: center;
+}
+form {
   margin: 50px auto;
   background: #c1cad3;
   border-radius: 2px;
   padding: 20px;
   font-family: Georgia, "Times New Roman", Times, serif;
 }
-#wrapper #main .admin .certs form h1 {
+form h1 {
   display: block;
   text-align: center;
   padding: 0;
@@ -613,30 +502,30 @@ body {
   color: #5C5C5C;
   font-size: x-large;
 }
-#wrapper #main .admin .certs form ul {
+form ul {
   list-style: none;
   padding: 0;
   margin: 0;
 }
-#wrapper #main .admin .certs form ul li {
+form ul li {
   display: block;
   padding: 9px;
   border: 1px solid #a2aab2;
   margin-bottom: 30px;
   border-radius: 3px;
 }
-#wrapper #main .admin .certs form ul li.error {
+form ul li.error {
   border: 1px solid red !important;
 }
-#wrapper #main .admin .certs form ul li.error > span {
+form ul li.error > span {
   background: red !important;
 }
-#wrapper #main .admin .certs form ul li:last-child {
+form ul li:last-child {
   border: none;
   margin-bottom: 0px;
   text-align: center;
 }
-#wrapper #main .admin .certs form ul li > label {
+form ul li > label {
   display: block;
   float: left;
   margin-top: -19px;
@@ -648,7 +537,7 @@ body {
   overflow: hidden;
   font-family: Arial, Helvetica, sans-serif;
 }
-#wrapper #main .admin .certs form ul li > span {
+form ul li > span {
   background: #4e4e4e;
   display: block;
   padding: 3px;
@@ -657,9 +546,6 @@ body {
   color: #fafafa;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 11px;
-}
-#wrapper #main .admin .certs form ul textarea {
-  resize: none;
 }
 input[disabled],
 input[readonly] {
@@ -698,6 +584,11 @@ input[type="button"] {
   border-radius: 3px;
   color: #D2E2FF;
 }
+input[type="submit"]:hover,
+input[type="button"]:hover {
+  background: #6B9FFF;
+  color: #fff;
+}
 input[type="submit"].low,
 input[type="button"].low {
   background: #8c8c8c;
@@ -711,7 +602,6 @@ input[type="button"].processing {
   background-position-y: 3px;
   color: rgba(0, 0, 0, 0);
 }
-/* The Modal (background) */
 .modal {
   position: fixed;
   /* Stay in place */
@@ -732,125 +622,60 @@ input[type="button"].processing {
   background-color: rgba(0, 0, 0, 0.4);
   /* Black w/ opacity */
 }
-/* Modal Content */
-.modalWrapper {
+.modal .modalWrapper {
   background-color: #fefefe;
   margin: auto;
   padding: 20px;
   border: 1px solid #888;
   width: 450px;
 }
-.modalWrapper .close {
+.modal .modalWrapper .close {
   color: #aaaaaa;
   float: right;
   font-size: 28px;
   font-weight: bold;
 }
-.modalWrapper .close:hover,
-.modalWrapper .closefocus {
+.modal .modalWrapper .close:hover,
+.modal .modalWrapper .closefocus {
   color: #000;
   text-decoration: none;
   cursor: pointer;
 }
-.modalWrapper .modalContent {
+.modal .modalWrapper .modalContent {
   min-height: 20px;
   overflow: auto;
   max-height: 470px;
   line-height: 18px;
   height: auto;
 }
-.modalWrapper .modalFooter {
+.modal .modalWrapper .modalFooter {
   text-align: right;
   margin-top: 15px;
 }
-.modalWrapper .modalFooter input {
+.modal .modalWrapper .modalFooter input {
   margin: 0 0 0 15px;
 }
-.modalWrapper form {
+.modal .modalWrapper form {
   max-width: 400px;
-  margin: 50px auto;
   background: #fff;
-  border-radius: 2px;
-  padding: 0 20px 0 20px;
-  font-family: Georgia, "Times New Roman", Times, serif;
 }
-.modalWrapper form h1 {
-  display: block;
-  text-align: center;
-  padding: 0;
-  margin: 0px 0px 20px 0px;
-  color: #5C5C5C;
-  font-size: x-large;
-}
-.modalWrapper form ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.modalWrapper form ul li {
-  display: block;
-  padding: 9px;
+.modal .modalWrapper form ul li {
   border: 1px solid #4e4e4e;
-  margin-bottom: 30px;
-  border-radius: 3px;
 }
-.modalWrapper form ul li.error {
+.modal .modalWrapper form ul li.error {
   border: 1px solid red !important;
 }
-.modalWrapper form ul li.error > span {
+.modal .modalWrapper form ul li.error > span {
   background: red !important;
 }
-.modalWrapper form ul li > label {
-  display: block;
-  float: left;
-  margin-top: -19px;
+.modal .modalWrapper form ul li > label {
   background: #fff;
-  height: 14px;
-  padding: 2px 5px 2px 5px;
-  color: #4e4e4e;
-  font-size: 14px;
-  overflow: hidden;
-  font-family: Arial, Helvetica, sans-serif;
 }
-.modalWrapper form ul li > span {
-  background: #4e4e4e;
-  display: block;
-  padding: 3px;
-  margin: 0 -9px -9px -9px;
-  text-align: center;
-  color: silver;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 11px;
-}
-.modalWrapper form ul input[type="text"],
-.modalWrapper form ul input[type="date"],
-.modalWrapper form ul input[type="datetime"],
-.modalWrapper form ul input[type="email"],
-.modalWrapper form ul input[type="number"],
-.modalWrapper form ul input[type="search"],
-.modalWrapper form ul input[type="time"],
-.modalWrapper form ul input[type="url"],
-.modalWrapper form ul input[type="password"],
-.modalWrapper form ul textarea,
-.modalWrapper form ul select {
-  box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  width: 100%;
-  display: block;
-  outline: none;
-  border: none;
-  height: 35px;
-  line-height: 35px;
-  font-size: 16px;
-  padding: 0;
-  font-family: Georgia, "Times New Roman", Times, serif;
-}
-.modalWrapper form ul textarea {
+.modal .modalWrapper form ul textarea {
   resize: none;
   max-height: 365px;
 }
-.modalWrapper a {
+.modal .modalWrapper a {
   color: #20c5f7;
   text-decoration: underline;
   cursor: pointer;
@@ -867,4 +692,14 @@ input[type="button"].processing {
 }
 .noneImportant {
   display: none !important;
+}
+.tip {
+  display: none;
+  position: absolute;
+  border: 1px solid #333;
+  background-color: #161616;
+  border-radius: 5px;
+  padding: 10px;
+  color: #fff;
+  font-size: 12px;
 }
