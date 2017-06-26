@@ -255,7 +255,7 @@ body {
   height: 80px !important;
 }
 #wrapper a {
-  color: #0000ee /* browser's internal value */;
+  color: #0000ee;
   text-decoration: underline;
   cursor: pointer;
 }
@@ -442,21 +442,41 @@ body {
   font-weight: bold;
   padding: 10px 0 10px 0;
 }
-#wrapper #main .admin .audit .listing {
-  overflow: scroll;
-  height: 250px;
+#wrapper #main .admin .audit .pages {
+  margin: 10px;
 }
+#wrapper #main .admin .audit .pages p {
+  margin: 0 0 10px 0;
+}
+#wrapper #main .admin .audit .pages a {
+  padding-right: 10px;
+  text-decoration: none;
+}
+#wrapper #main .admin .audit .pages a:after {
+  content: '|';
+  padding: 0 0 0 10px;
+  color: #000 !important;
+}
+#wrapper #main .admin .audit .pages a:last-child:after {
+  content: '';
+}
+#wrapper #main .admin .audit .pages a.current {
+  color: #ffba00;
+}
+#wrapper #main .admin .audit > p,
 #wrapper #main .admin .classes > p,
 #wrapper #main .admin .certs > p,
 #wrapper #main .admin .users > p {
   font-weight: bold;
   padding: 10px 0 10px 0;
 }
+#wrapper #main .admin .audit .listing li:nth-child(even),
 #wrapper #main .admin .classes .listing li:nth-child(even),
 #wrapper #main .admin .certs .listing li:nth-child(even),
 #wrapper #main .admin .users .listing li:nth-child(even) {
   background: #b1bcc7;
 }
+#wrapper #main .admin .audit li,
 #wrapper #main .admin .classes li,
 #wrapper #main .admin .certs li,
 #wrapper #main .admin .users li {
@@ -465,11 +485,13 @@ body {
   border: 1px solid black;
   border-bottom: none;
 }
+#wrapper #main .admin .audit li:last-child,
 #wrapper #main .admin .classes li:last-child,
 #wrapper #main .admin .certs li:last-child,
 #wrapper #main .admin .users li:last-child {
   border-bottom: 1px solid #000000;
 }
+#wrapper #main .admin .audit li img,
 #wrapper #main .admin .classes li img,
 #wrapper #main .admin .certs li img,
 #wrapper #main .admin .users li img {

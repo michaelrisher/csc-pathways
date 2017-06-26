@@ -8,6 +8,7 @@
 	if( !$GLOBALS['main']->users->isLoggedIn() ){
 		Core::errorPage( 404 );
 	}
+	$params = $data['params'];
 ?>
 <!DOCTYPE html>
 <html>
@@ -42,19 +43,38 @@
 	</div>
 	<div id="main">
 		<div class="admin">
-			<div class="classes aligncenter">
+			<div class="audit aligncenter">
 				<p>Audit Log</p>
 				<div class="listing alignleft">
 					<ul>
 					<?php
 						$GLOBALS['main']->loadModule( 'audit' );
-						$data = $GLOBALS['main']->audit->listing();
+
+						if( is_numeric( $params ) ){
+							$data = $GLOBALS['main']->audit->listing( $data['params'] );
+						} else {
+							$data = $GLOBALS['main']->audit->listing();
+						}
 						foreach ( $data as $event ) {
 							echo "<li>User ${event['username']}: ${event['event']}  <span class='floatright'>${event['date']}</span>";
 							echo "</li>";
 						}
 					?>
 					</ul>
+					<div class="pages aligncenter" >
+						<p>Pages</p>
+					<?php
+						$pages = $GLOBALS['main']->audit->getPages();
+						$currentPage = is_numeric( $params ) ? $params : 1;
+						if(  $currentPage > 1 ) echo "<a href='" . CORE_URL . "admin/" . ( $currentPage - 1 ). "'/>&lt;</a>";
+						for( $i = 1; $i <= $pages; $i++ ){
+							echo "<a href='" . CORE_URL . 'admin/' . $i . "' class='";
+							echo is_numeric( $params ) ? ( $params == $i ? 'current' : '' ) : ( $i == 1 ? 'current' : '' );
+							echo "'>" . ( $i ) . "</a>";
+						}
+						if(  $currentPage < $pages ) echo "<a href='" . CORE_URL . "admin/" . ( $currentPage + 1 ). "'/>&gt;</a>";
+					?>
+					</div>
 				</div>
 			</div>
 		</div>

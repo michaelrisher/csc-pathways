@@ -15,7 +15,10 @@
 		public function listing( $page = 1 ){
 			$this->loadModule( 'users' );
 			if( $this->users->isLoggedIn() ) {
-				$query = "SELECT date,users.username,event FROM audit INNER JOIN users ON audit.user = users.id ORDER BY date DESC LIMIT 50";
+				$limit = 50;
+				$page--;//to make good looking page numbers for users
+				$offset = $page * $limit;
+				$query = "SELECT date,users.username,event FROM audit INNER JOIN users ON audit.user = users.id ORDER BY date DESC LIMIT $offset,$limit";
 
 				if ( !$result = $this->db->query( $query ) ) {
 					echo( 'There was an error running the query [' . $this->db->error . ']' );
@@ -31,6 +34,19 @@
 					array_push( $return, $a );
 				}
 				return $return;
+			}
+		}
+
+		public function getPages(){
+			$this->loadModule( 'users' );
+			if( $this->users->isLoggedIn() ) {
+				$limit = 50;
+				$query = "SELECT COUNT(id) as pages FROM audit";
+
+				if ( $result = $this->db->query( $query ) ) {
+					$row = $result->fetch_assoc();
+					return ceil( $row['pages'] / $limit );
+				}
 			}
 		}
 

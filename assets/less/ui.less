@@ -9,7 +9,7 @@ html, body{ background-color: #d3dce6; }
 	}
 
 	a {
-		color: #0000ee/* browser's internal value */;
+		color: #0000ee;
 		text-decoration: underline;
 		cursor: pointer;
 	}
@@ -205,13 +205,32 @@ html, body{ background-color: #d3dce6; }
 					font-weight: bold;
 					padding: 10px 0 10px 0;
 				}
-				.listing{
-					overflow: scroll;
-					height: 250px;
+
+				.pages{
+					margin: 10px;
+					p{
+						margin: 0 0 10px 0;
+					}
+					a{
+						padding-right: 10px;
+						text-decoration: none;
+						&:after{
+							content: '|';
+							padding: 0 0 0 10px;
+							color: #000 !important;
+						}
+
+						&:last-child:after{
+							content: '';
+						}
+						&.current{
+							color: #ffba00;
+						}
+					}
 				}
 			}
 
-			.classes, .certs, .users{
+			.audit, .classes, .certs, .users{
 				& > p{
 					font-weight: bold;
 					padding: 10px 0 10px 0;
