@@ -47,33 +47,29 @@
 		 */
 		public function get( $id, $forceReturn = false ){
 			$this->loadModule( 'users' );
-			if( $this->users->isLoggedIn() ) {
-				$query = "SELECT * FROM classes WHERE id = '$id'";
+			$query = "SELECT * FROM classes WHERE id = '$id'";
 
-				if ( !$result = $this->db->query( $query ) ) {
+			if ( !$result = $this->db->query( $query ) ) {
 //					echo( 'There was an error running the query [' . $this->db->error . ']' );
-					echo Core::ajaxResponse( array( 'error' => "An error occurred please try again" ), false );
-					return;
-				}
-				$row = $result->fetch_assoc();
-				$return = array(
-						'id' => $row['id'],
-						'title' => $row['title'],
-						'units' => $row['units'],
-						'transfer' => $row['transfer'],
-						'advisory' => $row['advisory'],
-						'prereq' => $row['prereq'],
-						'coreq' => $row['coreq'],
-						'description' => $row['description']
-				);
+				echo Core::ajaxResponse( array( 'error' => "An error occurred please try again" ), false );
+				return null;
+			}
+			$row = $result->fetch_assoc();
+			$return = array(
+					'id' => $row['id'],
+					'title' => $row['title'],
+					'units' => $row['units'],
+					'transfer' => $row['transfer'],
+					'advisory' => $row['advisory'],
+					'prereq' => $row['prereq'],
+					'coreq' => $row['coreq'],
+					'description' => $row['description']
+			);
 
-				if ( IS_AJAX  && !$forceReturn) {
-					echo Core::ajaxResponse( $return );
-				} else {
-					return $return;
-				}
+			if ( IS_AJAX  && !$forceReturn) {
+				echo Core::ajaxResponse( $return );
 			} else {
-				echo Core::ajaxResponse( array( 'error' => 'Session expired.<br>Please log in again'), false );
+				return $return;
 			}
 		}
 

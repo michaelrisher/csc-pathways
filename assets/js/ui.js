@@ -387,9 +387,10 @@ $( document ).ready( function () {
 		tinyMCE.init( {
 			mode: "textareas",
 			branding: false,
-			plugins: "table, lists, code, autoresize",
+			plugins: "table, lists, code, autoresize, textcolor, colorpicker",
 			autoresize_max_height: 600,
-			toolbar: 'undo redo | bold italic underline subscript superscript | fontselect fontsizeselect | alignleft aligncenter alignright alignjustify formatselect table ' +
+			toolbar: 'undo redo | bold italic underline subscript superscript | fontselect fontsizeselect forecolor backcolor ' +
+			'alignleft aligncenter alignright alignjustify | formatselect table ' +
 			' bullist | addclass shortClass scheduleTable | code',
 			menubar: false,
 			setup: function ( editor ) {

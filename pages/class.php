@@ -7,20 +7,12 @@
 	 */
 
 	//TODO update this to new code
-	$db = new DB();
-	$mysqli = $db->createConnection();
 	$data = Core::sanitize( $data );
 	$id = $data['params'];
-	$sql = "SELECT * FROM classes WHERE id = '" . $id . "'";
-	if(!$result = $mysqli->query($sql)){
-		die('There was an error running the query [' . $mysqli->error . ']');
-	}
-	$row = null;
-	if( $result->num_rows == 1 ) {
-		$row = $result->fetch_assoc();
-//		echo '<pre>';
-//		print_r( $row );
-//		echo '</pre>';
+	$GLOBALS['main']->loadModule( 'classes' );
+	$row = $GLOBALS['main']->classes->get( $id, true );
+	if( isset( $row ) && $row['id'] != null ) {
+
 		?>
 		<div>
 			<div class="">

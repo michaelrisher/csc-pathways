@@ -15,7 +15,7 @@
 		public function listing( $page = 1 ){
 			$this->loadModule( 'users' );
 			if( $this->users->isLoggedIn() ) {
-				$limit = 50;
+				$limit = 25;
 				$page--;//to make good looking page numbers for users
 				$offset = $page * $limit;
 				$query = "SELECT date,users.username,event FROM audit INNER JOIN users ON audit.user = users.id ORDER BY date DESC LIMIT $offset,$limit";
@@ -40,7 +40,7 @@
 		public function getPages(){
 			$this->loadModule( 'users' );
 			if( $this->users->isLoggedIn() ) {
-				$limit = 50;
+				$limit = 25;
 				$query = "SELECT COUNT(id) as pages FROM audit";
 
 				if ( $result = $this->db->query( $query ) ) {
