@@ -17,7 +17,7 @@
 		<div>
 			<div class="">
 				<div class="aligncenter clearfix margin15">
-					<p class="info">Class Information <img class="floatright margin10Right back" data-to="cert" width=20
+					<p class="info">Class Information <img alt="To Certificate Info" title="To Certificate Info" class="floatright margin10Right back tooltip" data-to="cert" width=20
 														   src="<?= CORE_URL . 'assets/img/back.png' ?>"/></p>
 				</div>
 				<div class="margin15 padding10">

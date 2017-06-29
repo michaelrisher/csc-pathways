@@ -932,6 +932,7 @@ $( document ).ready( function () {
 							$( 'input[name=user]', form ).closest( 'li' ).slideUp();
 							$( 'input[name=password]', form ).closest( 'li' ).removeClass( 'noneImportant' );
 							$( 'input[name=password2]', form ).closest( 'li' ).removeClass( 'noneImportant' );
+							$( 'input[type=submit]', form ).val( 'Reset Password' );
 							$( form ).attr( 'action', 'users/setPassword' );
 						} else {
 							var modal = createModal( { title: 'Log in failed', buttons: [{ value: 'Ok' }] } );
@@ -978,7 +979,7 @@ $( document ).ready( function () {
 	/*******************************ToolTip Events*********************************/
 	/******************************************************************************/
 	//tooltip from http://www.alessioatzeni.com/blog/simple-tooltip-with-jquery-only-text/
-	$('.tooltip').hover(function(){
+	$( document ).on( 'mouseover', '.tooltip', function(e){
 		// Hover over code
 		var title = $(this).attr('title');
 		$(this).data('tipText', title).removeAttr('title');
@@ -986,15 +987,18 @@ $( document ).ready( function () {
 			.text(title)
 			.appendTo('body')
 			.fadeIn('slow');
-	}, function() {
+	});
+
+	$( document ).on( 'mouseout', '.tooltip', function(e){
 		// Hover out code
 		$(this).attr('title', $(this).data('tipText'));
 		$('.tip').remove();
-	}).mousemove(function(e) {
+	});
+
+	$( document ).on( 'mousemove', '.tooltip', function(e){
 		var mousex = e.pageX + 20; //Get X coordinates
 		var mousey = e.pageY + 10; //Get Y coordinates
-		$('.tip')
-			.css({ top: mousey, left: mousex })
+		$('.tip') .css({ top: mousey, left: mousex })
 	});
 
 	/******************************************************************************/

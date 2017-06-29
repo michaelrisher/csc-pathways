@@ -346,7 +346,7 @@
 				$obj['user'] = $row['username'];
 				//if the user is set to active meaning they are allowed to access report that error to them
 				if( $row['active'] == 0 ){
-					$obj['errors'] = "Account has been deactivated.";
+					$obj['error'] = "Account has been deactivated.";
 					echo Core::ajaxResponse( $obj, false );
 				} else {
 					//if user is active then log in

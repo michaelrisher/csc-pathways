@@ -13,7 +13,7 @@
 <div>
 	<div class="aligncenter">
 		<div class="clearfix margin10">
-			<p class="info">Certification Information <img class="floatright margin15Right back" data-to="top" width=20 src="<?= CORE_URL . 'assets/img/back.png' ?>"/></p>
+			<p class="info">Certification Information <img alt="To Top" title="To Top" class="floatright margin15Right back tooltip" data-to="top" width=20 src="<?= CORE_URL . 'assets/img/back.png' ?>"/></p>
 
 			<p class="title"><?= $data['title'] ?> (<?php
 					if ( $data['hasAs'] ) {

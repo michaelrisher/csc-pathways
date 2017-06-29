@@ -38,9 +38,9 @@
 	$main->users->checkExpiredSession(); //check for expired session
 
 	//set cookie with the core_url
-	//TODO problem setting cookie on staging
 	setcookie ("url", CORE_URL, time()+3600*24*(2) );
 
+	//TODO fix it so all functions that don't exist go to 404
 	if ( /*IS_AJAX &&*/ isset( $_GET['rested'] ) ) { //calling a module
 		$GLOBALS['main']->loadModule( $uri['module'] );
 		if ( isset( $uri['params'] ) ) {
