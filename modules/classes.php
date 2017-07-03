@@ -150,7 +150,14 @@
 					echo Core::ajaxResponse( $obj );
 					$this->audit->newEvent( "Created class: " . $_POST['title'] );
 				} else{
-					$obj['error'] = $statement->error;
+					$error = $statement->error;
+					if( preg_match( "/Duplicate entry '(.+?)' for key 'id'/", $error ) ){
+						$value = preg_replace( "/Duplicate entry '(.+?)' for key 'id'/", '$1', $error );
+						$obj['error'] = "That id of \"$value\" already exists";
+						$obj['errorCode'] = 1;
+					} else {
+						$obj['error'] = $statement->error;
+					}
 					echo Core::ajaxResponse( $obj, false );
 				}
 			} else{

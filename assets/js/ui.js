@@ -61,6 +61,10 @@ $( document ).ready( function () {
 		}, 500 );
 	} );
 
+	/******************************************************************************/
+	/********************************login*****************************************/
+	/******************************************************************************/
+
 	$( '#main .login [type=submit]' ).on( 'click', function ( e ) {
 		e.preventDefault(); //prevent the default submit action
 		var form = $( this ).closest( 'form' );
@@ -134,16 +138,17 @@ $( document ).ready( function () {
 							}
 						]
 					} );
-					var html = "<form><ul>";
+					var html = "<p>* fields are required</p>";
+					html += "<form><ul>";
 					//type, name, label, data, text
-					html += modalLi( 'text', 'id', 'ID', data.data.id, "Enter the class ID", true );
-					html += modalLi( 'text', 'title', 'Title', data.data.title, "Enter the class title", false );
-					html += modalLi( 'number', 'units', 'Units', data.data.units, "Enter the class units", false );
+					html += modalLi( 'text', 'id', 'ID*', data.data.id, "Enter the class ID", true );
+					html += modalLi( 'text', 'title', 'Title*', data.data.title, "Enter the class title", false, false, 'Class title should look like: CIS-1 - Title' );
+					html += modalLi( 'number', 'units', 'Units*', data.data.units, "Enter the class units", false );
 					html += modalLi( 'text', 'transfer', 'Transfer', data.data.transfer ? data.data.transfer : '', "Enter the class transfer", false );
 					html += modalLi( 'text', 'advisory', 'Advisory', data.data.advisory ? data.data.advisory : '', "Enter the class advisory", false, true );
 					html += modalLi( 'text', 'prereq', 'Prerequisite', data.data.prereq ? data.data.prereq : '', "Enter the class prerequisite", false, true );
 					html += modalLi( 'text', 'coreq', 'Corequisite', data.data.coreq ? data.data.coreq : '', "Enter the class corequisite", false, true );
-					html += modalLi( 'textarea', 'description', 'Description', data.data.description, "Enter the class Description", false );
+					html += modalLi( 'textarea', 'description', 'Description*', data.data.description, "Enter the class Description", false );
 					html += "</ul></form>";
 					setModalContent( modal, html );
 					displayModal( modal );
@@ -173,6 +178,10 @@ $( document ).ready( function () {
 		} );
 		var hasError = false;
 		//verify data
+		if ( map['id'].length == 0 ) {
+			$( form ).find( 'input[name=id]' ).closest( 'li' ).addClass( 'error' );
+			hasError = true;
+		}
 		if ( map['title'].length == 0 ) {
 			$( form ).find( 'input[name=title]' ).closest( 'li' ).addClass( 'error' );
 			hasError = true;
@@ -184,6 +193,13 @@ $( document ).ready( function () {
 		if ( map['description'].length == 0 ) {
 			$( form ).find( 'textarea[name=description]' ).closest( 'li' ).addClass( 'error' );
 			hasError = true;
+		}
+		if( !regex['classTitle'].test( map['title'] ) ){ //if doesnt match the
+			$( form ).find( 'input[name=title]' ).closest( 'li' ).addClass( 'error' );
+			hasError = true;
+			var modal = createModal({ title: "Error", buttons : [{value: "Ok"}] });
+			setModalContent( modal, "<p>Title must match this pattern</p><p>EXA-1 - Example title for class example-1</p>");
+			displayModal( modal );
 		}
 
 		if ( !hasError && !window.processing ) {
@@ -301,17 +317,18 @@ $( document ).ready( function () {
 				}
 			]
 		} );
-		var html = "<form><ul>";
+		var html = "<p>* fields are required</p>";
+		html+="<form><ul>";
 		//type, name, label, data, text
 		html += "<input type='hidden' name='create' value='create' />";
-		html += modalLi( 'text', 'id', 'ID', '', "Enter the class ID", false );
-		html += modalLi( 'text', 'title', 'Title', '', "Enter the class title", false );
-		html += modalLi( 'number', 'units', 'Units', 0, "Enter the class units", false );
+		html += modalLi( 'text', 'id', 'ID*', '', "Enter the class ID", false, false, 'An sample id for CIS-1A would be c1a' );
+		html += modalLi( 'text', 'title', 'Title*', '', "Enter the class title", false, false, 'Class title should look like: CIS-1 - Title' );
+		html += modalLi( 'number', 'units', 'Units*', 0, "Enter the class units", false );
 		html += modalLi( 'text', 'transfer', 'Transfer', '', "Enter the class transfer", false );
 		html += modalLi( 'text', 'advisory', 'Advisory', '', "Enter the class advisory", false, true );
 		html += modalLi( 'text', 'prereq', 'Prerequisite', '', "Enter the class prerequisite", false, true );
 		html += modalLi( 'text', 'coreq', 'Corequisite', '', "Enter the class corequisite", false, true );
-		html += modalLi( 'textarea', 'description', 'Description', '', "Enter the class Description", false );
+		html += modalLi( 'textarea', 'description', 'Description*', '', "Enter the class Description", false );
 		html += "</ul></form>";
 		setModalContent( modal, html );
 		displayModal( modal );
@@ -898,6 +915,7 @@ $( document ).ready( function () {
 			}
 
 			if ( !window.modals.displaying ) {
+				//todo make sure this doesnt alternate because of the /[a-z]/g flag
 				if ( !regex['password'].test( $( form ).find( 'input[name=password]' ).val() ) ) {
 					$( form ).find( 'input[name=password]' ).closest( 'li' ).addClass( 'error' );
 					var modal = createModal( { title: 'Error', buttons: [{ value: 'Ok' }] } );
@@ -1156,15 +1174,15 @@ function modalLi( type, name, label, data, text, readOnly ) {
  * @param readOnly set if readonly
  * @returns {string}
  */
-function modalLi( type, name, label, data, text, readOnly, addClass ) {
+function modalLi( type, name, label, data, text, readOnly, addClass, tooltip ) {
 	var html = "<li>";
 	html += "<label for='" + name + "'>" + label + "</label>";
 	if ( type == 'textarea' ) {
-		html += "<textarea onkeyup='adjustTextarea(this)' name='" + name + "' type='" + type + "' " + ( readOnly ? 'readonly' : '' ) + ">" + data + "</textarea>";
+		html += "<textarea onkeyup='adjustTextarea(this)' name='" + name + "' type='" + type + "' " + ( readOnly ? 'readonly' : '' ) + ( tooltip ? ( 'class="tooltip" title="' + tooltip +'"' ):'' ) + ">" + data + "</textarea>";
 	} else if ( type == "checkbox" ) {
-		html += "<input name='" + name + "' type='" + type + "' value='1'" + ( data == 1 ? 'checked' : '' ) + " " + ( readOnly ? 'readonly' : '' ) + "/>" + text;
+		html += "<input name='" + name + "' type='" + type + "' value='1'" + ( data == 1 ? 'checked' : '' ) + " " + ( readOnly ? 'readonly' : '' ) + ( tooltip ? ( 'class="tooltip" title="' + tooltip +'"' ):'' ) + "/>" + text;
 	} else {
-		html += "<input name='" + name + "' type='" + type + "' value='" + data + "' " + ( readOnly ? 'readonly' : '' ) + "/>";
+		html += "<input name='" + name + "' type='" + type + "' value='" + data + "' " + ( readOnly ? 'readonly' : '' ) + ( tooltip ? ( 'class="tooltip" title="' + tooltip +'"' ):'' ) +  "/>";
 	}
 	if ( addClass ) {
 		html += "<span>" + text + "<a class='addClass floatright'>+ Add Class</a></span>";
@@ -1223,5 +1241,6 @@ function getStorage( key ) {
 
 var regex = {};
 regex['password'] = /.*(?=.{10,})(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[&"'(\-_)=~#{[|`\\^@\]}^$*иг╡%,;:!?./з+]).*/g;
-regex['strongPassword'] = /^(?!.*(.)\1{1})(?=(.*[\d]){2,})(?=(.*[a-z]){2,})(?=(.*[A-Z]){2,})(?=(.*[@#$%!]){2,})(?:[\da-zA-Z@#$%!]){15,100}$/g;
-regex['email'] = /[a-z\d]+([\.\_]?[a-z\d]+)+@[a-z\d]+(\.[a-z]+)+/g;
+regex['strongPassword'] = /^(?!.*(.)\1{1})(?=(.*[\d]){2,})(?=(.*[a-z]){2,})(?=(.*[A-Z]){2,})(?=(.*[@#$%!]){2,})(?:[\da-zA-Z@#$%!]){15,100}$/;
+regex['email'] = /[a-z\d]+([\.\_]?[a-z\d]+)+@[a-z\d]+(\.[a-z]+)+/;
+regex['classTitle'] = /^[A-Za-z]{3}-.+? - .+$/;
