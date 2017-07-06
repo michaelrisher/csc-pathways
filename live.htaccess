@@ -1,0 +1,42 @@
+<IfModule mod_rewrite.c>
+	#Options +FollowSymlinks
+	#Options -Indexes
+
+	RewriteEngine on
+	#RewriteBase /lab/
+
+	# Prevent them from viewing hidden files/dirs.
+	RewriteRule "(^|/)\." - [F] 
+
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteRule ^/?assets/(.*) %{HTTP_ROOT}/~michael_risher/pathways/assets/$1 [L,QSA]
+
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteRule ^/?rest/(.*) %{HTTP_ROOT}/~michael_risher/pathways/index.php?url=$1&rested=1 [L,QSA]
+	
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{HTTPS} !=on
+	RewriteRule ^/?certs/(.*) %{HTTP_ROOT}/~michael_risher/pathways/index.php?url=certs/$1&rested=1 [L,QSA]
+
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{HTTPS} !=on
+	RewriteRule ^/?classes(.*) %{HTTP_ROOT}/~michael_risher/pathways/index.php?url=classes/$1&rested=1 [L,QSA]
+
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{HTTPS} !=on
+	RewriteRule ^/?users/(.*) %{HTTP_ROOT}/~michael_risher/pathways/index.php?url=users/$1&rested=1 [L,QSA]
+	
+	RewriteRule ^$ %{HTTP_ROOT}/~michael_risher/pathways/index.php?url=pages/display/home [L,QSA]
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteRule (.*) %{HTTP_ROOT}/~michael_risher/pathways/index.php?url=pages/display/$1 [L,QSA]
+	
+	
+</IfModule>
+
+
