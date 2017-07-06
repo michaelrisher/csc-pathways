@@ -65,6 +65,20 @@ $( document ).ready( function () {
 		}, 500 );
 	} );
 
+	$( 'html' ).on( 'click', 'img.link', function ( e ) { //link button
+		var parent = $( this ).closest( '.datablock' );
+		if( $( parent ).attr( 'id' ) == 'cert' ) {
+			var qsa = getQueryString();
+			var qsaE = { cert : qsa.cert };
+			var url = stripQueryString() + queryStringToUrl( qsaE );
+		} else {
+			var url = location.href;
+		}
+		var modal = createModal( { title : "Copy Link", buttons : [ { value : 'Ok' } ] } );
+		setModalContent( modal, '<textarea>' + url + '</textarea>' );
+		displayModal( modal );
+	} );
+
 	/******************************************************************************/
 	/********************************login*****************************************/
 	/******************************************************************************/
