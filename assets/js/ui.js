@@ -75,8 +75,13 @@ $( document ).ready( function () {
 			var url = location.href;
 		}
 		var modal = createModal( { title : "Copy Link", buttons : [ { value : 'Ok' } ] } );
-		setModalContent( modal, '<textarea>' + url + '</textarea>' );
+		setModalContent( modal, '<p>The link has been copied</p><textarea>' + url + '</textarea>' );
 		displayModal( modal );
+		$( 'textarea', modal ).select();
+
+		try {
+			var successful = document.execCommand('copy');
+		} catch (err) { }
 	} );
 
 	/******************************************************************************/
