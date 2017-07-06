@@ -128,7 +128,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="<?= ( isset( $_GET ) && isset( $_GET['cert'] )) ? '' : 'none';?>" id="cert">
+			<div class="datablock<?= ( isset( $_GET ) && isset( $_GET['cert'] )) ? '' : ' none';?>" id="cert">
 				<?php
 					if( isset( $_GET ) && isset( $_GET['cert'] ) ){
 						$GLOBALS['main']->loadModule( 'certs' );
@@ -137,7 +137,7 @@
 					}
 				?>
 			</div>
-			<div class="<?= ( isset( $_GET ) && isset( $_GET['class'] )) ? '' : 'none';?>" id="class">
+			<div class="datablock<?= ( isset( $_GET ) && isset( $_GET['class'] )) ? '' : ' none';?>" id="class">
 				<?php
 					if( isset( $_GET ) && isset( $_GET['class'] ) ){
 						$GLOBALS['main']->loadModule( 'classes' );

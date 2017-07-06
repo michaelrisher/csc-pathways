@@ -17,8 +17,10 @@
 		<div>
 			<div class="">
 				<div class="aligncenter clearfix margin15">
-					<p class="info">Class Information <img alt="To Certificate Info" title="To Certificate Info" class="floatright margin10Right back tooltip" data-to="cert" width=20
-														   src="<?= CORE_URL . 'assets/img/back.png' ?>"/></p>
+					<p class="info">Class Information
+						<img alt="To Certificate Info" title="To Certificate Info" class="floatright margin10Right back tooltip" data-to="cert" width=20 src="<?= CORE_URL . 'assets/img/back.png' ?>"/>
+						<img alt="Copy Link" title="Copy Link" class="floatright margin15Right link tooltip" data-to="top" width=20 src="<?= CORE_URL . 'assets/img/link.png' ?>"/>
+					</p>
 				</div>
 				<div class="margin15 padding10">
 					<div class="clearfix">
