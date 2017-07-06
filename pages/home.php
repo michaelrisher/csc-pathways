@@ -128,11 +128,23 @@
 					</div>
 				</div>
 			</div>
-			<div class="none" id="cert">
-				<?php //include CORE_PATH . 'assets/inc/cert/CE803.php'; ?>
+			<div class="<?= ( isset( $_GET ) && isset( $_GET['cert'] )) ? '' : 'none';?>" id="cert">
+				<?php
+					if( isset( $_GET ) && isset( $_GET['cert'] ) ){
+						$GLOBALS['main']->loadModule( 'certs' );
+						$_GET = Core::sanitize( $_GET );
+						$GLOBALS['main']->certs->show( $_GET['cert'] );
+					}
+				?>
 			</div>
-			<div class="none" id="class">
-				<?php //include CORE_PATH . 'assets/inc/class/c1a.php'; ?>
+			<div class="<?= ( isset( $_GET ) && isset( $_GET['class'] )) ? '' : 'none';?>" id="class">
+				<?php
+					if( isset( $_GET ) && isset( $_GET['class'] ) ){
+						$GLOBALS['main']->loadModule( 'classes' );
+						$_GET = Core::sanitize( $_GET );
+						$GLOBALS['main']->classes->show( $_GET['class'] );
+					}
+				?>
 			</div>
 		</div>
 	</div>

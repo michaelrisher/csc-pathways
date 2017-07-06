@@ -26,17 +26,7 @@
 				<div class="floatleft subtitle">Join the Bitcoin Revolution.</div>
 			</div>
 			<div class="nav clearfix">
-				<ul>
-					<li><a href="<?= CORE_URL ?>admin">Admin Home</a></li>
-					<li><a href="<?= CORE_URL ?>editClass">Classes</a></li>
-					<li><a href="<?= CORE_URL ?>editCerts">Certificates</a></li>
-					<?php if( $GLOBALS['main']->users->isAdmin() ) { ?>
-						<li><a href="<?= CORE_URL ?>editUsers">Users</a></li>
-					<?php } ?>
-				</ul>
-				<div class="floatright">
-					<a href="logout">Logout</a>
-				</div>
+				<?php include_once CORE_PATH . 'assets/inc/adminNav.php'; ?>
 			</div>
 		</div>
 	</div>

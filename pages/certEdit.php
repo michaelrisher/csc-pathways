@@ -27,39 +27,38 @@
 				<div class="floatleft subtitle">Join the Bitcoin Revolution.</div>
 			</div>
 			<div class="nav clearfix">
-				<ul>
-					<li><a href="<?= CORE_URL ?>admin">Admin Home</a></li>
-					<li><a href="<?= CORE_URL ?>editClass">Classes</a></li>
-					<li><a href="<?= CORE_URL ?>editCerts">Certificates</a></li>
-					<?php if( $GLOBALS['main']->users->isAdmin() ) { ?>
-						<li><a href="<?= CORE_URL ?>editUsers">Users</a></li>
-					<?php } ?>
-				</ul>
-				<div class="floatright">
-					<a href="<?= CORE_URL ?>logout">Logout</a>
-				</div>
+				<?php include_once CORE_PATH . 'assets/inc/adminNav.php'; ?>
 			</div>
 		</div>
 	</div>
 	<div id="main">
 		<div class="admin">
 			<div class="certs aligncenter margin15Bottom">
-				<p>Editing <?=$data['title']?></p>
+				<p>
+				<?php
+					if( isset( $_GET['create'] ) ){
+						echo "Create";
+					} else{
+						echo "Editing ${data['title']}";
+					}
+				?>
+				</p>
 				<form action="certs/save/<?=$data['id']?>" method="post">
 					<input type="hidden" name="id" value="<?=$data['id']?>" />
+					<p class="alignleft margin15Bottom">* Required fields</p>
 					<ul>
 						<li>
-							<label for="title">Title</label>
+							<label for="title">Title*</label>
 							<input type="text" name="title" value="<?=isset( $data['title'] ) ? $data['title'] : ''?>"/>
 							<span>Enter the certificate description</span>
 						</li>
 						<li>
-							<label for="code">Code</label>
+							<label for="code">Code*</label>
 							<input type="text" name="code" value="<?=isset( $data['code'] ) ? $data['code'] : ''?>"/>
 							<span>Enter the certificate code number</span>
 						</li>
 						<li>
-							<label for="units">Units</label>
+							<label for="units">Units*</label>
 							<input type="number" name="units" value="<?=isset( $data['units'] ) ? $data['units'] : 0?>"/>
 							<span>Enter the certificate units</span>
 						</li>
@@ -86,17 +85,17 @@
 							<span>Enter the certificate category</span>
 						</li>
 						<li>
-							<label for="description">Description</label>
+							<label for="description">Description*</label>
 							<textarea class="froala-editor" name="description" id="description" ><?=isset( $data['description'] ) ? $data['description'] : ''?></textarea>
 							<span>Enter the certificate description</span>
 						</li>
 						<li>
-							<label for="elo">Expected Learning Outcomes</label>
+							<label for="elo">Expected Learning Outcomes*</label>
 							<textarea class="froala-editor" name="elo" id="elo" ><?=isset( $data['elo'] ) ? $data['elo'] : ''?></textarea>
 							<span>Enter the certificate expected learning outcome</span>
 						</li>
 						<li>
-							<label for="schedule">Schedule</label>
+							<label for="schedule">Schedule*</label>
 							<textarea class="froala-editor" name="schedule" id="schedule" ><?=isset( $data['schedule'] ) ? $data['schedule'] : ''?></textarea>
 							<span>Enter the certificate schedule</span>
 						</li>

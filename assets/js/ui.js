@@ -8,6 +8,8 @@ $( document ).ready( function () {
 
 		if ( loc == 'cert' && !$( '#class' ).hasClass( 'none' ) ) {
 			$( "#class" ).toggleClass( 'none' );
+			var qsa = queryString( 'class', null );
+			updateUrl( stripQueryString() + queryStringToUrl( qsa ) );
 		}
 
 		if ( $( idLocation ).hasClass( 'none' ) ) {
@@ -32,6 +34,8 @@ $( document ).ready( function () {
 			success: function ( data ) {
 				$( idLocation ).html( data );
 				$( idLocation ).css( 'height', '' );
+				var qsa = queryString( loc, goto );
+				updateUrl( stripQueryString() + queryStringToUrl( qsa ) );
 				$( 'html, body' ).animate( { //update scroll once ajax finishes
 					scrollTop: $( idLocation ).offset().top
 				}, 500 );
@@ -452,8 +456,8 @@ $( document ).ready( function () {
 					}
 				} );
 				editor.addButton( 'shortClass', {
-					text: '8 week class',
-					tooltip: 'Add the 8 week class text',
+					text: '8 Week Class',
+					tooltip: 'Add an 8 week class table',
 					icon: false,
 					onclick: function () {
 						var str = "<table><tr><td colspan='2' style='text-align: center;'>8 Week Classes</td></tr>" +
@@ -606,6 +610,11 @@ $( document ).ready( function () {
 		}
 		if ( map['code'].length == 0 ) {
 			scrollTo = $( form ).find( 'input[name=code]' ).closest( 'li' );
+			scrollTo.addClass( 'error' );
+			hasError = true;
+		}
+		if ( map['units'].length == 0 ) {
+			scrollTo = $( form ).find( 'input[name=units]' ).closest( 'li' );
 			scrollTo.addClass( 'error' );
 			hasError = true;
 		}
@@ -1237,6 +1246,64 @@ function getStorage( key ) {
 	} else {
 		return false;
 	}
+}
+
+/**
+ * change url without refreshing page
+ */
+function updateUrl(url) {
+	history.pushState(null, null, url);
+}
+
+function stripQueryString(){
+	var url = location.href;
+	if( url.indexOf( '?' ) > 0 ){
+		url = url.substr( 0, url.indexOf( '?' ) );
+	} else{
+		url = url.substr( 0, url.indexOf( '&' ) );
+	}
+	return url;
+}
+function queryStringToUrl( obj ){
+	var s = '';
+	for( x in obj ){
+		//this works in javascript
+		//s += `${x}=${obj[x]}`;
+		s += '&' + x + '=' + obj[x];
+	}
+	s = '?' + s.substr( 1 );
+	return s;
+}
+
+function queryString( key, value ){
+	var obj = getQueryString();
+	if( value == null && obj[key] ){
+		delete obj[key];
+	} else{
+		obj[key] = value;
+	}
+	return obj;
+}
+
+function getQueryString(){
+	var url = location.href;
+	var vars;
+	var obj = {};
+	if( url.indexOf( '?' ) == -1 && url.indexOf( '&' ) == -1){
+		return {};
+	}
+	if( url.indexOf( '?' ) > 0 ){
+		vars = url.substr( url.indexOf( '?' ) + 1 );
+	} else{
+		vars = url.substr( url.indexOf( '&' ) + 1 );
+	}
+	var arr = vars.split( '&' );
+	for( var i = 0; i < arr.length; i++ ){
+		var s = arr[i];
+		s = s.split( '=' );
+		obj[s[0]] = s[1];
+	}
+	return obj;
 }
 
 var regex = {};

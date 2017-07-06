@@ -267,4 +267,9 @@ EOD;
 				echo Core::ajaxResponse( $obj, false );
 			}
 		}
+
+		function show( $id ){
+			$data['params'] = $id;
+			include( CORE_PATH . 'pages/cert.php' );
+		}
 	}

@@ -206,4 +206,9 @@
 				}
 			}
 		}
+
+		public function show( $id ){
+			$data['params'] = $id;
+			include CORE_PATH . 'pages/class.php';
+		}
 	}
