@@ -1022,6 +1022,20 @@ $( document ).ready( function () {
 	} );
 
 	/******************************************************************************/
+	/******************************Language Picker*********************************/
+	/******************************************************************************/
+	$( '.langList li' ).on( 'click', function ( e ) {
+		var lang = $( this ).attr( 'data-value' );
+		if( lang == 'en' ){
+			var qsa = queryString( 'lang', null );
+		} else {
+			var qsa = queryString( 'lang', lang );
+		}
+		setCookie( 'lang', lang );
+		location.href = stripQueryString() + queryStringToUrl( qsa );
+	} );
+
+	/******************************************************************************/
 	/*******************************ToolTip Events*********************************/
 	/******************************************************************************/
 	//tooltip from http://www.alessioatzeni.com/blog/simple-tooltip-with-jquery-only-text/
@@ -1233,6 +1247,17 @@ function readCookie( name ) {
 	return null;
 }
 
+function setCookie( name, data, expires ){
+	if( expires ){
+		var date = new Date();
+		date.setTime(date.getTime()+( expires * 24 * 60 * 60 * 1000));
+		expires = date.toUTCString();
+		document.cookie = name + "=" + data + "; expires=" + expires + "; path=/";
+	} else{
+		document.cookie = name + "=" + data + "; path=/";
+	}
+}
+
 function setStorageJSON( key, data ) {
 	if ( typeof(Storage) !== "undefined" ) {
 		localStorage.setItem( key, JSON.stringify( data ) );
@@ -1290,7 +1315,9 @@ function queryStringToUrl( obj ){
 		//s += `${x}=${obj[x]}`;
 		s += '&' + x + '=' + obj[x];
 	}
-	s = '?' + s.substr( 1 );
+	if( s.length != 0 ) {
+		s = '?' + s.substr( 1 );
+	}
 	return s;
 }
 
@@ -1298,7 +1325,7 @@ function queryString( key, value ){
 	var obj = getQueryString();
 	if( value == null && obj[key] ){
 		delete obj[key];
-	} else{
+	} else if( value != null ){
 		obj[key] = value;
 	}
 	return obj;

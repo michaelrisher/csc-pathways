@@ -82,7 +82,7 @@ html, body{ background-color: #d3dce6; }
 
 	#main{
 		width: 1000px;
-		margin: 0 auto 0;
+		margin: 0 auto 37px;
 
 		#tree{
 			.treeCertSubject{
@@ -95,7 +95,7 @@ html, body{ background-color: #d3dce6; }
 				top: -70px;
 			}
 			.middleTree{
-				margin: 0 70px 0;
+				margin: 0 67px 0;
 			}
 			table {
 				padding: 5px;
@@ -278,6 +278,66 @@ html, body{ background-color: #d3dce6; }
 	}
 }
 
+footer{
+	background-color: #26354a;
+	position: relative;
+	bottom: 1px;
+	height: 36px;
+	color: #d3dce6;
+	//overflow: hidden;
+	& > div {
+		width: 1000px;
+		margin: 0 auto 0;
+		padding: 10px 0 0 0;
+
+		.langPicker {
+			display: inline-block;
+			cursor: pointer;
+			img.uparrow {
+				height: 13px;
+				vertical-align: text-top;
+			}
+			img.flag {
+				height: 11px;
+				width: 16px;
+				object-fit: none;
+				margin-right: 10px;
+			}
+
+			.es {
+				object-position: -72px -76px;
+			}
+			.en {
+				object-position: -118px -256px;
+			}
+
+			ul{
+				list-style: none;
+			}
+
+			ul li ul {
+				position: absolute;
+				display: none;
+				z-index: 1000;
+				background: #26354a;
+			}
+
+			ul li ul li{
+				padding: 10px;
+				border-top: 1px dotted #d3dce6;
+				
+				&:first-child {
+					border: none;
+				}
+			}
+
+			ul li:hover ul{
+				display: block;
+				bottom: 25px;
+			}
+		}
+	}
+}
 //global input styles
 
 form{

@@ -6,4 +6,6 @@
 	 * Time: 10:08
 	 */
 ?>
+<link rel="shortcut icon" href="<?=CORE_URL?>assets/img/favicon.ico" type="image/x-icon">
+<link rel="icon" href="<?=CORE_URL?>assets/img/favicon.ico" type="image/x-icon">
 <title>CSC Pathways</title>
