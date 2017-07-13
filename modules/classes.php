@@ -49,7 +49,32 @@
 		 */
 		public function get( $id, $forceReturn = false ) {
 			$this->loadModule( 'users' );
-			$query = "SELECT * FROM classes WHERE id = '$id'";
+			//get the language code for
+			$language = Lang::getCode();
+			$langQuery = "SELECT id FROM enumLanguages WHERE code = '$language'";
+			$langCode = null;
+			if( !$result = $this->db->query( $langQuery ) ){
+				$langCode = 0; //if couldn't find for whatever reason default to en
+			}
+			$query = <<<EOD
+SELECT
+    classes.id,
+    classes.sort,
+    classes.title,
+    classes.units,
+    classes.transfer,
+    classData.prereq,
+    classData.coreq,
+    classData.advisory,
+    classData.description
+FROM
+    classes
+INNER JOIN classData on classes.id = classData.class
+WHERE classData.language = $langCode AND classes.id = '$id'
+EOD;
+
+
+			//$query = "SELECT * FROM classes WHERE id = '$id'";
 
 			if ( !$result = $this->db->query( $query ) ) {
 //					echo( 'There was an error running the query [' . $this->db->error . ']' );

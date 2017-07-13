@@ -73,6 +73,7 @@
 SELECT
 certificateList.id,
 certificateList.code,
+certificateData.language,
 certificateList.hasAs,
 certificateList.hasCe,
 certificateList.units,
@@ -167,6 +168,7 @@ units = VALUES( units ),
 description = VALUES( description ),
 sort = VALUES( sort )
 EOD;
+				$findCertQuery = "SELECT id FROM certificateData WHERE id = ? AND language = ?";
 				$queryData = <<<EOD
 INSERT INTO certificateData (cert, description, elo, schedule )
 VALUES (?,?,?,?)
