@@ -250,9 +250,7 @@ body {
 }
 #wrapper {
   background-color: #d3dce6;
-}
-#wrapper.admin #header {
-  height: 80px !important;
+  margin-bottom: 50px;
 }
 #wrapper a {
   color: #0000ee;
@@ -265,7 +263,8 @@ body {
 #wrapper #headerWrapper #header {
   width: 1000px;
   margin: 0 auto 20px;
-  height: 50px;
+  min-height: 50px;
+  max-height: 80px;
   background-color: #26354a;
   color: #d3dce6;
   letter-spacing: .3em;
@@ -511,10 +510,11 @@ body {
 }
 footer {
   background-color: #26354a;
-  position: relative;
+  position: fixed;
   bottom: 1px;
   height: 36px;
   color: #d3dce6;
+  width: 100%;
 }
 footer > div {
   width: 1000px;

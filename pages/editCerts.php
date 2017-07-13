@@ -19,17 +19,7 @@
 </head>
 <body>
 <div id="wrapper" class="admin">
-	<div id="headerWrapper">
-		<div id="header">
-			<div class="clearfix">
-				<div class="floatleft title"><a href="<?= CORE_URL ?>home">Computer Science <br> Computer Information Systems</a></div>
-				<div class="floatleft subtitle">Join the Bitcoin Revolution.</div>
-			</div>
-			<div class="nav clearfix">
-				<?php include_once CORE_PATH . 'assets/inc/adminNav.php'; ?>
-			</div>
-		</div>
-	</div>
+	<?php include CORE_PATH . 'assets/inc/logo.php'; ?>
 	<div id="main">
 		<div class="admin">
 			<div class="certs aligncenter margin15Bottom">

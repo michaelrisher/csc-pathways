@@ -4,9 +4,10 @@ html, body{ background-color: #d3dce6; }
 
 #wrapper{
 	background-color: #d3dce6;
-	&.admin #header{
-		height: 80px !important;
-	}
+	margin-bottom: 50px;
+	//&.admin #header{
+	//	height: 80px !important;
+	//}
 
 	a {
 		color: #0000ee;
@@ -19,7 +20,8 @@ html, body{ background-color: #d3dce6; }
 		#header {
 			width: 1000px;
 			margin: 0 auto 20px;
-			height: 50px;
+			min-height: 50px;
+			max-height: 80px;
 			background-color: #26354a;
 			color: #d3dce6;
 			letter-spacing: .3em;
@@ -280,10 +282,11 @@ html, body{ background-color: #d3dce6; }
 
 footer{
 	background-color: #26354a;
-	position: relative;
+	position: fixed;
 	bottom: 1px;
 	height: 36px;
 	color: #d3dce6;
+	width: 100%;
 	//overflow: hidden;
 	& > div {
 		width: 1000px;

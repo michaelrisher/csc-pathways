@@ -16,14 +16,7 @@
 </head>
 <body>
 <div id="wrapper">
-	<div id="headerWrapper">
-		<div id="header">
-			<div class="clearfix">
-				<div class="floatleft title"><a href="<?= CORE_URL ?>home">Computer Science <br> Computer Information Systems</a></div>
-				<div class="floatleft subtitle">Join the Bitcoin Revolution.</div>
-			</div>
-		</div>
-	</div>
+	<?php include CORE_PATH . 'assets/inc/logo.php'; ?>
 	<div id="main">
 		<div class="errorPage">
 			<div class="aligncenter">

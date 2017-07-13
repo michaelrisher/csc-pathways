@@ -9,7 +9,7 @@
 	class Lang {
 		private $languageCode;
 		private $definitions;
-
+/*
 		public static $list = array(
 			'en' => 'English',
 			'es' => 'Español'
@@ -49,6 +49,6 @@
 			}
 		}
 
-
+*/
 
 	}
