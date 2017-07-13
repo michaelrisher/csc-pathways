@@ -35,6 +35,7 @@
 				</p>
 				<form action="certs/save/<?=$data['id']?>" method="post">
 					<input type="hidden" name="id" value="<?=$data['id']?>" />
+					<input type="hidden" name="language" value="<?=$data['language']?>" />
 					<p class="alignleft margin15Bottom">* Required fields</p>
 					<ul>
 						<li>

@@ -9,8 +9,8 @@
 <div id="headerWrapper">
 	<div id="header">
 		<div class="clearfix">
-			<div class="floatleft title"><a href="<?= CORE_URL ?>home">Computer Science <br> Computer Information Systems</a></div>
-			<div class="floatleft subtitle">Join the Bitcoin Revolution.</div>
+			<div class="floatleft title"><a href="<?= CORE_URL ?>home"><?= $lang->o('title') ?></a></div>
+			<div class="floatleft subtitle"><?= $lang->o('subtitle') ?></div>
 		</div>
 		<?php if( $GLOBALS['main']->users->isLoggedIn() ){ ?>
 		<div class="nav clearfix">
