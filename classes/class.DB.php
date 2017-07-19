@@ -8,6 +8,11 @@
 	 */
 	class DB {
 		public function __construct(){}
+
+		/**
+		 * @deprecated
+		 * @return mysqli
+		 */
 		public function createConnection(){
 			$connection = new mysqli( DB_IP, DB_USER, DB_PASS, DB_DB );
 

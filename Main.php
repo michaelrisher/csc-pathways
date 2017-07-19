@@ -41,4 +41,85 @@
 
 			$this->$module = new $class;
 		}
+
+		/**
+		 * @param $table
+		 * @param $id
+		 * @param array $data
+		 * @return bool true if successful
+		 * {
+		 * id : data,  //required
+		 * column : data
+		 * }
+		 */
+		protected function upsertRecord( $table, $where, $data = array() ){
+			$exists = false;
+			if( isset( $where ) ) {
+				$query = "SELECT * FROM $table WHERE $where";
+				if( !$result = $this->db->query($query) ){
+					return false;
+				}
+				if( $result->num_rows > 0 ){
+					$exists = true;
+				}
+				$result->close();
+				if ( $exists ) { //exists so update
+					$query = "UPDATE $table SET ";
+					foreach( $data as $key => $val ){
+						$query .= $key . '=';
+						if ( gettype( $val ) == 'string' ) {
+							$query .= "\"" . $val . "\", ";
+						} else{
+							$query .= $val . ', ';
+						}
+					}
+
+					//remove last comma and space
+					$query = rtrim( $query, ", " );
+					$query .= " WHERE " . $where;
+
+					if( $this->db->query( $query ) ) {
+						return true;
+					} else {
+						return false;
+					}
+				} else { //the record does not exist
+					$query = "INSERT INTO $table (";
+					$values = array();
+					foreach( $data as $key => $val ){
+						$query .= $key . ',';
+						array_push( $values, $val );
+					}
+					$query = rtrim( $query, ',' ); //remove the right comma
+					$query .= ') VALUES (';
+					for( $i = 0; $i < count( $values ); $i++ ) {
+						if ( gettype( $values[$i] ) == 'string' ) {
+							$query .= "\"" . $values[$i] . "\",";
+						} else{
+							$query .= $values[$i] . ',';
+						}
+					}
+					$query = rtrim( $query, ',' ); //remove the right comma
+					$query .= ')';
+					if( $this->db->query( $query ) ) {
+						return true;
+					} else {
+						return false;
+					}
+				}
+			}
+		}
+
+		/**
+		 * @param $table
+		 * @param $where
+		 * @return bool|mysqli_result
+		 */
+		protected function deleteRecord( $table, $where ){
+			if( isset( $where ) ) {
+				$query = "DELETE FROM $table WHERE $where";
+
+				return $this->db->query( $query );
+			}
+		}
 	}

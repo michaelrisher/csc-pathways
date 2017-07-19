@@ -209,4 +209,13 @@
 				$string
 			);//regex to match the link string
 		}
+
+		/**
+		 * returns the users ip
+		 * @return mixed
+		 */
+		public static function getIp(){
+			return $_SERVER['REMOTE_ADDR'];
+
+		}
 	}

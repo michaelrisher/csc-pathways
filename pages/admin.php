@@ -36,7 +36,9 @@
 							$data = $GLOBALS['main']->audit->listing();
 						}
 						foreach ( $data as $event ) {
-							echo "<li>User ${event['username']}: ${event['event']}  <span class='floatright'>${event['date']}</span>";
+							echo "<li>User ${event['username']}: ${event['event']}  <span class='floatright'>";
+							echo date( 'm/d/Y h:i:s A', strtotime( $event['date'] ) );
+							echo "</span>";
 							echo "</li>";
 						}
 					?>

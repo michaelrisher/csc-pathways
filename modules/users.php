@@ -315,7 +315,6 @@
 				$obj['error'] = 'Username does not exist';
 				echo Core::ajaxResponse( $obj, false );
 			}
-
 		}
 
 		/**
@@ -324,13 +323,30 @@
 		public function login(){
 			//clean the post of any injects
 			$_POST = Core::sanitize( $_POST );
+			//return array
+			$obj = array();
+
+			//check we can even attempt
+			$query = "SELECT * FROM loginBan WHERE ip = '" . Core::getIp() ."'";
+			if( $result = $this->db->query($query) ){
+				if( $result->num_rows > 0 ){
+					$row = $result->fetch_assoc();
+					if( $row['expires'] > time() ){
+						//can't run yet still blocked
+						$diff = ( $row['expires'] - time() ) / 60 ;
+						$obj['error'] = "You have put in your password incorrectly to many times<br>You can try again in " . ceil( $diff ) . " minutes.";
+						echo Core::ajaxResponse( $obj, false );
+						return;
+					}
+				}
+			}
+
 			//hash the password and username to salt the password
 			$passwordHash = $this->hashPassword( $_POST['password'], $_POST['user'] );
 			//create the query to check if the user exists and to verify hashs
 			$query = "SELECT * FROM users WHERE username = '${_POST['user']}' AND password = '$passwordHash'";
 
-			//return array
-			$obj = array();
+
 			//query the database
 			if( !$result = $this->db->query($query) ){
 //				die('There was an error running the query [' . $this->db->error . ']');
@@ -366,11 +382,25 @@
 					$_SESSION['session']['id'] = $row['id'];
 					$_SESSION['session']['expires'] = time() + ( 60 * 10 ); //session set for 10 minutes
 					$_SESSION['session']['started'] = time();
+					$this->deleteRecord( 'loginBan', 'ip = "' .Core::getIp() . '"' );
+					unset( $_SESSION['loginAttempts'] );
 					//load audit module and report the login
 					$this->loadModule( 'audit' );
 					$this->audit->newEvent( "Logged into administration" );
 				}
 			} else{
+				//you entered a wrong password
+				if( isset( $_SESSION['loginAttempts'] ) ){
+					$_SESSION['loginAttempts']++;
+				} else{
+					$_SESSION['loginAttempts'] = 0;
+				}
+				$this->upsertRecord( 'loginBan', 'ip = "' . Core::getIp() . '"', array(
+					'attempt' => $_SESSION['loginAttempts'],
+					'expires' => max( time(), time() + ( 120 * $_SESSION['loginAttempts'] ) ), //2 minutes times attempts
+					'ip' => Core::getIp(),
+					'created' => time()
+				) );
 				$obj['error'] = "Your username or email is incorrect";
 				echo Core::ajaxResponse( $obj, false );
 			}
