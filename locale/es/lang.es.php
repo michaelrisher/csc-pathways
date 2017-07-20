@@ -7,23 +7,27 @@
 	 */
 
 	class LanguageDefinitions{
+		// Á  Í  É  Ó  Ú  Ü  Ñ  ¡
+		// á  í  é  ó  ú  ü  ñ  ¿
 		public $translations = array(
-			'title' => 'Ciencias de la Computación<br>Sistemas de información computacional',
+			'title0' => 'Ciencias de la Computación','Sistemas de información computacional',
+			'title1' => 'Sistemas de información computacional',
 			'subtitle' => 'Unirse a la revolución Bitcoin',
-			'certGroup1' => 'Programaci&oacute;n',
-			'certGroup2' => 'Conexión y seguridad de informaci&oacute;n',
-			'certGroup3' => 'Web master y aplicaci&oacute;nes',
+			'certGroup1' => 'Programación',
+			'certGroup2' => 'Conexión y seguridad de información',
+			'certGroup3' => 'Web master y aplicaciónes',
 			'csusbCyber' => 'Ve a ver',
-			'csusbCyberLink' => 'centre del<br>seguridad cibernética',
-			'certListDesc' => 'Descripci&oacute;n',
+			'csusbCyberLink0' => 'centre del',
+			'csusbCyberLink1' => 'seguridad cibernética',
+			'certListDesc' => 'Descripción',
 			'certListCert' => 'Cert #',
 			'certListUnit' => 'Unids',
 			'certInfoHeader' => 'Información de certificado',
 			'certInfoElo' => 'Resultados de aprendizaje del programa',
-			'certInfoEloMsg' => 'Al finalizar con &eacute;xito de la programa, estudiantes deben poder',
+			'certInfoEloMsg' => 'Al finalizar con éxito de la programa, estudiantes deben poder',
 			'certInfoToTop' => 'Hasta arriba',
 			'copyLink' => 'Copia enlace',
-			'classInfoHeader' => 'Informaci&oacute;n de curso',
+			'classInfoHeader' => 'Información de curso',
 			'classInfoToTop' => 'Hasta arriba',
 			'classIntoUnit' => 'unids',
 			'classInfoPrereq' => 'Requisito',

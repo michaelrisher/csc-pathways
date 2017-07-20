@@ -32,6 +32,7 @@
 						foreach ( $data as $class ) {
 							echo "<li data-id='${class['id']}'>${class['title']}";
 							echo "<img class='delete tooltip' title='Delete class' src='". CORE_URL ."assets/img/delete.png'/>";
+							echo "<img class='languageEdit tooltip' title='Edit in Different Language' src='". CORE_URL ."assets/img/region.png'/>";
 							echo "<img class='edit tooltip' title='Edit class' src='". CORE_URL ."assets/img/edit.svg'/>";
 							echo "</li>";
 						}

@@ -47,18 +47,30 @@
 		 * @param bool|false $forceReturn force a return if the get is not called through ajax
 		 * @return array|void array if forceReturn is true echos echos json otherwise
 		 */
-		public function get( $id, $forceReturn = false ) {
+		public function get( $id, $language = 'en', $forceReturn = false ) {
 			$this->loadModule( 'users' );
 			//get the language code for
-			$language = Lang::getCode();
-			$langQuery = "SELECT id FROM enumLanguages WHERE code = '$language'";
-			$langCode = null;
-			if( !$result = $this->db->query( $langQuery ) ){
-				$langCode = 0; //if couldn't find for whatever reason default to en
+			if ( isset( $language ) && !isset( $_POST['language'] ) ) {
+				$this->loadModule( "language" );
+				$langCode = $this->language->getId( $language, true );
+			} elseif ( isset( $_POST['language'] ) ) {
+				$langCode = $_POST['language'];
+			} else {
+				$langCode = 0;
 			}
+//			$langCode = isset( $_POST['language'] ) ? $_POST['language'] : 0;
+//			$langQuery = "SELECT id FROM enumLanguages WHERE code = '$language'";
+//			$langCode = null;
+//			if( !$result = $this->db->query( $langQuery ) ){
+//				$langCode = 1; //if couldn't find for whatever reason default to en
+//			} else {
+//				$row = $result->fetch_assoc();
+//				$langCode = $row['id'];
+//			}
 			$query = <<<EOD
 SELECT
     classes.id,
+    classData.language,
     classes.sort,
     classes.title,
     classes.units,
@@ -70,9 +82,10 @@ SELECT
 FROM
     classes
 INNER JOIN classData on classes.id = classData.class
-WHERE classData.language = $langCode AND classes.id = '$id'
+WHERE classes.id = '$id'
+ORDER BY classData.language ASC
 EOD;
-
+//WHERE classData.language = $langCode AND classes.id = '$id'
 
 			//$query = "SELECT * FROM classes WHERE id = '$id'";
 
@@ -81,7 +94,21 @@ EOD;
 				echo Core::ajaxResponse( array( 'error' => "An error occurred please try again" ), false );
 				return null;
 			}
-			$row = $result->fetch_assoc();
+
+			if( $result->num_rows > 1 ){ //find the right language
+				$results = $result->fetch_all( MYSQLI_ASSOC );
+				for( $i = 0; $i < count( $results ); $i++ ){
+					if( $results[$i]['language'] == $langCode ){
+						$row = $results[$i];
+						break;
+					}
+				}
+				if( !isset( $row ) ){ //if it is not there by some chance grab first one
+					$row = $results[0];
+				}
+			} else {
+				$row = $result->fetch_assoc();
+			}
 			$return = array(
 				'id' => $row['id'],
 				'title' => $row['title'],
@@ -90,7 +117,8 @@ EOD;
 				'advisory' => $row['advisory'],
 				'prereq' => $row['prereq'],
 				'coreq' => $row['coreq'],
-				'description' => $row['description']
+				'description' => $row['description'],
+				'language' => $langCode
 			);
 
 			if ( IS_AJAX && !$forceReturn ) {
@@ -110,14 +138,23 @@ EOD;
 			$obj = array();
 			$_POST = Core::sanitize( $_POST, true );
 			if ( $this->users->isLoggedIn() ) {
-				$statement = $this->db->prepare( "UPDATE classes SET title=?, units=?, transfer=?, prereq=?, advisory=?, coreq=?, description=? WHERE id=?" );
-				$statement->bind_param( "sdssssss", $_POST['title'], $_POST['units'], $_POST['transfer'], $_POST['prereq'], $_POST['advisory'], $_POST['coreq'], $_POST['description'], $_POST['id'] );
-				if ( $statement->execute() ) {
+				$statement0 = $this->db->prepare( "UPDATE classes SET title=?, units=?, transfer=?, sort=? WHERE id=?");
+				$statement1 = $this->db->prepare( "UPDATE classData SET prereq=?, advisory=?, coreq=?, description=? WHERE class=? AND language=?");
+
+				//get the sort from the title
+				$sort = explode( ' - ', $_POST['title'] )[0];
+				$sort = preg_replace( '/\D/', '', $sort );
+
+				//bind the statements with values
+				$statement0->bind_param( "sdsds", $_POST['title'], $_POST['units'], $_POST['transfer'], $_POST['sort'], $_POST['id'] );
+				$statement1->bind_param( "sssssd", $_POST['prereq'], $_POST['advisory'], $_POST['coreq'], $_POST['description'], $_POST['id'], $_POST['language'] );
+				//excute it
+				if ( $statement0->execute() && $statement1->execute() ) {
 					$obj['msg'] = "Saved successfully.";
 					$this->audit->newEvent( "Updated class: " . $_POST['title'] );
 					echo Core::ajaxResponse( $obj );
 				} else {
-					$obj['error'] = $statement->error;
+					$obj['error'] = $statement0->error . '<br>' . $statement1->error;
 					echo Core::ajaxResponse( $obj, false );
 				}
 			} else {
@@ -170,6 +207,7 @@ EOD;
 			$obj = array();
 			$_POST = Core::sanitize( $_POST );
 			if ( $this->users->isLoggedIn() ) {
+				//TODO add the sort column in this too
 				$statement = $this->db->prepare( "INSERT INTO classes(id, title, units, transfer, prereq, advisory, coreq, description) VALUES (?,?,?,?,?,?,?,?)" );
 				$statement->bind_param( "ssdsssss", $_POST['id'], $_POST['title'], $_POST['units'], $_POST['transfer'], $_POST['prereq'], $_POST['advisory'], $_POST['coreq'], $_POST['description'] );
 				if ( $statement->execute() ) {
