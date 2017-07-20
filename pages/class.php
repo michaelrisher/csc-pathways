@@ -10,7 +10,7 @@
 	$data = Core::sanitize( $data );
 	$id = $data['params'];
 	$GLOBALS['main']->loadModule( 'classes' );
-	$row = $GLOBALS['main']->classes->get( $id, true );
+	$row = $GLOBALS['main']->classes->get( $id, Lang::getCode(), true );
 	$lang = new Lang( Lang::getCode() );
 	if( isset( $row ) && $row['id'] != null ) {
 

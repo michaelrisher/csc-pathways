@@ -87,7 +87,7 @@
 								}
 							?>
 							<tr>
-								<td class="aligncenter" colspan="3"><p class="padding15Top"><?= $lang->o('csusbCyber')?><br><a href="https://www.csusb.edu/cyber-security"><?= $lang->o('csusbCyberLink')?></a></p></td>
+								<td class="aligncenter" colspan="3"><p class="padding15Top"><?= $lang->o('csusbCyber')?><br><a href="https://www.csusb.edu/cyber-security"><?= $lang->o('csusbCyberLink0'). '<br>' . $lang->o('csusbCyberLink1')?></a></p></td>
 							</tr>
 						</table>
 					</div>
