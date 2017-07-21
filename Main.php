@@ -9,6 +9,7 @@
 	class Main {
 		public $db;
 		public $url;
+		private $lastError;
 
 		public function Main(){
 			$connection = new mysqli( DB_IP, DB_USER, DB_PASS, DB_DB );
@@ -44,7 +45,7 @@
 
 		/**
 		 * @param $table
-		 * @param $id
+		 * @param $where
 		 * @param array $data
 		 * @return bool true if successful
 		 * {
@@ -56,57 +57,90 @@
 			$exists = false;
 			if( isset( $where ) ) {
 				$query = "SELECT * FROM $table WHERE $where";
-				if( !$result = $this->db->query($query) ){
+				if( !$result = @$this->db->query($query) ){
 					return false;
 				}
-				if( $result->num_rows > 0 ){
+				if( @$result->num_rows > 0 ){
 					$exists = true;
 				}
-				$result->close();
+				@$result->close();
+				$evalStr = "\$state->bind_param(";
+				$bindType = '';
+				$paramsStr = '';
 				if ( $exists ) { //exists so update
 					$query = "UPDATE $table SET ";
 					foreach( $data as $key => $val ){
-						$query .= $key . '=';
-						if ( gettype( $val ) == 'string' ) {
-							$query .= "\"" . $val . "\", ";
-						} else{
-							$query .= $val . ', ';
-						}
+						$query .= $key . '=?,';
+						$paramsStr .= "\$data['$key'], ";
+						$bindType .= $this->getTypeMysql( $val );
 					}
 
 					//remove last comma and space
-					$query = rtrim( $query, ", " );
-					$query .= " WHERE " . $where;
+					$query = rtrim( $query, "," );
+					$paramsStr = rtrim( $paramsStr, ", " );
+					$query .= " WHERE $where;";
+					$evalStr .= "\"$bindType\"," .$paramsStr . ");";
 
-					if( $this->db->query( $query ) ) {
+					//setup statements
+					$state = @$this->db->prepare( $query );
+					//bind param call using eval
+					@eval( $evalStr );
+					//after bind then excute
+					if( @$state->execute() ) {
 						return true;
 					} else {
+						$this->lastError = $state->error;
 						return false;
 					}
 				} else { //the record does not exist
 					$query = "INSERT INTO $table (";
-					$values = array();
+					$queryPart2 = '';
 					foreach( $data as $key => $val ){
 						$query .= $key . ',';
-						array_push( $values, $val );
+						$queryPart2 .= '?,';
+						$bindType .= $this->getTypeMysql( $val );
+						$paramsStr .= "\$data['$key'], ";
 					}
 					$query = rtrim( $query, ',' ); //remove the right comma
-					$query .= ') VALUES (';
-					for( $i = 0; $i < count( $values ); $i++ ) {
-						if ( gettype( $values[$i] ) == 'string' ) {
-							$query .= "\"" . $values[$i] . "\",";
-						} else{
-							$query .= $values[$i] . ',';
-						}
-					}
-					$query = rtrim( $query, ',' ); //remove the right comma
-					$query .= ')';
-					if( $this->db->query( $query ) ) {
+					$queryPart2 = rtrim( $queryPart2, ',' ); //remove the right comma
+					$query .= ') VALUES (' . $queryPart2 . ')';
+					//query should be like this at this point
+					//INSERT INTO table (col1,col2,col3) VALUES (?,?,?)
+					//remove last comma
+					$paramsStr = rtrim( $paramsStr, ", " );
+					//set up the eval string
+					$evalStr .= "\"$bindType\"," .$paramsStr . ");";
+
+					//setup statements
+					$state = @$this->db->prepare( $query );
+					//bind param call using eval
+					@eval( $evalStr );
+					//after bind then excute
+					if( $state->execute() ) {
 						return true;
 					} else {
+						$this->lastError = $state->error;
 						return false;
 					}
 				}
+			}
+		}
+
+		/**
+		 * translates php variables into bind_parm data-type strings
+		 * @param $val
+		 * @return string
+		 */
+		private function getTypeMysql( $val ){
+			$type = gettype( $val );
+			if ( $type == 'string' ) {
+				return's';
+			} elseif( $type == 'double' ) {
+				return 'd';
+			} elseif( $type == 'integer' || $type == 'boolean' ){
+				return 'i';
+			} else {
+				return 'b';
 			}
 		}
 
@@ -121,5 +155,9 @@
 
 				return $this->db->query( $query );
 			}
+		}
+
+		protected function getLastError(){
+			return $this->lastError;
 		}
 	}

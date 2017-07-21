@@ -163,7 +163,7 @@ $( document ).ready( function () {
 				if ( data.success ) {
 					//alert( JSON.stringify( data ) );
 					var modal = createModal( {
-						title: 'Edit Class',
+						title: 'Pick language to edit class in',
 						buttons: [
 							{
 								value: 'Edit',
@@ -179,7 +179,7 @@ $( document ).ready( function () {
 					var html = '<form><input type="hidden" name="class" value="' + id + '" />';
 					html += '<ul><li><label for="class">Languages</label><select name="language">';
 					for ( var i = 0; i < data.data.length; i++ ) {
-						html += "<option value='" + data.data[i].id + "'>" + data.data[i].fullName + "</option>";
+						html += "<option value='" + data.data[i].id + "'>" + data.data[i].code + ' - ' + data.data[i].fullName + "</option>";
 					}
 					html += '</select><span>Pick a class to add</span></li>';
 					setModalContent( modal, html );
@@ -614,6 +614,67 @@ $( document ).ready( function () {
 		} );
 	} catch ( ignore ) {
 	}
+
+	//language edit
+	$( document ).on( 'click', '#main .certs li img.languageEdit', function () {
+		//get the class info
+		var id = $( this ).closest( 'li' ).attr( 'data-id' );
+		$.ajax( {
+			type: 'POST',
+			url: 'rest/language/listing',
+			dataType: 'json',
+			success: function ( data ) {
+				if ( data.success ) {
+					//alert( JSON.stringify( data ) );
+					var modal = createModal( {
+						title: 'Pick language to edit class in',
+						buttons: [
+							{
+								value: 'Edit',
+								name: 'edit',
+								//onclick : getClassAjax
+							},
+							{
+								value: 'Cancel',
+								class: 'low'
+							}
+						]
+					} );
+					var html = '<form><input type="hidden" name="class" value="' + id + '" />';
+					html += '<ul><li><label for="class">Languages</label><select name="language">';
+					for ( var i = 0; i < data.data.length; i++ ) {
+						html += "<option value='" + data.data[i].id + "'>" + data.data[i].code + ' - ' + data.data[i].fullName + "</option>";
+					}
+					html += '</select><span>Pick a class to add</span></li>';
+					setModalContent( modal, html );
+					displayModal( modal );
+					//adjustTextarea( $( modal ).find( 'textarea' )[0] );
+				} else {
+					var modal = createModal( { title: 'Failed to load class', buttons: [{ value: 'Ok' }] } );
+					setModalContent( modal, data.data.error );
+					displayModal( modal, true )
+				}
+			}
+		} );
+
+		function getClassAjax( id ){
+			var modal = $( '.modal[data-id=' + id + ']' ).eq( 0 );
+			var lang = $( 'select', modal ).val();
+			var classId = $( 'input[name="class"]' ).val();
+			$.ajax({
+				type: 'POST',
+				url: 'rest/classes/get/' + classId,
+				data : {
+					language : lang
+				},
+				dataType: 'json',
+				success: function ( data ) {
+					editClassModal( data );
+				}
+			});
+			return true;
+		}
+	} );
 
 	/******************************************************************************/
 	/***************************certification delete*******************************/

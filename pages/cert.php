@@ -8,7 +8,7 @@
 
 	$id = $data['params'];
 	$GLOBALS['main']->loadModule( 'certs' );
-	$data = $GLOBALS['main']->certs->get( $id, true );
+	$data = $GLOBALS['main']->certs->get( $id, Lang::getCode(), true );
 	$lang = new Lang( Lang::getCode() );
 ?>
 <div>

@@ -6,7 +6,6 @@
 	 * Time: 12:29
 	 */
 
-	//TODO update this to new code
 	$data = Core::sanitize( $data );
 	$id = $data['params'];
 	$GLOBALS['main']->loadModule( 'classes' );
@@ -46,7 +45,6 @@
 							}
 						?>
 						<br>
-
 						<p class="alignjustify"><?= $row['description'] ?></p>
 					</div>
 				</div>
