@@ -184,7 +184,6 @@
 		 * @return string
 		 */
 		public function createResetPassword( $id, $forceReturn = false, $noLog = false ){
-			//TODO should we set active = 0 when we do this????
 			$this->loadModule( 'audit' );
 			if( $this->isAdmin() ) {
 				$hasToken = false;

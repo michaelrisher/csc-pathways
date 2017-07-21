@@ -42,14 +42,21 @@
 		/**
 		 * edit cert action from the admin page
 		 * only allowed if the user is admin
-		 * @param $id
+		 * @param $params
 		 */
-		public function edit( $id ) {
+		public function edit( $params ) {
 			$this->loadModule( 'users' );
 			if ( $this->users->isLoggedIn() ) {
 				Core::queueStyle( 'assets/css/reset.css' );
 				Core::queueStyle( 'assets/css/ui.css' );
 				//put the data onscreen
+				if( gettype( $params ) == 'array' ){
+					$id = $params[0];
+					$lang = $params[1];
+				} else{
+					$id = $params;
+					$lang = 0;
+				}
 				$data = $this->get( $id );
 				$data['categories'] = $this->listCategories();
 				include( CORE_PATH . 'pages/certEdit.php' );
@@ -67,7 +74,7 @@
 		 * @param bool|false $forceReturn forces a array return
 		 * @return array|null
 		 */
-		public function get( $id, $forceReturn = false ) {
+		public function get( $id, $language = 'en', $forceReturn = false ) {
 			$this->loadModule( 'users' );
 			$query = <<<EOD
 SELECT
@@ -87,7 +94,7 @@ FROM
 certificateList
 INNER JOIN enumCategories ON certificateList.category = enumCategories.id
 INNER JOIN certificateData ON certificateList.id = certificateData.cert
-WHERE certificateList.id = ${id}
+WHERE certificateList.id = $id
 EOD;
 			if ( !$result = $this->db->query( $query ) ) {
 				echo Core::ajaxResponse( array( 'error' => "An error occurred please try again" ), false );
@@ -156,39 +163,37 @@ EOD;
 
 
 				//separate the two tables data
-				$query = <<<EOD
-INSERT INTO certificateList (id, code, hasAs, hasCe, category, units, description, sort)
-VALUES (?,?,?,?,?,?,?,?)
-ON DUPLICATE KEY UPDATE
-code = VALUES( code ),
-hasAs = VALUES( hasAs ),
-hasCe = VALUES( hasCe ),
-category = VALUES( category ),
-units = VALUES( units ),
-description = VALUES( description ),
-sort = VALUES( sort )
-EOD;
-				$findCertQuery = "SELECT id FROM certificateData WHERE id = ? AND language = ?";
-				$queryData = <<<EOD
-INSERT INTO certificateData (cert, description, elo, schedule )
-VALUES (?,?,?,?)
-ON DUPLICATE KEY UPDATE
-description = VALUES( description ),
-elo = VALUES( elo ),
-schedule = VALUES( schedule )
-EOD;
-				//cert list update statement
-				$statement = $this->db->prepare($query);
-				$statement->bind_param( 'isiiiisi', $id, $_POST['code'], $hasAs, $hasCe, $_POST['category'], $_POST['units'], $_POST['title'], $_POST['sort'] );
-				//cert data update statement
-				$statementData = $this->db->prepare($queryData);
-				$statementData->bind_param( 'isss', $id, $_POST['description'], $_POST['elo'], $_POST['schedule'] );
-				if( $statement->execute() && $statementData->execute() ){
+				$certListUpdated = $this->upsertRecord( 'certificateList', "id=$id", array(
+					'code' => (string)$_POST['code'],
+					'hasAs' => $hasAs,
+					'hasCe' => $hasCe,
+					'category' => (int)$_POST['category'],
+					'units' => (int)$_POST['units'],
+					'description' => $_POST['title'],
+					'sort' => (int)$_POST['sort']
+				) );
+
+				$error = '';
+				if( !$certListUpdated ){
+					$error = $this->getLastError();
+				}
+
+				$certDataUpdated = $this->upsertRecord( 'certificateData', "cert=$id", array(
+					'description' => $_POST['description'],
+					'elo' => $_POST['elo'],
+					'schedule' => $_POST['schedule']
+				) );
+
+				if( !$certListUpdated ){
+					$error .= '<br>' . $this->getLastError();
+				}
+
+				if( $certListUpdated && $certDataUpdated ){
 					$obj['msg'] = "Saved successfully.";
 					$this->audit->newEvent( "Updated cert: " . $_POST['title'] );
 					echo Core::ajaxResponse( $obj );
 				} else{
-					$obj['error'] = $statement->error;
+					$obj['error'] = $error;
 					echo Core::ajaxResponse( $obj, false );
 				}
 			} else{
