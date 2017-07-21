@@ -52,12 +52,12 @@
 				//put the data onscreen
 				if( gettype( $params ) == 'array' ){
 					$id = $params[0];
-					$lang = $params[1];
+					$lang = (int)$params[1];
 				} else{
 					$id = $params;
 					$lang = 0;
 				}
-				$data = $this->get( $id );
+				$data = $this->get( $id, $lang );
 				$data['categories'] = $this->listCategories();
 				include( CORE_PATH . 'pages/certEdit.php' );
 			} else {
@@ -71,11 +71,24 @@
 		 * echos JSON to the user
 		 * returns an array if forceReturn is true
 		 * @param $id int id which is not the three digit code
+		 * @param integer|string $language id or code of the language
 		 * @param bool|false $forceReturn forces a array return
 		 * @return array|null
 		 */
 		public function get( $id, $language = 'en', $forceReturn = false ) {
 			$this->loadModule( 'users' );
+			if ( isset( $language ) && !isset( $_POST['language'] ) ) {
+				$this->loadModule( "language" );
+				if( gettype( $language ) == 'integer' ){
+					$langCode = $language; //if its an int i assume its the id
+				} else {
+					$langCode = $this->language->getId( $language, true );
+				}
+			} elseif ( isset( $_POST['language'] ) ) {
+				$langCode = $_POST['language'];
+			} else {
+				$langCode = 0;
+			}
 			$query = <<<EOD
 SELECT
 certificateList.id,
@@ -95,12 +108,27 @@ certificateList
 INNER JOIN enumCategories ON certificateList.category = enumCategories.id
 INNER JOIN certificateData ON certificateList.id = certificateData.cert
 WHERE certificateList.id = $id
+ORDER by certificateData.language ASC
 EOD;
 			if ( !$result = $this->db->query( $query ) ) {
 				echo Core::ajaxResponse( array( 'error' => "An error occurred please try again" ), false );
 				return null;
 			}
-			$row = $result->fetch_assoc();
+
+			if( $result->num_rows > 1 ){
+				$results = $result->fetch_all( MYSQLI_ASSOC );
+				for( $i = 0; $i < count( $results ); $i++ ){
+					if( $results[$i]['language'] == $langCode ){
+						$row = $results[$i];
+						break;
+					}
+				}
+				if( !isset( $row ) ){ //if it is not there by some chance grab first one
+					$row = $results[0];
+				}
+			} else {
+				$row = $result->fetch_assoc();
+			}
 			$return = $row;
 
 			if ( IS_AJAX && !$forceReturn ) {
@@ -158,6 +186,7 @@ EOD;
 				$_POST['elo'] = core::sanitize( $_POST['elo'], true );
 				$_POST['schedule'] = core::sanitize( $_POST['schedule'], true );
 				$_POST['sort'] = core::sanitize( $_POST['sort'] );
+				$language = intval( Core::sanitize( $_POST['language'] ) );
 				$hasCe = isset( $_POST['hasCe'] ) ? 1 : 0; //js returns something like hasCe=on if its on else its not set
 				$hasAs = isset( $_POST['hasAs'] ) ? 1 : 0; //js returns something like hasCe=on if its on else its not set
 
@@ -175,17 +204,17 @@ EOD;
 
 				$error = '';
 				if( !$certListUpdated ){
-					$error = $this->getLastError();
+					$error = 'List failed to upsert';
 				}
 
-				$certDataUpdated = $this->upsertRecord( 'certificateData', "cert=$id", array(
+				$certDataUpdated = $this->upsertRecord( 'certificateData', "cert=$id AND language=$language", array(
 					'description' => $_POST['description'],
 					'elo' => $_POST['elo'],
 					'schedule' => $_POST['schedule']
 				) );
 
-				if( !$certListUpdated ){
-					$error .= '<br>' . $this->getLastError();
+				if( !$certDataUpdated ){
+					$error .= '<br>Data failed to upsert';
 				}
 
 				if( $certListUpdated && $certDataUpdated ){

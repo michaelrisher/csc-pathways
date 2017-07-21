@@ -116,7 +116,7 @@
 					//bind param call using eval
 					@eval( $evalStr );
 					//after bind then excute
-					if( $state->execute() ) {
+					if( @$state->execute() ) {
 						return true;
 					} else {
 						$this->lastError = $state->error;

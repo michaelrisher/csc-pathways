@@ -177,7 +177,7 @@ $( document ).ready( function () {
 						]
 					} );
 					var html = '<form><input type="hidden" name="class" value="' + id + '" />';
-					html += '<ul><li><label for="class">Languages</label><select name="language">';
+					html += '<ul><li><label for="language">Languages</label><select name="language">';
 					for ( var i = 0; i < data.data.length; i++ ) {
 						html += "<option value='" + data.data[i].id + "'>" + data.data[i].code + ' - ' + data.data[i].fullName + "</option>";
 					}
@@ -287,9 +287,9 @@ $( document ).ready( function () {
 		if( !regex['classTitle'].test( map['title'] ) ){ //if doesnt match the
 			$( form ).find( 'input[name=title]' ).closest( 'li' ).addClass( 'error' );
 			hasError = true;
-			var modal = createModal({ title: "Error", buttons : [{value: "Ok"}] });
-			setModalContent( modal, "<p>Title must match this pattern</p><p>EXA-1 - Example title for class example-1</p>");
-			displayModal( modal );
+			var modalNew = createModal({ title: "Error", buttons : [{value: "Ok"}] });
+			setModalContent( modalNew, "<p>Title must match this pattern</p><p>EXA-1 - Example title for class example-1</p>");
+			displayModal( modalNew );
 		}
 
 		if ( !hasError && !window.processing ) {
@@ -312,9 +312,9 @@ $( document ).ready( function () {
 				success: function ( data ) {
 					//alert( JSON.stringify( data ) );
 					if ( data.success ) {
-						var modal = createModal( { title: "Saved Class Successfully", buttons: [{ value: 'Ok' }] } );
-						setModalContent( modal, data.data.msg );
-						displayModal( modal );
+						var modalNew = createModal( { title: "Saved Class Successfully", buttons: [{ value: 'Ok' }] } );
+						setModalContent( modalNew, data.data.msg );
+						displayModal( modalNew );
 						successful = true;
 						if ( url == 'create' ) {
 							$( '.classes .listing ul' ).append( '<li data-id="' + map['id'] + '">' +
@@ -326,16 +326,16 @@ $( document ).ready( function () {
 						}
 						window.processing = false;
 					} else {
-						var modal = createModal( { title: "Error Saving Class", buttons: [{ value: 'Ok' }] } );
-						setModalContent( modal, data.data.error );
-						displayModal( modal );
+						var modalNew = createModal( { title: "Error Saving Class", buttons: [{ value: 'Ok' }] } );
+						setModalContent( modalNew, data.data.error );
+						displayModal( modalNew );
 						successful = false;
 						window.processing = false;
 						saveBtn.removeClass( 'processing' );
 					}
 				}
 			} );
-			return successful;
+			return true;
 		} else {
 			saveBtn.removeClass( 'processing' );
 			return false;
@@ -632,7 +632,13 @@ $( document ).ready( function () {
 							{
 								value: 'Edit',
 								name: 'edit',
-								//onclick : getClassAjax
+								onclick : function( id ){
+									var modal = $( '.modal[data-id=' + id + ']' ).eq( 0 );
+									var lang = $( 'select', modal ).val();
+									var certId = $( 'input[name="cert"]' ).val();
+									location.href = CORE_URL + 'certs/edit/' + certId + '/' + lang;
+									return true;
+								}
 							},
 							{
 								value: 'Cancel',
@@ -640,8 +646,8 @@ $( document ).ready( function () {
 							}
 						]
 					} );
-					var html = '<form><input type="hidden" name="class" value="' + id + '" />';
-					html += '<ul><li><label for="class">Languages</label><select name="language">';
+					var html = '<form><input type="hidden" name="cert" value="' + id + '" />';
+					html += '<ul><li><label for="language">Languages</label><select name="language">';
 					for ( var i = 0; i < data.data.length; i++ ) {
 						html += "<option value='" + data.data[i].id + "'>" + data.data[i].code + ' - ' + data.data[i].fullName + "</option>";
 					}
@@ -656,24 +662,6 @@ $( document ).ready( function () {
 				}
 			}
 		} );
-
-		function getClassAjax( id ){
-			var modal = $( '.modal[data-id=' + id + ']' ).eq( 0 );
-			var lang = $( 'select', modal ).val();
-			var classId = $( 'input[name="class"]' ).val();
-			$.ajax({
-				type: 'POST',
-				url: 'rest/classes/get/' + classId,
-				data : {
-					language : lang
-				},
-				dataType: 'json',
-				success: function ( data ) {
-					editClassModal( data );
-				}
-			});
-			return true;
-		}
 	} );
 
 	/******************************************************************************/
@@ -805,11 +793,13 @@ $( document ).ready( function () {
 						setModalContent( modal, data.data.msg );
 						displayModal( modal, true );
 					} else {
+						var modal = createModal( {
+							title: 'An Error Occurred',
+							buttons: [ { value: 'Ok' } ]
+						} );
+						setModalContent( modal, data.data.error );
+						displayModal( modal, true );
 					}
-					//	var modal = createModal( { title: 'Log in failed', buttons : [{ value : 'Ok' }] } );
-					//	setModalContent( modal, data.data.error );
-					//	displayModal( modal, true )
-					//}
 				}
 			} )
 		} else {
@@ -1312,10 +1302,10 @@ function displayModal( modal, shake ) {
 function closeModal( modal ) {
 	modal.find( '.modalWrapper' ).hide();
 	var id = $( modal ).attr( 'data-id' );
+	delete window.modals.data[id];
+	window.modals.ids.splice( window.modals.ids.indexOf( id ), 1 );
 	$( modal ).fadeOut( 300, function () {
 		$( modal ).remove();
-		delete window.modals.data[id];
-		window.modals.ids.splice( window.modals.ids.indexOf( id ), 1 );
 		if ( $( '.modal' ).last().length ) {
 			window.modals.displaying = $( '.modal' ).last().attr( 'data-id' );
 		} else {

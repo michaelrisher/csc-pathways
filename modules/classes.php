@@ -44,6 +44,7 @@
 		 * echos json if ajaxed
 		 * returns an array if forced to return
 		 * @param $id string id of the class
+		 * @param integer|string $language id or code of the language
 		 * @param bool|false $forceReturn force a return if the get is not called through ajax
 		 * @return array|void array if forceReturn is true echos echos json otherwise
 		 */
@@ -52,21 +53,17 @@
 			//get the language code for
 			if ( isset( $language ) && !isset( $_POST['language'] ) ) {
 				$this->loadModule( "language" );
-				$langCode = $this->language->getId( $language, true );
+				if( gettype( $language ) == 'integer' ){
+					$langCode = $language; //if its an int i assume its the id
+				} else {
+					$langCode = $this->language->getId( $language, true );
+				}
+
 			} elseif ( isset( $_POST['language'] ) ) {
 				$langCode = $_POST['language'];
 			} else {
 				$langCode = 0;
 			}
-//			$langCode = isset( $_POST['language'] ) ? $_POST['language'] : 0;
-//			$langQuery = "SELECT id FROM enumLanguages WHERE code = '$language'";
-//			$langCode = null;
-//			if( !$result = $this->db->query( $langQuery ) ){
-//				$langCode = 1; //if couldn't find for whatever reason default to en
-//			} else {
-//				$row = $result->fetch_assoc();
-//				$langCode = $row['id'];
-//			}
 			$query = <<<EOD
 SELECT
     classes.id,
@@ -85,9 +82,6 @@ INNER JOIN classData on classes.id = classData.class
 WHERE classes.id = '$id'
 ORDER BY classData.language ASC
 EOD;
-//WHERE classData.language = $langCode AND classes.id = '$id'
-
-			//$query = "SELECT * FROM classes WHERE id = '$id'";
 
 			if ( !$result = $this->db->query( $query ) ) {
 //					echo( 'There was an error running the query [' . $this->db->error . ']' );
@@ -138,23 +132,32 @@ EOD;
 			$obj = array();
 			$_POST = Core::sanitize( $_POST, true );
 			if ( $this->users->isLoggedIn() ) {
-				$statement0 = $this->db->prepare( "UPDATE classes SET title=?, units=?, transfer=?, sort=? WHERE id=?");
-				$statement1 = $this->db->prepare( "UPDATE classData SET prereq=?, advisory=?, coreq=?, description=? WHERE class=? AND language=?");
-
 				//get the sort from the title
 				$sort = explode( ' - ', $_POST['title'] )[0];
 				$sort = preg_replace( '/\D/', '', $sort );
 
-				//bind the statements with values
-				$statement0->bind_param( "sdsds", $_POST['title'], $_POST['units'], $_POST['transfer'], $_POST['sort'], $_POST['id'] );
-				$statement1->bind_param( "sssssd", $_POST['prereq'], $_POST['advisory'], $_POST['coreq'], $_POST['description'], $_POST['id'], $_POST['language'] );
-				//excute it
-				if ( $statement0->execute() && $statement1->execute() ) {
+				$setClass = $this->upsertRecord( 'classes', "id='${_POST['id']}'", array(
+					'title' => $_POST['title'],
+					'units' => intval( $_POST['units'] ),
+					'transfer' => $_POST['transfer'],
+					'sort' => intval( $sort )
+				));
+
+				$setClassData = $this->upsertRecord( 'classData', "class='${_POST['id']}' AND language=${_POST['language']}", array(
+					'class' => $_POST['id'],
+					'language' => $_POST['language'],
+					'prereq' => $_POST['prereq'],
+					'advisory' => $_POST['advisory'],
+					'coreq' => $_POST['coreq'],
+					'description' => $_POST['description'],
+				) );
+
+				if ( $setClass && $setClassData ) {
 					$obj['msg'] = "Saved successfully.";
 					$this->audit->newEvent( "Updated class: " . $_POST['title'] );
 					echo Core::ajaxResponse( $obj );
 				} else {
-					$obj['error'] = $statement0->error . '<br>' . $statement1->error;
+					$obj['error'] = 'An error occurred please contact administrator';
 					echo Core::ajaxResponse( $obj, false );
 				}
 			} else {
