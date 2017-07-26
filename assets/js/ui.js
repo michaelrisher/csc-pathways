@@ -947,10 +947,13 @@ $( document ).ready( function () {
 				if ( !regex['password'].test( $( form ).find( 'input[name=password]' ).val() ) ) {
 					$( form ).find( 'input[name=password]' ).closest( 'li' ).addClass( 'error' );
 					var modal = createModal( { title: 'Error', buttons: [{ value: 'Ok' }] } );
-					setModalContent( modal, "Your passwords must have at least:<br> one lowercase letter<br>" +
-						"one uppercase letter<br>" +
-						"one digit<br>" +
-						"and one symbol" );
+					setModalContent( modal, "Your passwords must have at least:" +
+						"<ol style='padding-left:40px;'>" +
+						"<li>Ten characters or longer</li>" +
+						"<li>One lowercase letter</li>" +
+						"<li>One uppercase letter</li>" +
+						"<li>One digit</li>" +
+						"<li>One symbol</li></ol>" );
 					displayModal( modal, true );
 					hasError = true;
 				}

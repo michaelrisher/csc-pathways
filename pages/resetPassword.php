@@ -23,6 +23,7 @@
 				<p>Reset Password</p>
 				<div class="alignleft margin15Top">Password Tips:</div>
 				<ol class="alignleft">
+					<li>Be at least 10 characters or longer</li>
 					<li>Use at least 1 lower case letter</li>
 					<li>Use at least 1 upper case letter</li>
 					<li>Use at least 1 number</li>
