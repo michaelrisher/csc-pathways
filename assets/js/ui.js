@@ -90,6 +90,7 @@ $( document ).ready( function () {
 
 	$( '#main .login [type=submit]' ).on( 'click', function ( e ) {
 		e.preventDefault(); //prevent the default submit action
+		$( ':focus' ).blur();
 		var form = $( this ).closest( 'form' );
 		var data = $( form ).serializeArray();
 		var map = {};
