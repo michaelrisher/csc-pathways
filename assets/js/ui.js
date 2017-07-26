@@ -125,7 +125,7 @@ $( document ).ready( function () {
 					if ( data.success ) {
 						location.href = data.data.redirect;
 					} else {
-						var modal = createModal( { title: 'Log in failed', buttons: [{ value: 'Ok' }] } );
+						var modal = createModal( { title: 'Log in failed', buttons: [{ value: 'Ok', focus : true }] } );
 						setModalContent( modal, data.data.error );
 						displayModal( modal, true )
 					}
@@ -177,7 +177,7 @@ $( document ).ready( function () {
 					displayModal( modal );
 					adjustTextarea( $( modal ).find( 'textarea' )[0] );
 				} else {
-					var modal = createModal( { title: 'Failed to load class', buttons: [{ value: 'Ok' }] } );
+					var modal = createModal( { title: 'Failed to load class', buttons: [{ value: 'Ok', focus : true }] } );
 					setModalContent( modal, data.data.error );
 					displayModal( modal, true )
 				}
@@ -245,7 +245,7 @@ $( document ).ready( function () {
 				success: function ( data ) {
 					//alert( JSON.stringify( data ) );
 					if ( data.success ) {
-						var modal = createModal( { title: "Saved Class Successfully", buttons: [{ value: 'Ok' }] } );
+						var modal = createModal( { title: "Saved Class Successfully", buttons: [{ value: 'Ok', focus : true }] } );
 						setModalContent( modal, data.data.msg );
 						displayModal( modal );
 						successful = true;
@@ -259,7 +259,7 @@ $( document ).ready( function () {
 						}
 						window.processing = false;
 					} else {
-						var modal = createModal( { title: "Error Saving Class", buttons: [{ value: 'Ok' }] } );
+						var modal = createModal( { title: "Error Saving Class", buttons: [{ value: 'Ok', focus : true }] } );
 						setModalContent( modal, data.data.error );
 						displayModal( modal );
 						successful = false;
@@ -393,6 +393,7 @@ $( document ).ready( function () {
 				title: "Choose Class",
 				buttons: [{
 					value: 'Add',
+					focus : true,
 					onclick: function ( id ) {
 						var that = $( '.modal[data-id=' + id + ']' );
 						var val = $( that ).find( 'select').val();
@@ -667,7 +668,9 @@ $( document ).ready( function () {
 							title: 'Saved Successfully',
 							buttons: [
 								{
-									value: 'Finished', onclick: function () {
+									value: 'Finished',
+									focus : true,
+									onclick: function () {
 									location.href = CORE_URL + 'editCerts'
 								}
 								},
@@ -675,13 +678,12 @@ $( document ).ready( function () {
 							]
 						} );
 						setModalContent( modal, data.data.msg );
-						displayModal( modal, true );
+						displayModal( modal );
 					} else {
+						var modal = createModal( { title: 'Error', buttons : [{ value : 'Ok', focus : true }] } );
+						setModalContent( modal, data.data.error );
+						displayModal( modal )
 					}
-					//	var modal = createModal( { title: 'Log in failed', buttons : [{ value : 'Ok' }] } );
-					//	setModalContent( modal, data.data.error );
-					//	displayModal( modal, true )
-					//}
 				}
 			} )
 		} else {
@@ -707,7 +709,7 @@ $( document ).ready( function () {
 				if ( data.success ) {
 					createUserModal( data, false );
 				} else {
-					var modal = createModal( { title: 'Failed to load class', buttons: [{ value: 'Ok' }] } );
+					var modal = createModal( { title: 'Failed to load class', buttons: [{ value: 'Ok', focus : true }] } );
 					setModalContent( modal, data.data.error );
 					displayModal( modal, true )
 				}
@@ -799,7 +801,7 @@ $( document ).ready( function () {
 				success: function ( data ) {
 					//alert( JSON.stringify( data ) );
 					if ( data.success ) {
-						var modal = createModal( { title: "Saved User Successfully", buttons: [{ value: 'Ok' }] } );
+						var modal = createModal( { title: "Saved User Successfully", buttons: [{ value: 'Ok', focus : true }] } );
 						setModalContent( modal, data.data.msg );
 						displayModal( modal );
 						successful = true;
@@ -809,7 +811,7 @@ $( document ).ready( function () {
 						}
 						window.processing = false;
 					} else {
-						var modal = createModal( { title: "Error Saving User", buttons: [{ value: 'Ok' }] } );
+						var modal = createModal( { title: "Error Saving User", buttons: [{ value: 'Ok', focus : true }] } );
 						setModalContent( modal, data.data.error );
 						displayModal( modal );
 						successful = false;
@@ -904,6 +906,7 @@ $( document ).ready( function () {
 	/******************************************************************************/
 	$( '.resetPassword input[type=submit]' ).on( 'click', function ( e ) {
 		e.preventDefault();
+		$( ':focus' ).blur();
 		var form = $( this ).closest( 'form' );
 		var data = $( form ).serializeArray();
 		var map = {};
@@ -923,6 +926,8 @@ $( document ).ready( function () {
 		}
 
 		if ( map['stage'] == 1 ) {
+			var modal = createModal( { title: 'Error', buttons: [{ value: 'Ok' }] } );
+			setModalContent( modal, '' );
 			if ( map['password'].length == 0 ) {
 				$( form ).find( 'input[name=password]' ).closest( 'li' ).addClass( 'error' );
 				hasError = true;
@@ -936,28 +941,27 @@ $( document ).ready( function () {
 			if ( map['password'] != map['password2'] ) {
 				$( form ).find( 'input[name=password]' ).closest( 'li' ).addClass( 'error' );
 				$( form ).find( 'input[name=password2]' ).closest( 'li' ).addClass( 'error' );
-				var modal = createModal( { title: 'Error', buttons: [{ value: 'Ok' }] } );
-				setModalContent( modal, "You passwords do not match" );
-				displayModal( modal, true );
+
+				appendModalContent( modal, "<p>You passwords do not match</p>" );
 				hasError = true;
 			}
 
-			if ( !window.modals.displaying ) {
-				//todo make sure this doesnt alternate because of the /[a-z]/g flag
-				if ( !regex['password'].test( $( form ).find( 'input[name=password]' ).val() ) ) {
-					$( form ).find( 'input[name=password]' ).closest( 'li' ).addClass( 'error' );
-					var modal = createModal( { title: 'Error', buttons: [{ value: 'Ok' }] } );
-					setModalContent( modal, "Your passwords must have at least:" +
-						"<ol style='padding-left:40px;'>" +
-						"<li>Ten characters or longer</li>" +
-						"<li>One lowercase letter</li>" +
-						"<li>One uppercase letter</li>" +
-						"<li>One digit</li>" +
-						"<li>One symbol</li></ol>" );
-					displayModal( modal, true );
-					hasError = true;
-				}
+			//todo make sure this doesn't alternate because of the /[a-z]/g flag
+			if ( !regex['password'].test( $( form ).find( 'input[name=password]' ).val() ) ) {
+				$( form ).find( 'input[name=password]' ).closest( 'li' ).addClass( 'error' );
+				appendModalContent( modal, "Your passwords must have at least:" +
+					"<ol style='padding-left:40px;'>" +
+					"<li>Ten characters or longer</li>" +
+					"<li>One lowercase letter</li>" +
+					"<li>One uppercase letter</li>" +
+					"<li>One digit</li>" +
+					"<li>One symbol</li></ol>" );
+				hasError = true;
 			}
+		}
+
+		if ( hasError ){
+			displayModal( modal, 0 );
 		}
 
 		if ( !hasError ) {
@@ -973,9 +977,9 @@ $( document ).ready( function () {
 					},
 					success: function ( data ) {
 						if ( data.success ) {
-							var modal = createModal( { title: 'Reset Your Password', buttons: [{ value: 'Ok' }] } );
+							var modal = createModal( { title: 'Reset Your Password', buttons: [{ value: 'Ok', focus : true }] } );
 							setModalContent( modal, data.data.msg );
-							displayModal( modal, true );
+							displayModal( modal, 0 );
 							$( 'input[name=stage]', form ).val( 1 );
 							$( 'input[name=user]', form ).attr( 'readonly' );
 							$( 'input[name=user]', form ).closest( 'li' ).slideUp();
@@ -984,13 +988,14 @@ $( document ).ready( function () {
 							$( 'input[type=submit]', form ).val( 'Reset Password' );
 							$( form ).attr( 'action', 'users/setPassword' );
 						} else {
-							var modal = createModal( { title: 'Log in failed', buttons: [{ value: 'Ok' }] } );
+							var modal = createModal( { title: 'Log in failed', buttons: [{ value: 'Ok', focus : true }] } );
 							setModalContent( modal, data.data.error );
 							displayModal( modal, true )
 						}
 					}
 				} );
 			} else if ( map['stage'] == 1 ) {
+				closeModal( modal );
 				$.ajax( {
 					type: 'POST',
 					url: CORE_URL + 'rest/' + $( form ).attr( 'action' ),
@@ -1006,6 +1011,7 @@ $( document ).ready( function () {
 								title: 'Success', buttons: [
 									{
 										value: 'Ok',
+										focus : true,
 										onclick: function () {
 											location.href = CORE_URL + data.data.redirect;
 										}
@@ -1014,7 +1020,7 @@ $( document ).ready( function () {
 							setModalContent( modal, data.data.msg );
 							displayModal( modal, true );
 						} else {
-							var modal = createModal( { title: 'Log in failed', buttons: [{ value: 'Ok' }] } );
+							var modal = createModal( { title: 'Log in failed', buttons: [{ value: 'Ok', focus : true }] } );
 							setModalContent( modal, data.data.error );
 							displayModal( modal, true )
 						}
@@ -1135,6 +1141,7 @@ window.modals = { ids: [], data: {}, displaying: false };
  *			name : "string", //name of the input
  *  		onclick : function, //click event to run
  *  		class : "string" //class of the button for style or whatever
+ *  		focus : true //focus on this button
  *  	}
  *  ]
  * @param options
@@ -1164,7 +1171,7 @@ function createModal( options ) {
 				var x = options.buttons[i];
 				x.class = x.class ? x.class : '';
 				x.name = x.name ? x.name : '';
-				html += "<input type='button' value='" + x.value + "' class='" + x.class + "' name='" + x.name + "'/>";
+				html += "<input type='button' value='" + x.value + "' class='" + x.class + "' name='" + x.name + "' " + ( ( x.focus ) ? 'autofocus />' : '/>' );
 			}
 		}
 		html += '</div>';
@@ -1179,7 +1186,11 @@ function setModalContent( modal, html ) {
 	$( modal ).find( '.modalContent' ).html( html );
 }
 
-function displayModal( modal, shake ) {
+function appendModalContent( modal, html ){
+	$( modal ).find( '.modalContent' ).html( $( modal ).find( '.modalContent' ).html() + html );
+}
+
+function displayModal( modal, focusIndex ) {
 	$( modal ).fadeIn( 300 );
 	window.modals.displaying = $( modal ).attr( 'data-id' );
 }
@@ -1199,7 +1210,6 @@ function closeModal( modal ) {
 
 	} );
 }
-
 
 function modalLi( type, name, label, data, text ) {
 	return modalLi( type, name, label, data, text, false, false );
