@@ -13,31 +13,31 @@
 		 * @return array
 		 */
 		public function listing( $page = 1 ) {
-			$this->loadModule( 'users' );
-			if ( $this->users->isLoggedIn() ) {
-				$query = "SELECT * FROM enumLanguages";//remove limit for a time LIMIT $page,50
+//			$this->loadModule( 'users' );
+//			if ( $this->users->isLoggedIn() ) {
+			$query = "SELECT * FROM enumLanguages";//remove limit for a time LIMIT $page,50
 
-				if ( !$result = $this->db->query( $query ) ) {
-					echo( 'There was an error running the query [' . $this->db->error . ']' );
-				}
-
-				$return = array();
-				while ( $row = $result->fetch_assoc() ) {
-					$a = array(
-						'id' => $row['id'],
-						'code' => $row['code'],
-						'fullName' => utf8_encode( $row['fullName'] )
-					);
-					array_push( $return, $a );
-				}
-				if ( IS_AJAX ) {
-//					echo '{"success" : true, "data" : { "s" : 1 } }';
-					$s = Core::ajaxResponse( $return );
-					echo $s;
-				} else {
-					return $return;
-				}
+			if ( !$result = $this->db->query( $query ) ) {
+				echo( 'There was an error running the query [' . $this->db->error . ']' );
 			}
+
+			$return = array();
+			while ( $row = $result->fetch_assoc() ) {
+				$a = array(
+					'id' => $row['id'],
+					'code' => $row['code'],
+					'fullName' => utf8_encode( $row['fullName'] )
+				);
+				array_push( $return, $a );
+			}
+			if ( IS_AJAX ) {
+//					echo '{"success" : true, "data" : { "s" : 1 } }';
+				$s = Core::ajaxResponse( $return );
+				echo $s;
+			} else {
+				return $return;
+			}
+//			}
 		}
 
 		/**

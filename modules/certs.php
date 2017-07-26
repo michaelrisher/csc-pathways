@@ -174,6 +174,7 @@ EOD;
 		 */
 		public function save( $id ) {
 			$this->loadModule( 'users' );
+			$lang = new Lang( Lang::getCode() );
 			$obj = array();
 			if( $this->users->isLoggedIn() ){
 				$this->loadModule( 'audit' );
@@ -218,7 +219,7 @@ EOD;
 				}
 
 				if( $certListUpdated && $certDataUpdated ){
-					$obj['msg'] = "Saved successfully.";
+					$obj['msg'] = $lang->o( 'ajaxSaved' ); //"Saved successfully.";
 					$this->audit->newEvent( "Updated cert: " . $_POST['title'] );
 					echo Core::ajaxResponse( $obj );
 				} else{
@@ -226,7 +227,7 @@ EOD;
 					echo Core::ajaxResponse( $obj, false );
 				}
 			} else{
-				$obj['error'] = 'Session expired.<br>Please log in again';
+				$obj['error'] = $lang->o( 'ajaxSessionExpire' );// 'Session expired.<br>Please log in again';
 				echo Core::ajaxResponse( $obj, false );
 			}
 		}
@@ -272,6 +273,7 @@ EOD;
 		public function delete( $id ){
 			$this->loadModule( 'users' );
 			$this->loadModule( 'audit' );
+			$lang = new Lang( Lang::getCode() );
 			$obj = array();
 			$_POST = Core::sanitize( $_POST, true );
 			if( $this->users->isLoggedIn() ) {
@@ -288,7 +290,7 @@ EOD;
 				$statementData = $this->db->prepare("DELETE FROM certificateData WHERE cert=?");
 				$statementData->bind_param( "s", $_POST['id']);
 				if( $statement->execute() && $statementData->execute() ){
-					$obj['msg'] = "Deleted successfully.";
+					$obj['msg'] = $lang->o( 'ajaxDelete' ); //"Deleted successfully.";
 					$this->audit->newEvent( "Deleted certificate: " . $event );
 					echo Core::ajaxResponse( $obj );
 				} else{
@@ -299,7 +301,7 @@ EOD;
 				$statement->close();
 				$statementData->close();
 			} else{
-				$obj['error'] = "Session expired.<br>Please log in again";
+				$obj['error'] = $lang->o( 'ajaxSessionExpire' ); //"Session expired.<br>Please log in again";
 				echo Core::ajaxResponse( $obj, false );
 			}
 		}

@@ -33,9 +33,16 @@
 			'classInfoPrereq' => 'Requisito',
 			'classInfoCoreq' => 'Prerrequisito o concurrente',
 			'classInfoAdvisory' => 'Consultivo',
-
-
 			'language' => 'Idioma',
+			'ajaxSaved' => 'Salvado con éxito',
+			'ajaxErrorOccurred' => 'Ocurrió un error. Debe contactar con administrador',
+			'ajaxSessionExpire' => 'Sesión expirada. Inicia sesión de nuevo',
+			'ajaxDelete' => 'Borrado con éxito',
+			'ajaxCreate' => 'Creado con éxito',
+			'ajaxLogin' => 'Conectado con éxito.',
+			'ajaxLoginDisabled' => 'Nombre de usuario ha desactivado',
+			'ajaxLoginIncorrect' => 'Nombre de usuario o correo electrónico es incorrecto.',
 		);
-
+		// Á  Í  É  Ó  Ú  Ü  Ñ  ¡
+		// á  í  é  ó  ú  ü  ñ  ¿
 	}
