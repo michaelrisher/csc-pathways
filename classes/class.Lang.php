@@ -47,7 +47,7 @@
 				if ( isset( $this->definitions->translations[$msgid] ) ) {
 					return htmlentities( utf8_encode( $this->definitions->translations[$msgid] ), 0, 'UTF-8' ); //( $this->definitions->translations[$msgid] );
 				} else {
-					return '';
+					return $msgid . ' string missing';
 				}
 			} else {
 				return '';

@@ -24,6 +24,7 @@
 		<div class="admin">
 			<div class="classes aligncenter margin15Bottom">
 				<p>Classes</p>
+				<input type="search" placeholder="Search Classes" />
 				<div class="listing alignleft">
 					<ul>
 					<?php

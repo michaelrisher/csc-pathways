@@ -129,6 +129,7 @@ EOD;
 		public function save() {
 			$this->loadModule( 'users' );
 			$this->loadModule( 'audit' );
+			$lang = new Lang( Lang::getCode() );
 			$obj = array();
 			$_POST = Core::sanitize( $_POST, true );
 			if ( $this->users->isLoggedIn() ) {
@@ -153,15 +154,15 @@ EOD;
 				) );
 
 				if ( $setClass && $setClassData ) {
-					$obj['msg'] = "Saved successfully.";
+					$obj['msg'] = $lang->o( 'ajaxSaved' );
 					$this->audit->newEvent( "Updated class: " . $_POST['title'] );
 					echo Core::ajaxResponse( $obj );
 				} else {
-					$obj['error'] = 'An error occurred please contact administrator';
+					$obj['error'] = $lang->o( 'ajaxErrorOccurred' );
 					echo Core::ajaxResponse( $obj, false );
 				}
 			} else {
-				$obj['error'] = "Session expired.<br>Please log in again";
+				$obj['error'] = $lang->o( 'ajaxSessionExpire' );
 				echo Core::ajaxResponse( $obj, false );
 			}
 		}
@@ -173,6 +174,7 @@ EOD;
 		public function delete() {
 			$this->loadModule( 'users' );
 			$this->loadModule( 'audit' );
+			$lang = new Lang( Lang::getCode() );
 			$obj = array();
 			$_POST = Core::sanitize( $_POST, true );
 			if ( $this->users->isLoggedIn() ) {
@@ -187,7 +189,7 @@ EOD;
 				$statement = $this->db->prepare( "DELETE FROM classes WHERE id=?" );
 				$statement->bind_param( "s", $_POST['id'] );
 				if ( $statement->execute() ) {
-					$obj['msg'] = "Deleted successfully.";
+					$obj['msg'] = $lang->o( 'ajaxDelete' );
 					$this->audit->newEvent( "Deleted class: " . $event );
 					echo Core::ajaxResponse( $obj );
 				} else {
@@ -195,7 +197,7 @@ EOD;
 					echo Core::ajaxResponse( $obj, false );
 				}
 			} else {
-				$obj['error'] = "Session expired.<br>Please log in again";
+				$obj['error'] = $lang->o( 'ajaxSessionExpire' );
 				echo Core::ajaxResponse( $obj, false );
 			}
 		}
@@ -207,6 +209,7 @@ EOD;
 		public function create() {
 			$this->loadModule( 'users' );
 			$this->loadModule( 'audit' );
+			$lang = new Lang( Lang::getCode() );
 			$obj = array();
 			$_POST = Core::sanitize( $_POST );
 			if ( $this->users->isLoggedIn() ) {
@@ -214,7 +217,7 @@ EOD;
 				$statement = $this->db->prepare( "INSERT INTO classes(id, title, units, transfer, prereq, advisory, coreq, description) VALUES (?,?,?,?,?,?,?,?)" );
 				$statement->bind_param( "ssdsssss", $_POST['id'], $_POST['title'], $_POST['units'], $_POST['transfer'], $_POST['prereq'], $_POST['advisory'], $_POST['coreq'], $_POST['description'] );
 				if ( $statement->execute() ) {
-					$obj['msg'] = "Created successfully.";
+					$obj['msg'] = $lang->o( 'ajaxCreate' );
 					echo Core::ajaxResponse( $obj );
 					$this->audit->newEvent( "Created class: " . $_POST['title'] );
 				} else {
@@ -229,7 +232,7 @@ EOD;
 					echo Core::ajaxResponse( $obj, false );
 				}
 			} else {
-				$obj['error'] = "Session expired.<br>Please log in again";
+				$obj['error'] = $lang->o( 'ajaxSessionExpire' );
 				echo Core::ajaxResponse( $obj, false );
 			}
 		}

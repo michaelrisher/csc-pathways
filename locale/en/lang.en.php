@@ -31,7 +31,14 @@
 			'classInfoPrereq' => 'Prerequisite',
 			'classInfoCoreq' => 'Corequisite',
 			'classInfoAdvisory' => 'Advisory',
-
 			'language' => 'Language',
+			'ajaxUpdateClass' => 'Saved successfully',
+			'ajaxErrorOccurred' => 'An error occurred please contact administrator',
+			'ajaxSessionExpire' => 'Session expired. Please log in again.',
+			'ajaxDelete' => 'Deleted successfully',
+			'ajaxCreate' => 'Created successfully',
+			'ajaxLogin' => 'Successfully logged in.',
+			'ajaxLoginDisabled' => 'Account has been deactivated.',
+			'ajaxLoginIncorrect' => 'Your username or email is incorrect.'
 		);
 	}
