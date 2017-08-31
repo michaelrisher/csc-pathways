@@ -32,6 +32,7 @@
 			'classInfoCoreq' => 'Corequisite',
 			'classInfoAdvisory' => 'Advisory',
 			'language' => 'Language',
+			'ajaxSaved' => 'Saved successfully.',
 			'ajaxUpdateClass' => 'Saved successfully',
 			'ajaxErrorOccurred' => 'An error occurred please contact administrator',
 			'ajaxSessionExpire' => 'Session expired. Please log in again.',

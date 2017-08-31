@@ -14,10 +14,19 @@
 		 * @param int $page not used yet
 		 * @return array
 		 */
-		public function listing( $page = 1 ) {
+		public function listing( $page = 1) {
 			$this->loadModule( 'users' );
 			if ( $this->users->isLoggedIn() ) {
-				$query = "SELECT * FROM classes ORDER BY sort";//remove limit for a time LIMIT $page,50
+				$limit = 25;
+				$page--;//to make good looking page numbers for users
+				$offset = $page * $limit;
+				$_POST = Core::sanitize( $_POST );
+				$search = isset( $_POST['search'] ) ? $_POST['search'] : '' ;
+				if( empty( $search ) ){
+					$query = "SELECT * FROM classes ORDER BY sort LIMIT $offset,$limit";//remove limit for a time LIMIT $page,50
+				} else {
+					$query = "SELECT * FROM classes WHERE title LIKE '%$search%'ORDER BY sort LIMIT $offset,$limit";
+				}
 
 				if ( !$result = $this->db->query( $query ) ) {
 					echo( 'There was an error running the query [' . $this->db->error . ']' );
@@ -234,6 +243,23 @@ EOD;
 			} else {
 				$obj['error'] = $lang->o( 'ajaxSessionExpire' );
 				echo Core::ajaxResponse( $obj, false );
+			}
+		}
+
+		/**
+		 * get the number of pages with the limit
+		 * @param int $limit the number od results to limit
+		 * @return float
+		 */
+		public function getPages( $limit = 25){
+			$this->loadModule( 'users' );
+			if( $this->users->isLoggedIn() ) {
+				$query = "SELECT COUNT(id) as pages FROM classes";
+
+				if ( $result = $this->db->query( $query ) ) {
+					$row = $result->fetch_assoc();
+					return ceil( $row['pages'] / $limit );
+				}
 			}
 		}
 

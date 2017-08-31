@@ -97,6 +97,7 @@ html, body{ background-color: #d3dce6; }
 				top: -70px;
 			}
 			.middleTree{
+				width: 255px;
 				margin: 0 67px 0;
 			}
 			table {
@@ -207,29 +208,6 @@ html, body{ background-color: #d3dce6; }
 					font-weight: bold;
 					padding: 10px 0 10px 0;
 				}
-
-				.pages{
-					margin: 10px;
-					p{
-						margin: 0 0 10px 0;
-					}
-					a{
-						padding-right: 10px;
-						text-decoration: none;
-						&:after{
-							content: '|';
-							padding: 0 0 0 10px;
-							color: #000 !important;
-						}
-
-						&:last-child:after{
-							content: '';
-						}
-						&.current{
-							color: #ffba00;
-						}
-					}
-				}
 			}
 
 			.audit, .classes, .certs, .users{
@@ -258,6 +236,29 @@ html, body{ background-color: #d3dce6; }
 						height: 20px;
 						vertical-align: text-top;
 						padding: 0 5px 0 5px;
+					}
+				}
+
+				.pages{
+					margin: 10px;
+					p{
+						margin: 0 0 10px 0;
+					}
+					a{
+						padding-right: 10px;
+						text-decoration: none;
+						&:after{
+							content: '|';
+							padding: 0 0 0 10px;
+							color: #000 !important;
+						}
+
+						&:last-child:after{
+							content: '';
+						}
+						&.current{
+							color: #ffba00;
+						}
 					}
 				}
 			}
