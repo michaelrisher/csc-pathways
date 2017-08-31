@@ -1,5 +1,7 @@
 $( document ).ready( function () {
-	CORE_URL = readCookie( 'url' );
+	var CORE_URL = readCookie( 'url' );
+	var searchTypingTimer = -1;
+
 	$( 'html' ).on( 'click', '.fakeLink', function ( e ) {
 		e.preventDefault();
 		var loc = $( this ).attr( 'data-to' );//location we are going to
@@ -486,6 +488,47 @@ $( document ).ready( function () {
 		}
 	} );
 
+	$( '.classes input.search' ).on( 'keyup', function(e) {
+		clearTimeout( searchTypingTimer );
+		if( e.keyCode != 13 ){
+			searchTypingTimer = setTimeout( classSearch, 1000 );
+		}
+	} );
+
+	$( '.classes input.search' ).on( 'search', function( e ){
+		clearTimeout( searchTypingTimer );
+		classSearch();
+	} );
+
+	function classSearch(){
+		var value = $( '.classes input.search' ).val();
+		$.ajax({
+			type: 'POST',
+			url: CORE_URL + 'rest/classes/listing',
+			dataType: 'json',
+			data: {
+				page : 1,
+				search : value
+			},
+			success : function( data ){
+				if( data.success ){
+					var listing = $( '.listing ul');
+					$( listing ).html('');
+					for( var i = 0; i < data.data.length; i++ ){
+						var item = data.data[i];
+						var s = "<li data-id='" + item.id + "'>" + item.title;
+						s += '<img class="delete tooltip" title="Delete class" src="' + CORE_URL + 'assets/img/delete.png">';
+						s += '<img class="languageEdit tooltip" title="Edit in Different Language" src="' + CORE_URL + 'assets/img/region.png">';
+						s += '<img class="edit tooltip" title="Edit class" src="' + CORE_URL + 'assets/img/edit.svg">';
+						s += "</li>";
+						$( listing ).append( s );
+					}
+				} else{
+					//TODO catch a search failure
+				};
+			}
+		});
+	}
 
 	/******************************************************************************/
 	/****************************certification edit********************************/

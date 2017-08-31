@@ -8,6 +8,7 @@
 	if( !$GLOBALS['main']->users->isLoggedIn() ){
 		Core::errorPage( 404 );
 	}
+	$params = $data['params'];
 ?>
 <!DOCTYPE html>
 <html>
@@ -24,12 +25,18 @@
 		<div class="admin">
 			<div class="classes aligncenter margin15Bottom">
 				<p>Classes</p>
-				<input type="search" placeholder="Search Classes" />
+				<div class="searchBar padding5">
+					<input type="search" class="search" placeholder="Search Classes" />
+				</div>
 				<div class="listing alignleft">
 					<ul>
 					<?php
 						$GLOBALS['main']->loadModule( 'classes' );
-						$data = $GLOBALS['main']->classes->listing();
+						if( is_numeric( $params ) ){
+							$data = $GLOBALS['main']->classes->listing( $data['params'] );
+						} else {
+							$data = $GLOBALS['main']->classes->listing();
+						}
 						foreach ( $data as $class ) {
 							echo "<li data-id='${class['id']}'>${class['title']}";
 							echo "<img class='delete tooltip' title='Delete class' src='". CORE_URL ."assets/img/delete.png'/>";
@@ -39,6 +46,20 @@
 						}
 					?>
 					</ul>
+				</div>
+				<div class="pages aligncenter" >
+					<p>Pages</p>
+					<?php
+						$pages = $GLOBALS['main']->classes->getPages();
+						$currentPage = is_numeric( $params ) ? $params : 1;
+						if(  $currentPage > 1 ) echo "<a href='" . CORE_URL . "editClass/" . ( $currentPage - 1 ). "'/>&lt;</a>";
+						for( $i = 1; $i <= $pages; $i++ ){
+							echo "<a href='" . CORE_URL . 'editClass/' . $i . "' class='";
+							echo is_numeric( $params ) ? ( $params == $i ? 'current' : '' ) : ( $i == 1 ? 'current' : '' );
+							echo "'>" . ( $i ) . "</a>";
+						}
+						if(  $currentPage < $pages ) echo "<a href='" . CORE_URL . "editClass/" . ( $currentPage + 1 ). "'/>&gt;</a>";
+					?>
 				</div>
 				<div class="margin25Top">
 					<input type="button" value="Create Class" name="createClass"/>
