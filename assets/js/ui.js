@@ -512,8 +512,9 @@ $( document ).ready( function () {
 				if( data.success ){
 					var listing = $( '.listing ul');
 					$( listing ).html('');
-					for( var i = 0; i < data.data.length; i++ ){
-						var item = data.data[i];
+					var data = data.data;
+					for( var i = 0; i < data.listing.length; i++ ){
+						var item = data.listing[i];
 						var s = "<li data-id='" + item.id + "'>" + item.title;
 						s += '<img class="delete tooltip" title="Delete class" src="' + CORE_URL + 'assets/img/delete.png">';
 						s += '<img class="languageEdit tooltip" title="Edit in Different Language" src="' + CORE_URL + 'assets/img/region.png">';
@@ -521,6 +522,36 @@ $( document ).ready( function () {
 						s += "</li>";
 						$( listing ).append( s );
 					}
+
+					var pagesDom = $( '.pages div' );
+					$( pagesDom ).html('');
+					var pages = Math.ceil( data.count / data.limit );
+					var currentPage = data.currentPage;
+					var amount = 3;
+					var str = '';
+					if(  currentPage > 1 ){
+						str += "<a href='" + CORE_URL + "editClass/1'/>|&lt;</a>";
+					}
+					//left side of current math
+					var left = 0;
+					if( currentPage <= amount ){
+						left = ( ( currentPage - amount ) + amount ) - 1;
+					} else{
+						left = amount;
+					}
+					for( var i = left; i >= 1; i-- ){
+						str += "<a href='" + CORE_URL + 'editClass/' + ( currentPage - $i ) + "?q=" + value + "'>" + ( currentPage - $i ) + "</a>";
+					}
+					str += "<a href='" + CORE_URL + 'editClass/' + ( currentPage ) + "?q=" + value + "' class='current'>"  + ( currentPage ) + "</a>";
+					//right side of current math
+					for( var i = 1; i <= amount; i++ ){
+						if( ( currentPage + i ) > pages ){ break; }
+						str += "<a href='" + CORE_URL + 'editClass/' + ( currentPage + i ) + "?q=" + value + "'>"  + ( currentPage + i ) + "</a>";
+					}
+					if(  currentPage < pages ){
+						str += "<a href='" + CORE_URL + "editClass/" + pages + "'>&gt;|</a>";
+					}
+					$( pagesDom ).html( str );
 				} else{
 					//TODO catch a search failure
 				};
