@@ -14,14 +14,23 @@
 		 * @param int $page not used yet
 		 * @return array
 		 */
-		public function listing( $page = 1) {
+		public function listing( $page = 1 ) {
 			$this->loadModule( 'users' );
 			if ( $this->users->isLoggedIn() ) {
 				$limit = 25;
 				$page--;//to make good looking page numbers for users
 				$offset = $page * $limit;
-				$_POST = Core::sanitize( $_POST );
-				$search = isset( $_POST['search'] ) ? $_POST['search'] : '' ;
+				$search = '';
+				if( isset( $_POST ) || isset( $_GET ) ){
+					$_POST = Core::sanitize( $_POST );
+					if( isset( $_POST['search'] ) ){
+						$search = $_POST['search'];
+					}
+					if( isset( $_GET['q'] ) ){
+						$search = Core::sanitize( $_GET['q'] );
+					}
+				}
+//				$search = isset( $_POST['search'] ) ? $_POST['search'] : '' ;
 				if( empty( $search ) ){
 					$query = "SELECT * FROM classes ORDER BY sort LIMIT $offset,$limit";//remove limit for a time LIMIT $page,50
 				} else {
@@ -30,6 +39,7 @@
 
 				if ( !$result = $this->db->query( $query ) ) {
 					echo( 'There was an error running the query [' . $this->db->error . ']' );
+					return null;
 				}
 
 				$return = array();
@@ -40,6 +50,25 @@
 					);
 					array_push( $return, $a );
 				}
+
+				//get count of data
+				if( empty( $search ) ) {
+					$query = "SELECT COUNT( id ) AS items FROM classes";
+				} else {
+					$query = "SELECT COUNT( id ) AS items FROM classes WHERE title LIKE '%$search%'";
+				}
+				$result->close();
+				if( !$result = $this->db->query( $query ) ) {
+					echo( 'There was an error running the query [' . $this->db->error . ']' );
+					return null;
+				}
+
+				if( $result->num_rows == 1 ){
+					$row = $result->fetch_assoc();
+					$count = $row['items'];
+				}
+				$result->close();
+				$return = array( 'listing' => $return, 'count' => intval( $count ), 'limit' => $limit, 'currentPage' => ++$page );
 				if ( IS_AJAX ) {
 					echo Core::ajaxResponse( $return );
 				}
