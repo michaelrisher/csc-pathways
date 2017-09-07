@@ -34,4 +34,3 @@
 <?php
 	Core::queueScript( 'assets/js/core.js');
 	Core::queueScript( 'assets/js/ui.js');
-	Core::includeScripts();

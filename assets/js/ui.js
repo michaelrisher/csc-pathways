@@ -118,7 +118,7 @@ $( document ).ready( function () {
 			//ajax login
 			$.ajax( {
 				type: 'POST',
-				url: 'rest/' + $( form ).attr( 'action' ),
+				url: CORE_URL + 'rest/' + $( form ).attr( 'action' ),
 				dataType: 'json',
 				data: {
 					user: map['user'],
@@ -146,7 +146,7 @@ $( document ).ready( function () {
 		var id = $( this ).closest( 'li' ).attr( 'data-id' );
 		$.ajax( {
 			type: 'POST',
-			url: 'rest/classes/get/' + id,
+			url: CORE_URL + 'rest/classes/get/' + id,
 			dataType: 'json',
 			success: function ( data ) {
 				editClassModal( data );
@@ -160,7 +160,7 @@ $( document ).ready( function () {
 		var id = $( this ).closest( 'li' ).attr( 'data-id' );
 		$.ajax( {
 			type: 'POST',
-			url: 'rest/language/listing',
+			url: CORE_URL + 'rest/language/listing',
 			dataType: 'json',
 			success: function ( data ) {
 				if ( data.success ) {
@@ -202,7 +202,7 @@ $( document ).ready( function () {
 			var classId = $( 'input[name="class"]' ).val();
 			$.ajax({
 				type: 'POST',
-				url: 'rest/classes/get/' + classId,
+				url: CORE_URL + 'rest/classes/get/' + classId,
 				data : {
 					language : lang
 				},
@@ -308,7 +308,7 @@ $( document ).ready( function () {
 			}
 			$.ajax( {
 				type: 'POST',
-				url: 'rest/classes/' + url,
+				url: CORE_URL + 'rest/classes/' + url,
 				dataType: 'json',
 				data: map,
 				async: false,
@@ -345,7 +345,7 @@ $( document ).ready( function () {
 		}
 	}
 
-	//classes edit option
+	//classes delete option
 	$( document ).on( 'click', '#main .classes li img.delete', function () {
 		//get the class info
 		var id = $( this ).closest( 'li' ).attr( 'data-id' );
@@ -358,7 +358,7 @@ $( document ).ready( function () {
 					var successful = false;
 					$.ajax( {
 						type: 'POST',
-						url: 'rest/classes/delete/',
+						url: CORE_URL + 'rest/classes/delete/',
 						data: {
 							id: id
 						},
@@ -432,7 +432,7 @@ $( document ).ready( function () {
 		var input = $( this ).closest( 'li' ).find( 'input' );
 		var prevModal = $( this ).closest( '.modal' );
 		var id = $( prevModal ).attr( 'data-id' );
-		if ( getStorage( "invalidateCache" ) && getStorage( 'classes' ) ) {
+		if ( false && getStorage( "invalidateCache" ) && getStorage( 'classes' ) ) {
 			var time = parseInt( getStorage( "invalidateCache" ) );
 			var curr = +new Date(); //gives unix time
 			if ( curr >= time ) {
@@ -444,12 +444,12 @@ $( document ).ready( function () {
 		} else {
 			$.ajax( {
 				type: 'POST',
-				url: 'rest/classes/listing',
+				url: CORE_URL + 'rest/classes/listing',
 				dataType: 'json',
 				//async : false,
 				success: function ( data ) {
 					if ( data.success ) {
-						setStorageJSON( 'classes', data.data );
+						setStorageJSON( 'classes', data.data.listing );
 						var t = +new Date(); //gives unix time
 						setStorage( 'invalidateCache', ( t + ( 5 * 60 * 1000 ) ) );
 						createClassModal( data.data );
@@ -485,6 +485,7 @@ $( document ).ready( function () {
 			html += '</select><span>Pick a class to add</span></li>';
 			setModalContent( modal, html );
 			displayModal( modal );
+			$( 'select', modal ).select2();
 		}
 	} );
 
@@ -551,7 +552,7 @@ $( document ).ready( function () {
 						str += "<a href='" + CORE_URL + 'editClass/' + ( currentPage + i ) + "?q=" + value + "'>"  + ( currentPage + i ) + "</a>";
 					}
 					if(  currentPage < pages ){
-						str += "<a href='" + CORE_URL + "editClass/" + pages + "'>&gt;|</a>";
+						str += "<a href='" + CORE_URL + "editClass/" + pages + "?q=" + value + "'>&gt;|</a>";
 					}
 					$( pagesDom ).html( str );
 				} else{
@@ -596,10 +597,10 @@ $( document ).ready( function () {
 							requestClassListing( function ( data ) {
 								if ( data.success ) {
 									//store classes in cache
-									setStorageJSON( 'classes', data.data );
+									setStorageJSON( 'classes', data.data.listing );
 									var t = +new Date(); //gives unix time
 									setStorage( 'invalidateCache', ( t + ( 5 * 60 * 1000 ) ) );
-									loadClassModal( data.data );
+									loadClassModal( data.data.listing );
 								}
 							} );
 						}
@@ -679,6 +680,7 @@ $( document ).ready( function () {
 					html += '</ul></form>';
 					setModalContent( modal, html );
 					displayModal( modal );
+					$( 'select', modal ).select2();
 				}
 
 				function failedAjax() {
@@ -697,7 +699,7 @@ $( document ).ready( function () {
 		var id = $( this ).closest( 'li' ).attr( 'data-id' );
 		$.ajax( {
 			type: 'POST',
-			url: 'rest/language/listing',
+			url: CORE_URL + 'rest/language/listing',
 			dataType: 'json',
 			success: function ( data ) {
 				if ( data.success ) {
@@ -754,7 +756,7 @@ $( document ).ready( function () {
 					var successful = false;
 					$.ajax( {
 						type: 'POST',
-						url: 'rest/certs/delete/',
+						url: CORE_URL + 'rest/certs/delete/',
 						data: {
 							id: id
 						},
@@ -894,7 +896,7 @@ $( document ).ready( function () {
 		var id = $( this ).closest( 'li' ).attr( 'data-id' );
 		$.ajax( {
 			type: 'POST',
-			url: 'rest/users/get/' + id,
+			url: CORE_URL + 'rest/users/get/' + id,
 			dataType: 'json',
 			success: function ( data ) {
 				if ( data.success ) {
@@ -979,7 +981,7 @@ $( document ).ready( function () {
 			saveBtn.addClass( 'processing' );
 			$.ajax( {
 				type: 'POST',
-				url: 'rest/users/save',
+				url: CORE_URL + 'rest/users/save',
 				dataType: 'json',
 				data: {
 					id: map.id,
@@ -1023,7 +1025,7 @@ $( document ).ready( function () {
 		var userId = modal.find( 'input[name=id]' ).val();
 		$.ajax( {
 			type: 'POST',
-			url: 'rest/users/createResetPassword/' + userId,
+			url: CORE_URL + 'rest/users/createResetPassword/' + userId,
 			dataType: 'json',
 			async: false,
 			success: function ( data ) {
@@ -1055,7 +1057,7 @@ $( document ).ready( function () {
 					var successful = false;
 					$.ajax( {
 						type: 'POST',
-						url: 'rest/users/delete/',
+						url: CORE_URL + 'rest/users/delete/',
 						data: {
 							id: id
 						},
@@ -1301,6 +1303,13 @@ $( document ).ready( function () {
 			}
 		}
 	} );
+
+	//modal reposition after resize
+	$( window ).on( 'resize', function(){
+		$( '.modal' ).each( function( idx, elem ){
+			$( elem ).css( 'left', ( $( 'body' ).width() / 2 ) - ( $( elem ).width() / 2 ) + 'px' );
+		} );
+	} );
 } );
 
 
@@ -1344,8 +1353,9 @@ function createModal( options ) {
 	} else {
 		id = window.modals.ids[window.modals.ids.length - 1] + 1;
 	}
-	var html = '<div data-id="' + id + '" class="modal none">' +
-		'<div class="modalWrapper">'
+	var zIndex = ' style="z-index: ' + ( 5 + ( id - 1 ) ) + '" ';
+	var html = '<div data-id="' + id + '" class="modal none"' + zIndex + '>' +
+		'<div class="modalWrapper">';
 	if ( options.title ) { //insert the header
 		html += '<div class="modalHeader clearfix">' +
 			'<span class="title">' + options.title + '</span>' +
@@ -1367,7 +1377,7 @@ function createModal( options ) {
 		}
 		html += '</div>';
 	}
-	$( 'body' ).append( html );
+	$( 'body' ).append( '<div class="modalShadow" data-id="' + id + '"' + zIndex + '>&nbsp;</div>' ).append( html );
 	window.modals.data[id] = options
 	window.modals.ids.push( id );
 	return $( '.modal[data-id=' + id + ']' );
@@ -1382,24 +1392,33 @@ function appendModalContent( modal, html ){
 }
 
 function displayModal( modal, focusIndex ) {
+	//center the modal on the screen
+	$( modal ).css( 'left', ( $( 'body' ).width() / 2 ) - ( $( modal ).width() / 2 ) + 'px' );
+	$( modal ).css( 'top', ( $(document ).scrollTop() ) + 'px' );
 	$( modal ).fadeIn( 300 );
+	//$('html, body').animate({
+	//	scrollTop: $( modal ).offset().top
+	//}, 200);
 	window.modals.displaying = $( modal ).attr( 'data-id' );
 }
 
 function closeModal( modal ) {
-	modal.find( '.modalWrapper' ).hide();
+	//modal.find( '.modalWrapper' ).hide();
 	var id = $( modal ).attr( 'data-id' );
 	delete window.modals.data[id];
 	window.modals.ids.splice( window.modals.ids.indexOf( id ), 1 );
+	if( $( '.modal:not([data-id=' + id + '])' ).last().length ){
+		window.modals.displaying = $( '.modal' ).last().attr( 'data-id' );
+	} else {
+		window.modals.displaying = false;
+	}
 	$( modal ).fadeOut( 300, function () {
 		$( modal ).remove();
-		if ( $( '.modal' ).last().length ) {
-			window.modals.displaying = $( '.modal' ).last().attr( 'data-id' );
-		} else {
-			window.modals.displaying = false;
-		}
-
 	} );
+	$( '.modalShadow[data-id=' + id + ']' ).fadeOut( 300, function(){
+		$(this ).remove();
+	});
+
 }
 
 function modalLi( type, name, label, data, text ) {

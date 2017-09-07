@@ -15,7 +15,7 @@
 		$GLOBALS['main']->loadModule('certs');
 		$data = $GLOBALS['main']->certs->listing('category, sort');
 		$category = array();
-		foreach( $data as $item ){
+		foreach( $data['listing'] as $item ){
 			if( !@is_array( $category[$item['category']] ) ){ //@ means suppress warning
 				$category[$item['category']] = array();
 			}
@@ -141,7 +141,10 @@
 			</div>
 		</div>
 	</div>
-	<?php include_once CORE_PATH . 'assets/inc/footer.php'; ?>
+	<?php
+		include_once CORE_PATH . 'assets/inc/footer.php';
+		Core::includeScripts();
+	?>
 </body>
 </html>
 

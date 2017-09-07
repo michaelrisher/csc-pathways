@@ -68,7 +68,11 @@
 					$count = $row['items'];
 				}
 				$result->close();
-				$return = array( 'listing' => $return, 'count' => intval( $count ), 'limit' => $limit, 'currentPage' => ++$page );
+				$return = array(
+					'listing' => $return,
+					'count' => intval( $count ),
+					'limit' => $limit,
+					'currentPage' => ++$page );
 				if ( IS_AJAX ) {
 					echo Core::ajaxResponse( $return );
 				}
@@ -277,6 +281,7 @@ EOD;
 
 		/**
 		 * get the number of pages with the limit
+		 * @deprecated
 		 * @param int $limit the number od results to limit
 		 * @return float
 		 */

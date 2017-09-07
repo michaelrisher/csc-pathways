@@ -15,6 +15,7 @@
 <head>
 	<?php
 		include_once CORE_PATH . 'assets/inc/header.php';
+		Core::queueStyle( 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css' );
 		Core::includeStyles();
 	?>
 </head>
@@ -26,7 +27,7 @@
 			<div class="classes aligncenter margin15Bottom">
 				<p>Classes</p>
 				<div class="searchBar padding5">
-					<input type="search" class="search" placeholder="Search Classes" value="<?= isset( $_GET['q'] ) ? $_GET['q'] : '';?>" />
+					<input type="search" class="search" placeholder="Search Classes..." value="<?= isset( $_GET['q'] ) ? $_GET['q'] : '';?>" />
 				</div>
 				<div class="listing alignleft">
 					<ul>
@@ -55,9 +56,9 @@
 						$currentPage = $data['currentPage'];
 						$amount = 3;
 //						echo '#' . $pages;
+						$search = isset( $_GET['q'] ) ? ( '?q=' .$_GET['q']) : '';
 						if(  $currentPage > 1 ){
-							echo "<a href='" . CORE_URL . "editClass/1'/>|&lt;</a>";
-//							echo "<a href='" . CORE_URL . "editClass/" . ( $currentPage - 1 ). "'/>&lt;</a>";
+							echo "<a href='" . CORE_URL . "editClass/1" . $search ."'>|&lt;</a>";
 						}
 						//left side of current math
 						if( $currentPage <= $amount ){
@@ -66,17 +67,16 @@
 							$left = $amount;
 						}
 						for( $i = $left; $i >= 1; $i-- ){
-							echo "<a href='" . CORE_URL . 'editClass/' . ( $currentPage - $i ) . "'>"  . ( $currentPage - $i ) . "</a>";
+							echo "<a href='" . CORE_URL . 'editClass/' . ( $currentPage - $i ) . $search . "'>"  . ( $currentPage - $i ) . "</a>";
 						}
-						echo "<a href='" . CORE_URL . 'editClass/' . ( $currentPage ) . "' class='current'>"  . ( $currentPage ) . "</a>";
+						echo "<a href='" . CORE_URL . 'editClass/' . ( $currentPage ) . $search . "' class='current'>"  . ( $currentPage ) . "</a>";
 						//right side of current math
 						for( $i = 1; $i <= $amount; $i++ ){
 							if( ( $currentPage + $i ) > $pages ){ break; }
-							echo "<a href='" . CORE_URL . 'editClass/' . ( $currentPage + $i ) . "'>"  . ( $currentPage + $i ) . "</a>";
+							echo "<a href='" . CORE_URL . 'editClass/' . ( $currentPage + $i ) . $search . "'>"  . ( $currentPage + $i ) . "</a>";
 						}
 						if(  $currentPage < $pages ){
-//							echo "<a href='" . CORE_URL . "editClass/" . ( $currentPage + 1 ). "'/>&gt;</a>";
-							echo "<a href='" . CORE_URL . "editClass/" . $pages. "'>&gt;|</a>";
+							echo "<a href='" . CORE_URL . "editClass/" . $pages . $search . "'>&gt;|</a>";
 						}
 					?>
 					</div>
@@ -88,12 +88,11 @@
 		</div>
 	</div>
 </div>
-<?php include_once CORE_PATH . 'assets/inc/footer.php'; ?>
+<?php
+	include_once CORE_PATH . 'assets/inc/footer.php';
+	Core::queueScript( 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js' );
+	Core::includeScripts();
+?>
 
 </body>
 </html>
-
-<?php
-	//	Core::debug( $_SESSION );
-	//	Core::debug( $_SERVER );
-?>

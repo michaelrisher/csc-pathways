@@ -33,10 +33,34 @@
 					);
 					array_push( $return, $a );
 				}
-				return $return;
+
+				//get count of data
+				$query = "SELECT COUNT(*) AS items FROM audit";
+				$result->close();
+				if( !$result = $this->db->query( $query ) ) {
+					echo( 'There was an error running the query [' . $this->db->error . ']' );
+					return null;
+				}
+
+				if( $result->num_rows == 1 ){
+					$row = $result->fetch_assoc();
+					$count = $row['items'];
+				}
+				$result->close();
+				return array(
+					'listing' => $return,
+					'count' => intval( $count ),
+					'limit' => $limit,
+					'currentPage' => ++$page
+				);
 			}
 		}
 
+		/**
+		 * old way of getting pages
+		 * @deprecated
+		 * @return float
+		 */
 		public function getPages(){
 			$this->loadModule( 'users' );
 			if( $this->users->isLoggedIn() ) {

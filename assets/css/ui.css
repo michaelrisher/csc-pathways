@@ -519,6 +519,15 @@ body {
 #wrapper #main .admin .users .pages a.current {
   color: #ffba00;
 }
+#wrapper #main .admin .audit .searchBar input,
+#wrapper #main .admin .classes .searchBar input,
+#wrapper #main .admin .certs .searchBar input,
+#wrapper #main .admin .users .searchBar input {
+  border-radius: 11px;
+  background: #ffffff url(../img/search.png) no-repeat 9px 8px;
+  padding-left: 46px;
+  padding-right: 15px;
+}
 #wrapper #main .admin .certs form ul li {
   border: 1px solid #a2aab2;
 }
@@ -700,13 +709,11 @@ input[type="button"].processing {
   background-position-y: 3px;
   color: rgba(0, 0, 0, 0);
 }
-.modal {
+.modalShadow {
   position: fixed;
   /* Stay in place */
-  z-index: 70000;
+  z-index: 5;
   /* Sit on top */
-  padding-top: 100px;
-  /* Location of the box */
   left: 0;
   top: 0;
   width: 100%;
@@ -720,12 +727,22 @@ input[type="button"].processing {
   background-color: rgba(0, 0, 0, 0.4);
   /* Black w/ opacity */
 }
+.modal {
+  position: absolute;
+  /* Stay in place */
+  z-index: 5;
+  /* Sit on top */
+  padding-top: 100px;
+  /* Location of the box */
+  left: 0;
+  top: 0;
+}
 .modal .modalWrapper {
   background-color: #fefefe;
   margin: auto;
   padding: 20px;
   border: 1px solid #888;
-  width: 450px;
+  width: 500px;
 }
 .modal .modalWrapper .close {
   color: #aaaaaa;
@@ -742,7 +759,7 @@ input[type="button"].processing {
 .modal .modalWrapper .modalContent {
   min-height: 20px;
   overflow: auto;
-  max-height: 470px;
+  max-height: 450px;
   line-height: 18px;
   height: auto;
 }
@@ -755,7 +772,7 @@ input[type="button"].processing {
 }
 .modal .modalWrapper form {
   margin: 10px auto;
-  max-width: 400px;
+  max-width: 450px;
   background: #fff;
 }
 .modal .modalWrapper form ul li {
