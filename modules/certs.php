@@ -84,6 +84,7 @@
 				}
 				$data = $this->get( $id, $lang );
 				$data['categories'] = $this->listCategories();
+				$data['language'] = $lang; //bug fix when there is not a lang cert yet
 				include( CORE_PATH . 'pages/certEdit.php' );
 			} else {
 				Core::errorPage( 404 );
@@ -234,6 +235,8 @@ EOD;
 				}
 
 				$certDataUpdated = $this->upsertRecord( 'certificateData', "cert=$id AND language=$language", array(
+					'cert' => $id,
+					'language' => $language,
 					'description' => $_POST['description'],
 					'elo' => $_POST['elo'],
 					'schedule' => $_POST['schedule']
