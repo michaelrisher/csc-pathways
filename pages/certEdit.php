@@ -15,6 +15,7 @@
 <head>
 	<?php
 		include_once CORE_PATH . 'assets/inc/header.php';
+		Core::queueStyle( 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css' );
 		Core::includeStyles();
 	?>
 </head>
@@ -35,6 +36,7 @@
 				</p>
 				<form action="certs/save/<?=$data['id']?>" method="post">
 					<input type="hidden" name="id" value="<?=$data['id']?>" />
+					<input type="hidden" name="language" value="<?=$data['language']?>" />
 					<p class="alignleft margin15Bottom">* Required fields</p>
 					<ul>
 						<li>
@@ -108,6 +110,7 @@
 	Core::queueScript( 'assets/js/core.js');
 	Core::queueScript( "assets/tinymce/tinymce.min.js" );
 	Core::queueScript( 'assets/js/ui.js');
+	Core::queueScript( 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js' );
 	Core::includeScripts();
 ?>
 

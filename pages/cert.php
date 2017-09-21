@@ -8,16 +8,17 @@
 
 	$id = $data['params'];
 	$GLOBALS['main']->loadModule( 'certs' );
-	$data = $GLOBALS['main']->certs->get( $id, true );
+	$data = $GLOBALS['main']->certs->get( $id, Lang::getCode(), true );
+	$lang = new Lang( Lang::getCode() );
 ?>
 <div>
 	<div class="aligncenter">
 		<div class="clearfix margin10">
 			<div class="clearfix">
-				<img alt="To Top" title="To Top" class="floatright margin15Right back tooltip" data-to="top" width=20 src="<?= CORE_URL . 'assets/img/back.png' ?>"/>
-				<img alt="Copy Link" title="Copy Link" class="floatright margin15Right link tooltip" data-to="top" width=20 src="<?= CORE_URL . 'assets/img/link.png' ?>"/>
+				<img alt="<?=$lang->o('certInfoToTop')?>" title="<?=$lang->o('certInfoToTop')?>" class="floatright margin15Right back tooltip" data-to="top" width=20 src="<?= CORE_URL . 'assets/img/back.png' ?>"/>
+				<img alt="<?=$lang->o('copyLink')?>" title="<?=$lang->o('copyLink')?>" class="floatright margin15Right link tooltip" data-to="top" width=20 src="<?= CORE_URL . 'assets/img/link.png' ?>"/>
 			</div>
-			<p class="info">Certification Information</p>
+			<p class="info"><?= $lang->o('certInfoHeader')?></p>
 
 
 			<p class="title"><?= $data['title'] ?> (<?php
@@ -33,9 +34,9 @@
 			<div class="alignjustify">
 				<p><?= Core::replaceClassLink( $data['description'] ) ?></p>
 
-				<p class="bold margin15Top">Program Learning Outcomes</p>
+				<p class="bold margin15Top"><?= $lang->o('certInfoElo')?></p>
 
-				<p>Upon successful completion of this program, students should be able to:</p>
+				<p><?=$lang->o('certInfoEloMsg')?>:</p>
 				<?= Core::replaceClassLink( $data['elo'] ) ?>
 			</div>
 		</div>

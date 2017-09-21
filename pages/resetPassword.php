@@ -60,6 +60,9 @@
 		</div>
 	</div>
 </div>
-<?php include_once CORE_PATH . 'assets/inc/footer.php'; ?>
+<?php
+	include_once CORE_PATH . 'assets/inc/footer.php';
+	Core::includeScripts();
+?>
 </body>
 </html>

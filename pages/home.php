@@ -7,7 +7,7 @@
 	 */
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 	<?php
 		include_once CORE_PATH . 'assets/inc/header.php';
@@ -15,7 +15,7 @@
 		$GLOBALS['main']->loadModule('certs');
 		$data = $GLOBALS['main']->certs->listing('category, sort');
 		$category = array();
-		foreach( $data as $item ){
+		foreach( $data['listing'] as $item ){
 			if( !@is_array( $category[$item['category']] ) ){ //@ means suppress warning
 				$category[$item['category']] = array();
 			}
@@ -34,13 +34,13 @@
 				<div class="certList clearfix">
 					<div class="floatleft">
 						<div class="treeCertSubject">
-							<p>Programming</p>
+							<p><?= $lang->o('certGroup1')?></p>
 						</div>
 						<table>
 							<tr class="treeCertsDesc">
-								<td>Description</td>
-								<td>Cert #</td>
-								<td>Units</td>
+								<td><?= $lang->o( 'certListDesc' )?></td>
+								<td><?= $lang->o( 'certListCert' )?></td>
+								<td><?= $lang->o( 'certListUnit' )?></td>
 							</tr>
 							<?php
 								foreach( $category[1] as $item ){
@@ -62,13 +62,13 @@
 					</div>
 					<div class="middleTree floatleft">
 						<div class="treeCertSubject">
-							<p>Networking & Information Security</p>
+							<p><?= $lang->o('certGroup2')?></p>
 						</div>
 						<table>
 							<tr class="treeCertsDesc">
-								<td>Description</td>
-								<td>Cert #</td>
-								<td>Units</td>
+								<td><?= $lang->o( 'certListDesc' )?></td>
+								<td><?= $lang->o( 'certListCert' )?></td>
+								<td><?= $lang->o( 'certListUnit' )?></td>
 							</tr>
 							<?php
 								foreach( $category[2] as $item ){
@@ -87,19 +87,19 @@
 								}
 							?>
 							<tr>
-								<td class="aligncenter" colspan="3"><p class="padding15Top">Checkout <br> <a href="https://www.csusb.edu/cyber-security">CSUSB CyberSecurity<br>Center</a></p></td>
+								<td class="aligncenter" colspan="3"><p class="padding15Top"><?= $lang->o('csusbCyber')?><br><a href="https://www.csusb.edu/cyber-security"><?= $lang->o('csusbCyberLink0'). '<br>' . $lang->o('csusbCyberLink1')?></a></p></td>
 							</tr>
 						</table>
 					</div>
 					<div class="floatright">
 						<div class="treeCertSubject">
-							<p>Web Master & Applications</p>
+							<p><?= $lang->o('certGroup3')?></p>
 						</div>
 						<table>
 							<tr class="treeCertsDesc">
-								<td>Description</td>
-								<td>Cert #</td>
-								<td>Units</td>
+								<td><?= $lang->o( 'certListDesc' )?></td>
+								<td><?= $lang->o( 'certListCert' )?></td>
+								<td><?= $lang->o( 'certListUnit' )?></td>
 							</tr>
 							<?php
 								foreach( $category[3] as $item ){
@@ -141,7 +141,10 @@
 			</div>
 		</div>
 	</div>
-	<?php include_once CORE_PATH . 'assets/inc/footer.php'; ?>
+	<?php
+		include_once CORE_PATH . 'assets/inc/footer.php';
+		Core::includeScripts();
+	?>
 </body>
 </html>
 

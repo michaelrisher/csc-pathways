@@ -330,6 +330,7 @@ body {
   top: -70px;
 }
 #wrapper #main #tree .middleTree {
+  width: 255px;
   margin: 0 67px 0;
 }
 #wrapper #main #tree table {
@@ -441,27 +442,6 @@ body {
   font-weight: bold;
   padding: 10px 0 10px 0;
 }
-#wrapper #main .admin .audit .pages {
-  margin: 10px;
-}
-#wrapper #main .admin .audit .pages p {
-  margin: 0 0 10px 0;
-}
-#wrapper #main .admin .audit .pages a {
-  padding-right: 10px;
-  text-decoration: none;
-}
-#wrapper #main .admin .audit .pages a:after {
-  content: '|';
-  padding: 0 0 0 10px;
-  color: #000 !important;
-}
-#wrapper #main .admin .audit .pages a:last-child:after {
-  content: '';
-}
-#wrapper #main .admin .audit .pages a.current {
-  color: #ffba00;
-}
 #wrapper #main .admin .audit > p,
 #wrapper #main .admin .classes > p,
 #wrapper #main .admin .certs > p,
@@ -500,6 +480,54 @@ body {
   vertical-align: text-top;
   padding: 0 5px 0 5px;
 }
+#wrapper #main .admin .audit .pages,
+#wrapper #main .admin .classes .pages,
+#wrapper #main .admin .certs .pages,
+#wrapper #main .admin .users .pages {
+  margin: 10px;
+}
+#wrapper #main .admin .audit .pages p,
+#wrapper #main .admin .classes .pages p,
+#wrapper #main .admin .certs .pages p,
+#wrapper #main .admin .users .pages p {
+  margin: 0 0 10px 0;
+}
+#wrapper #main .admin .audit .pages a,
+#wrapper #main .admin .classes .pages a,
+#wrapper #main .admin .certs .pages a,
+#wrapper #main .admin .users .pages a {
+  padding-right: 10px;
+  text-decoration: none;
+}
+#wrapper #main .admin .audit .pages a:after,
+#wrapper #main .admin .classes .pages a:after,
+#wrapper #main .admin .certs .pages a:after,
+#wrapper #main .admin .users .pages a:after {
+  content: '|';
+  padding: 0 0 0 10px;
+  color: #000 !important;
+}
+#wrapper #main .admin .audit .pages a:last-child:after,
+#wrapper #main .admin .classes .pages a:last-child:after,
+#wrapper #main .admin .certs .pages a:last-child:after,
+#wrapper #main .admin .users .pages a:last-child:after {
+  content: '';
+}
+#wrapper #main .admin .audit .pages a.current,
+#wrapper #main .admin .classes .pages a.current,
+#wrapper #main .admin .certs .pages a.current,
+#wrapper #main .admin .users .pages a.current {
+  color: #ffba00;
+}
+#wrapper #main .admin .audit .searchBar input,
+#wrapper #main .admin .classes .searchBar input,
+#wrapper #main .admin .certs .searchBar input,
+#wrapper #main .admin .users .searchBar input {
+  border-radius: 11px;
+  background: #ffffff url(../img/search.png) no-repeat 9px 8px;
+  padding-left: 46px;
+  padding-right: 15px;
+}
 #wrapper #main .admin .certs form ul li {
   border: 1px solid #a2aab2;
 }
@@ -534,12 +562,13 @@ footer > div .langPicker img.flag {
   width: 16px;
   object-fit: none;
   margin-right: 10px;
+  object-position: -136px -273px;
 }
 footer > div .langPicker .es {
-  object-position: -72px -76px;
+  object-position: -72px -76px !important;
 }
 footer > div .langPicker .en {
-  object-position: -118px -256px;
+  object-position: -118px -256px !important;
 }
 footer > div .langPicker ul {
   list-style: none;
@@ -680,13 +709,11 @@ input[type="button"].processing {
   background-position-y: 3px;
   color: rgba(0, 0, 0, 0);
 }
-.modal {
+.modalShadow {
   position: fixed;
   /* Stay in place */
-  z-index: 70000;
+  z-index: 5;
   /* Sit on top */
-  padding-top: 100px;
-  /* Location of the box */
   left: 0;
   top: 0;
   width: 100%;
@@ -700,12 +727,22 @@ input[type="button"].processing {
   background-color: rgba(0, 0, 0, 0.4);
   /* Black w/ opacity */
 }
+.modal {
+  position: absolute;
+  /* Stay in place */
+  z-index: 5;
+  /* Sit on top */
+  padding-top: 75px;
+  /* Location of the box */
+  left: 0;
+  top: 0;
+}
 .modal .modalWrapper {
   background-color: #fefefe;
   margin: auto;
   padding: 20px;
   border: 1px solid #888;
-  width: 450px;
+  width: 500px;
 }
 .modal .modalWrapper .close {
   color: #aaaaaa;
@@ -722,7 +759,7 @@ input[type="button"].processing {
 .modal .modalWrapper .modalContent {
   min-height: 20px;
   overflow: auto;
-  max-height: 470px;
+  max-height: 450px;
   line-height: 18px;
   height: auto;
 }
@@ -735,7 +772,7 @@ input[type="button"].processing {
 }
 .modal .modalWrapper form {
   margin: 10px auto;
-  max-width: 400px;
+  max-width: 450px;
   background: #fff;
 }
 .modal .modalWrapper form ul li {

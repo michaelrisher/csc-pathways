@@ -97,6 +97,7 @@ html, body{ background-color: #d3dce6; }
 				top: -70px;
 			}
 			.middleTree{
+				width: 255px;
 				margin: 0 67px 0;
 			}
 			table {
@@ -207,29 +208,6 @@ html, body{ background-color: #d3dce6; }
 					font-weight: bold;
 					padding: 10px 0 10px 0;
 				}
-
-				.pages{
-					margin: 10px;
-					p{
-						margin: 0 0 10px 0;
-					}
-					a{
-						padding-right: 10px;
-						text-decoration: none;
-						&:after{
-							content: '|';
-							padding: 0 0 0 10px;
-							color: #000 !important;
-						}
-
-						&:last-child:after{
-							content: '';
-						}
-						&.current{
-							color: #ffba00;
-						}
-					}
-				}
 			}
 
 			.audit, .classes, .certs, .users{
@@ -258,6 +236,38 @@ html, body{ background-color: #d3dce6; }
 						height: 20px;
 						vertical-align: text-top;
 						padding: 0 5px 0 5px;
+					}
+				}
+
+				.pages{
+					margin: 10px;
+					p{
+						margin: 0 0 10px 0;
+					}
+					a{
+						padding-right: 10px;
+						text-decoration: none;
+						&:after{
+							content: '|';
+							padding: 0 0 0 10px;
+							color: #000 !important;
+						}
+
+						&:last-child:after{
+							content: '';
+						}
+						&.current{
+							color: #ffba00;
+						}
+					}
+				}
+
+				.searchBar {
+					input{
+						border-radius: 11px;
+						background: #ffffff url(../img/search.png) no-repeat 9px 8px;
+						padding-left: 46px;
+						padding-right: 15px;
 					}
 				}
 			}
@@ -305,13 +315,14 @@ footer{
 				width: 16px;
 				object-fit: none;
 				margin-right: 10px;
+				object-position: -136px -273px;
 			}
 
 			.es {
-				object-position: -72px -76px;
+				object-position: -72px -76px !important;
 			}
 			.en {
-				object-position: -118px -256px;
+				object-position: -118px -256px !important;;
 			}
 
 			ul{
@@ -452,11 +463,9 @@ input[type="submit"],  input[type="button"]{
 	}
 }
 
-.modal {
-	//display: none; /* Hidden by default */
+.modalShadow{
 	position: fixed; /* Stay in place */
-	z-index: 70000; /* Sit on top */
-	padding-top: 100px; /* Location of the box */
+	z-index: 5; /* Sit on top */
 	left: 0;
 	top: 0;
 	width: 100%; /* Full width */
@@ -464,12 +473,26 @@ input[type="submit"],  input[type="button"]{
 	overflow: auto; /* Enable scroll if needed */
 	background-color: rgb(0, 0, 0); /* Fallback color */
 	background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+}
+
+.modal {
+	//display: none; /* Hidden by default */
+	position: absolute; /* Stay in place */
+	z-index: 5; /* Sit on top */
+	padding-top: 75px; /* Location of the box */
+	left: 0;
+	top: 0;
+	//width: 100%; /* Full width */
+	//height: 100%; /* Full height */
+	//overflow: auto; /* Enable scroll if needed */
+	//background-color: rgb(0, 0, 0); /* Fallback color */
+	//background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
 	.modalWrapper {
 		background-color: #fefefe;
 		margin: auto;
 		padding: 20px;
 		border: 1px solid #888;
-		width: 450px;
+		width: 500px;
 
 		.close {
 			color: #aaaaaa;
@@ -486,7 +509,7 @@ input[type="submit"],  input[type="button"]{
 		.modalContent {
 			min-height: 20px;
 			overflow: auto;
-			max-height: 470px;
+			max-height: 450px;
 			line-height: 18px;
 			height: auto;
 		}
@@ -501,7 +524,7 @@ input[type="submit"],  input[type="button"]{
 
 		form {
 			margin: 10px auto;
-			max-width: 400px;
+			max-width: 450px;
 			background: #fff;
 
 			ul {
@@ -558,4 +581,8 @@ input[type="submit"],  input[type="button"]{
 	color:#fff;
 	font-size:12px;
 	z-index: 70001;
+}
+
+input:focus{
+	//border: 2px solid red !important;
 }

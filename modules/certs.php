@@ -13,6 +13,11 @@
 		 * @return array
 		 */
 		public function listing( $order = 'id' ) {
+			//to kinda standardize it for later needs
+			$page = 1;
+			$limit = 50;
+			$page--;//to make good looking page numbers for users
+			$offset = $page * $limit;
 			$query = "SELECT * FROM certificateList ORDER BY $order";//remove limit for a time LIMIT $page,50
 
 			if ( !$result = $this->db->query( $query ) ) {
@@ -33,6 +38,26 @@
 				);
 				array_push( $return, $a );
 			}
+
+			//get count of data
+			$query = "SELECT COUNT(*) AS items FROM audit";
+			$result->close();
+			if( !$result = $this->db->query( $query ) ) {
+				echo( 'There was an error running the query [' . $this->db->error . ']' );
+				return null;
+			}
+
+			if( $result->num_rows == 1 ){
+				$row = $result->fetch_assoc();
+				$count = $row['items'];
+			}
+			$result->close();
+			$return = array(
+				'listing' => $return,
+				'count' => intval( $count ),
+				'limit' => $limit,
+				'currentPage' => ++$page
+			);
 			if ( IS_AJAX ) {
 				echo Core::ajaxResponse( $return );
 			}
@@ -42,16 +67,24 @@
 		/**
 		 * edit cert action from the admin page
 		 * only allowed if the user is admin
-		 * @param $id
+		 * @param $params
 		 */
-		public function edit( $id ) {
+		public function edit( $params ) {
 			$this->loadModule( 'users' );
 			if ( $this->users->isLoggedIn() ) {
 				Core::queueStyle( 'assets/css/reset.css' );
 				Core::queueStyle( 'assets/css/ui.css' );
 				//put the data onscreen
-				$data = $this->get( $id );
+				if( gettype( $params ) == 'array' ){
+					$id = $params[0];
+					$lang = (int)$params[1];
+				} else{
+					$id = $params;
+					$lang = 0;
+				}
+				$data = $this->get( $id, $lang );
 				$data['categories'] = $this->listCategories();
+				$data['language'] = $lang; //bug fix when there is not a lang cert yet
 				include( CORE_PATH . 'pages/certEdit.php' );
 			} else {
 				Core::errorPage( 404 );
@@ -64,15 +97,29 @@
 		 * echos JSON to the user
 		 * returns an array if forceReturn is true
 		 * @param $id int id which is not the three digit code
+		 * @param integer|string $language id or code of the language
 		 * @param bool|false $forceReturn forces a array return
 		 * @return array|null
 		 */
-		public function get( $id, $forceReturn = false ) {
+		public function get( $id, $language = 'en', $forceReturn = false ) {
 			$this->loadModule( 'users' );
+			if ( isset( $language ) && !isset( $_POST['language'] ) ) {
+				$this->loadModule( "language" );
+				if( gettype( $language ) == 'integer' ){
+					$langCode = $language; //if its an int i assume its the id
+				} else {
+					$langCode = $this->language->getId( $language, true );
+				}
+			} elseif ( isset( $_POST['language'] ) ) {
+				$langCode = $_POST['language'];
+			} else {
+				$langCode = 0;
+			}
 			$query = <<<EOD
 SELECT
 certificateList.id,
 certificateList.code,
+certificateData.language,
 certificateList.hasAs,
 certificateList.hasCe,
 certificateList.units,
@@ -86,13 +133,28 @@ FROM
 certificateList
 INNER JOIN enumCategories ON certificateList.category = enumCategories.id
 INNER JOIN certificateData ON certificateList.id = certificateData.cert
-WHERE certificateList.id = ${id}
+WHERE certificateList.id = $id
+ORDER by certificateData.language ASC
 EOD;
 			if ( !$result = $this->db->query( $query ) ) {
 				echo Core::ajaxResponse( array( 'error' => "An error occurred please try again" ), false );
 				return null;
 			}
-			$row = $result->fetch_assoc();
+
+			if( $result->num_rows > 1 ){
+				$results = $result->fetch_all( MYSQLI_ASSOC );
+				for( $i = 0; $i < count( $results ); $i++ ){
+					if( $results[$i]['language'] == $langCode ){
+						$row = $results[$i];
+						break;
+					}
+				}
+				if( !isset( $row ) ){ //if it is not there by some chance grab first one
+					$row = $results[0];
+				}
+			} else {
+				$row = $result->fetch_assoc();
+			}
 			$return = $row;
 
 			if ( IS_AJAX && !$forceReturn ) {
@@ -138,6 +200,7 @@ EOD;
 		 */
 		public function save( $id ) {
 			$this->loadModule( 'users' );
+			$lang = new Lang( Lang::getCode() );
 			$obj = array();
 			if( $this->users->isLoggedIn() ){
 				$this->loadModule( 'audit' );
@@ -150,47 +213,49 @@ EOD;
 				$_POST['elo'] = core::sanitize( $_POST['elo'], true );
 				$_POST['schedule'] = core::sanitize( $_POST['schedule'], true );
 				$_POST['sort'] = core::sanitize( $_POST['sort'] );
+				$language = intval( Core::sanitize( $_POST['language'] ) );
 				$hasCe = isset( $_POST['hasCe'] ) ? 1 : 0; //js returns something like hasCe=on if its on else its not set
 				$hasAs = isset( $_POST['hasAs'] ) ? 1 : 0; //js returns something like hasCe=on if its on else its not set
 
 
 				//separate the two tables data
-				$query = <<<EOD
-INSERT INTO certificateList (id, code, hasAs, hasCe, category, units, description, sort)
-VALUES (?,?,?,?,?,?,?,?)
-ON DUPLICATE KEY UPDATE
-code = VALUES( code ),
-hasAs = VALUES( hasAs ),
-hasCe = VALUES( hasCe ),
-category = VALUES( category ),
-units = VALUES( units ),
-description = VALUES( description ),
-sort = VALUES( sort )
-EOD;
-				$queryData = <<<EOD
-INSERT INTO certificateData (cert, description, elo, schedule )
-VALUES (?,?,?,?)
-ON DUPLICATE KEY UPDATE
-description = VALUES( description ),
-elo = VALUES( elo ),
-schedule = VALUES( schedule )
-EOD;
-				//cert list update statement
-				$statement = $this->db->prepare($query);
-				$statement->bind_param( 'isiiiisi', $id, $_POST['code'], $hasAs, $hasCe, $_POST['category'], $_POST['units'], $_POST['title'], $_POST['sort'] );
-				//cert data update statement
-				$statementData = $this->db->prepare($queryData);
-				$statementData->bind_param( 'isss', $id, $_POST['description'], $_POST['elo'], $_POST['schedule'] );
-				if( $statement->execute() && $statementData->execute() ){
-					$obj['msg'] = "Saved successfully.";
+				$certListUpdated = $this->upsertRecord( 'certificateList', "id=$id", array(
+					'code' => (string)$_POST['code'],
+					'hasAs' => $hasAs,
+					'hasCe' => $hasCe,
+					'category' => (int)$_POST['category'],
+					'units' => (int)$_POST['units'],
+					'description' => $_POST['title'],
+					'sort' => (int)$_POST['sort']
+				) );
+
+				$error = '';
+				if( !$certListUpdated ){
+					$error = 'List failed to upsert';
+				}
+
+				$certDataUpdated = $this->upsertRecord( 'certificateData', "cert=$id AND language=$language", array(
+					'cert' => $id,
+					'language' => $language,
+					'description' => $_POST['description'],
+					'elo' => $_POST['elo'],
+					'schedule' => $_POST['schedule']
+				) );
+
+				if( !$certDataUpdated ){
+					$error .= '<br>Data failed to upsert';
+				}
+
+				if( $certListUpdated && $certDataUpdated ){
+					$obj['msg'] = $lang->o( 'ajaxSaved' ); //"Saved successfully.";
 					$this->audit->newEvent( "Updated cert: " . $_POST['title'] );
 					echo Core::ajaxResponse( $obj );
 				} else{
-					$obj['error'] = $statement->error;
+					$obj['error'] = $error;
 					echo Core::ajaxResponse( $obj, false );
 				}
 			} else{
-				$obj['error'] = 'Session expired.<br>Please log in again';
+				$obj['error'] = $lang->o( 'ajaxSessionExpire' );// 'Session expired.<br>Please log in again';
 				echo Core::ajaxResponse( $obj, false );
 			}
 		}
@@ -236,6 +301,7 @@ EOD;
 		public function delete( $id ){
 			$this->loadModule( 'users' );
 			$this->loadModule( 'audit' );
+			$lang = new Lang( Lang::getCode() );
 			$obj = array();
 			$_POST = Core::sanitize( $_POST, true );
 			if( $this->users->isLoggedIn() ) {
@@ -252,7 +318,7 @@ EOD;
 				$statementData = $this->db->prepare("DELETE FROM certificateData WHERE cert=?");
 				$statementData->bind_param( "s", $_POST['id']);
 				if( $statement->execute() && $statementData->execute() ){
-					$obj['msg'] = "Deleted successfully.";
+					$obj['msg'] = $lang->o( 'ajaxDelete' ); //"Deleted successfully.";
 					$this->audit->newEvent( "Deleted certificate: " . $event );
 					echo Core::ajaxResponse( $obj );
 				} else{
@@ -263,7 +329,7 @@ EOD;
 				$statement->close();
 				$statementData->close();
 			} else{
-				$obj['error'] = "Session expired.<br>Please log in again";
+				$obj['error'] = $lang->o( 'ajaxSessionExpire' ); //"Session expired.<br>Please log in again";
 				echo Core::ajaxResponse( $obj, false );
 			}
 		}

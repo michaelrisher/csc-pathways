@@ -45,8 +45,9 @@
 		</div>
 	</div>
 </div>
-<?php include_once CORE_PATH . 'assets/inc/footer.php';
-//	Core::debug( $_SESSION )
+<?php
+	include_once CORE_PATH . 'assets/inc/footer.php';
+	Core::includeScripts();
 ?>
 
 </body>

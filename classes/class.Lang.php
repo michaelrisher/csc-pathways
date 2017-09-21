@@ -9,17 +9,17 @@
 	class Lang {
 		private $languageCode;
 		private $definitions;
-/*
+
 		public static $list = array(
 			'en' => 'English',
 			'es' => 'Español'
 		);
 
-		public static function getCode(){
-			if( isset( $_COOKIE['lang'] ) || isset( $_GET['lang'] ) ) {
-				if( $_COOKIE['lang'] ) {
+		public static function getCode() {
+			if ( isset( $_COOKIE['lang'] ) || isset( $_GET['lang'] ) ) {
+				if ( $_COOKIE['lang'] ) {
 					return $_COOKIE['lang'];
-				} else{
+				} else {
 					return $_GET['lang'];
 				}
 			} else {
@@ -27,28 +27,32 @@
 			}
 		}
 
-		public static function codeToText( $code ){
+		/**
+		 * @deprecated
+		 * @param $code
+		 * @return mixed
+		 */
+		public static function codeToText( $code ) {
 			return self::$list[$code];
 		}
 
-		public function __construct( $code ){
+		public function __construct( $code ) {
 			$this->languageCode = $code;
 			require_once( CORE_PATH . 'locale/' . $this->languageCode . '/lang.' . $this->languageCode . '.php' );
 			$this->definitions = new LanguageDefinitions();
 		}
 
-		public function o( $msgid ){
-			if( isset( $this->definitions ) ){
-				if( isset( $this->definitions->translations[$msgid] ) ){
-					return $this->definitions->translations[$msgid];
-				} else{
-					return '';
+		public function o( $msgid ) {
+			if ( isset( $this->definitions ) ) {
+				if ( isset( $this->definitions->translations[$msgid] ) ) {
+					return htmlentities( utf8_encode( $this->definitions->translations[$msgid] ), 0, 'UTF-8' ); //( $this->definitions->translations[$msgid] );
+				} else {
+					return $msgid . ' string missing';
 				}
-			} else{
+			} else {
 				return '';
 			}
 		}
 
-*/
 
 	}

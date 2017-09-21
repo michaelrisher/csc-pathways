@@ -16,13 +16,15 @@
 	session_start();
 
 	$uri = array('module'=>'', 'function' => '' );
-
+	$url = trim( $url, '/' );
 	$tempUri = preg_split( '/\//', $url, 3 );
 	$uri['module'] = ( !empty( $tempUri[0] ) ? $tempUri[0] : '' );
 	$uri['function'] = ( isset( $tempUri[1] ) ? $tempUri[1] : '' );
 	if ( isset( $tempUri[2] ) ) {
 		$tempVar = preg_split( '/\//', $tempUri[2] );
-		$uri['params'] = ( count( $tempVar ) == 1 ? $tempUri[2] : $tempVar );
+		if( !empty( $tempVar ) ){
+			$uri['params'] = ( count( $tempVar ) == 1 ? $tempUri[2] : $tempVar );
+		}
 	}
 
 	//some globals for page loading

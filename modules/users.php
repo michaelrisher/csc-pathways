@@ -184,7 +184,6 @@
 		 * @return string
 		 */
 		public function createResetPassword( $id, $forceReturn = false, $noLog = false ){
-			//TODO should we set active = 0 when we do this????
 			$this->loadModule( 'audit' );
 			if( $this->isAdmin() ) {
 				$hasToken = false;
@@ -321,6 +320,8 @@
 		 * has the password and the username check the database and login
 		 */
 		public function login(){
+			//load translations
+			$lang = new Lang( Lang::getCode() );
 			//clean the post of any injects
 			$_POST = Core::sanitize( $_POST );
 			//return array
@@ -351,7 +352,7 @@
 			if( !$result = $this->db->query($query) ){
 //				die('There was an error running the query [' . $this->db->error . ']');
 				//if there was an error report it to the user
-				$obj['error'] = "An error occurred please try again";
+				$obj['error'] = $lang->o( 'ajaxErrorOccurred' ); //"An error occurred please try again";
 				echo Core::ajaxResponse( $obj, false );
 				return;
 			}
@@ -362,11 +363,11 @@
 				$obj['user'] = $row['username'];
 				//if the user is set to active meaning they are allowed to access report that error to them
 				if( $row['active'] == 0 ){
-					$obj['error'] = "Account has been deactivated.";
+					$obj['error'] = $lang->o( 'ajaxLoginDisabled' ); //"Account has been deactivated.";
 					echo Core::ajaxResponse( $obj, false );
 				} else {
 					//if user is active then log in
-					$obj['msg'] = 'Successfully logged in.';
+					$obj['msg'] = $lang->o( 'ajaxLogin' ); //'Successfully logged in.';
 					//set redirect url
 					$obj['redirect'] = 'admin';
 					//update date and ip
@@ -401,7 +402,7 @@
 					'ip' => Core::getIp(),
 					'created' => time()
 				) );
-				$obj['error'] = "Your username or email is incorrect";
+				$obj['error'] = $lang->o( 'ajaxLoginIncorrect' ); //"Your username or email is incorrect";
 				echo Core::ajaxResponse( $obj, false );
 			}
 			$result->close();

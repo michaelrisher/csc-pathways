@@ -35,7 +35,7 @@
 						} else {
 							$data = $GLOBALS['main']->audit->listing();
 						}
-						foreach ( $data as $event ) {
+						foreach ( $data['listing'] as $event ) {
 							echo "<li>User ${event['username']}: ${event['event']}  <span class='floatright'>";
 							echo date( 'm/d/Y h:i:s A', strtotime( $event['date'] ) );
 							echo "</span>";
@@ -46,15 +46,30 @@
 					<div class="pages aligncenter" >
 						<p>Pages</p>
 					<?php
-						$pages = $GLOBALS['main']->audit->getPages();
-						$currentPage = is_numeric( $params ) ? $params : 1;
-						if(  $currentPage > 1 ) echo "<a href='" . CORE_URL . "admin/" . ( $currentPage - 1 ). "'/>&lt;</a>";
-						for( $i = 1; $i <= $pages; $i++ ){
-							echo "<a href='" . CORE_URL . 'admin/' . $i . "' class='";
-							echo is_numeric( $params ) ? ( $params == $i ? 'current' : '' ) : ( $i == 1 ? 'current' : '' );
-							echo "'>" . ( $i ) . "</a>";
+						$pages = ceil( $data['count'] / $data['limit'] );
+						$currentPage = $data['currentPage'];
+						$amount = 3;
+						if(  $currentPage > 1 ){
+							echo "<a href='" . CORE_URL . "admin/1'/>|&lt;</a>";
 						}
-						if(  $currentPage < $pages ) echo "<a href='" . CORE_URL . "admin/" . ( $currentPage + 1 ). "'/>&gt;</a>";
+						//left side of current math
+						if( $currentPage <= $amount ){
+							$left = ( ( $currentPage - $amount ) + $amount ) - 1;
+						} else{
+							$left = $amount;
+						}
+						for( $i = $left; $i >= 1; $i-- ){
+							echo "<a href='" . CORE_URL . 'admin/' . ( $currentPage - $i ) . "'>"  . ( $currentPage - $i ) . "</a>";
+						}
+						echo "<a href='" . CORE_URL . 'admin/' . ( $currentPage ) . "' class='current'>"  . ( $currentPage ) . "</a>";
+						//right side of current math
+						for( $i = 1; $i <= $amount; $i++ ){
+							if( ( $currentPage + $i ) > $pages ){ break; }
+							echo "<a href='" . CORE_URL . 'admin/' . ( $currentPage + $i ) . "'>"  . ( $currentPage + $i ) . "</a>";
+						}
+						if(  $currentPage < $pages ){
+							echo "<a href='" . CORE_URL . "admin/" . $pages. "'>&gt;|</a>";
+						}
 					?>
 					</div>
 				</div>
@@ -63,7 +78,6 @@
 	</div>
 </div>
 <?php include_once CORE_PATH . 'assets/inc/footer.php'; ?>
-
 </body>
 </html>
 

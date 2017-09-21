@@ -1,5 +1,7 @@
 $( document ).ready( function () {
-	CORE_URL = readCookie( 'url' );
+	var CORE_URL = readCookie( 'url' );
+	var searchTypingTimer = -1;
+
 	$( 'html' ).on( 'click', '.fakeLink', function ( e ) {
 		e.preventDefault();
 		var loc = $( this ).attr( 'data-to' );//location we are going to
@@ -116,7 +118,7 @@ $( document ).ready( function () {
 			//ajax login
 			$.ajax( {
 				type: 'POST',
-				url: 'rest/' + $( form ).attr( 'action' ),
+				url: CORE_URL + 'rest/' + $( form ).attr( 'action' ),
 				dataType: 'json',
 				data: {
 					user: map['user'],
@@ -138,23 +140,38 @@ $( document ).ready( function () {
 	/******************************************************************************/
 	/*****************************Class functions**********************************/
 	/******************************************************************************/
+	//class edit
 	$( document ).on( 'click', '#main .classes li img.edit', function () {
 		//get the class info
 		var id = $( this ).closest( 'li' ).attr( 'data-id' );
 		$.ajax( {
 			type: 'POST',
-			url: 'rest/classes/get/' + id,
+			url: CORE_URL + 'rest/classes/get/' + id,
+			dataType: 'json',
+			success: function ( data ) {
+				editClassModal( data );
+			}
+		} );
+	} );
+
+	//language edit
+	$( document ).on( 'click', '#main .classes li img.languageEdit', function () {
+		//get the class info
+		var id = $( this ).closest( 'li' ).attr( 'data-id' );
+		$.ajax( {
+			type: 'POST',
+			url: CORE_URL + 'rest/language/listing',
 			dataType: 'json',
 			success: function ( data ) {
 				if ( data.success ) {
 					//alert( JSON.stringify( data ) );
 					var modal = createModal( {
-						title: 'Edit Class',
+						title: 'Pick language to edit class in',
 						buttons: [
 							{
-								value: 'Save',
-								name: 'save',
-								onclick: saveClass
+								value: 'Edit',
+								name: 'edit',
+								onclick : getClassAjax
 							},
 							{
 								value: 'Cancel',
@@ -162,21 +179,15 @@ $( document ).ready( function () {
 							}
 						]
 					} );
-					var html = "<p>* fields are required</p>";
-					html += "<form><ul>";
-					//type, name, label, data, text
-					html += modalLi( 'text', 'id', 'ID*', data.data.id, "Enter the class ID", true );
-					html += modalLi( 'text', 'title', 'Title*', data.data.title, "Enter the class title", false, false, 'Class title should look like: CIS-1 - Title' );
-					html += modalLi( 'number', 'units', 'Units*', data.data.units, "Enter the class units", false );
-					html += modalLi( 'text', 'transfer', 'Transfer', data.data.transfer ? data.data.transfer : '', "Enter the class transfer", false );
-					html += modalLi( 'text', 'advisory', 'Advisory', data.data.advisory ? data.data.advisory : '', "Enter the class advisory", false, true );
-					html += modalLi( 'text', 'prereq', 'Prerequisite', data.data.prereq ? data.data.prereq : '', "Enter the class prerequisite", false, true );
-					html += modalLi( 'text', 'coreq', 'Corequisite', data.data.coreq ? data.data.coreq : '', "Enter the class corequisite", false, true );
-					html += modalLi( 'textarea', 'description', 'Description*', data.data.description, "Enter the class Description", false );
-					html += "</ul></form>";
+					var html = '<form><input type="hidden" name="class" value="' + id + '" />';
+					html += '<ul><li><label for="language">Languages</label><select name="language">';
+					for ( var i = 0; i < data.data.length; i++ ) {
+						html += "<option value='" + data.data[i].id + "'>" + data.data[i].code + ' - ' + data.data[i].fullName + "</option>";
+					}
+					html += '</select><span>Pick a class to add</span></li>';
 					setModalContent( modal, html );
 					displayModal( modal );
-					adjustTextarea( $( modal ).find( 'textarea' )[0] );
+					//adjustTextarea( $( modal ).find( 'textarea' )[0] );
 				} else {
 					var modal = createModal( { title: 'Failed to load class', buttons: [{ value: 'Ok', focus : true }] } );
 					setModalContent( modal, data.data.error );
@@ -184,7 +195,65 @@ $( document ).ready( function () {
 				}
 			}
 		} );
+
+		function getClassAjax( id ){
+			var modal = $( '.modal[data-id=' + id + ']' ).eq( 0 );
+			var lang = $( 'select', modal ).val();
+			var classId = $( 'input[name="class"]' ).val();
+			$.ajax({
+				type: 'POST',
+				url: CORE_URL + 'rest/classes/get/' + classId,
+				data : {
+					language : lang
+				},
+				dataType: 'json',
+				success: function ( data ) {
+					editClassModal( data );
+				}
+			});
+			return true;
+		}
 	} );
+
+	function editClassModal( data ){
+		if ( data.success ) {
+			//alert( JSON.stringify( data ) );
+			var modal = createModal( {
+				title: 'Edit Class',
+				buttons: [
+					{
+						value: 'Save',
+						name: 'save',
+						onclick: saveClass
+					},
+					{
+						value: 'Cancel',
+						class: 'low'
+					}
+				]
+			} );
+			var html = "<p>* fields are required</p>";
+			html += "<form><ul>";
+			//type, name, label, data, text
+			html += "<input type='hidden' name='language' value='" + data.data.language + "'/>";
+			html += modalLi( 'text', 'id', 'ID*', data.data.id, "Enter the class ID", true );
+			html += modalLi( 'text', 'title', 'Title*', data.data.title, "Enter the class title", false, false, 'Class title should look like: CIS-1 - Title' );
+			html += modalLi( 'number', 'units', 'Units*', data.data.units, "Enter the class units", false );
+			html += modalLi( 'text', 'transfer', 'Transfer', data.data.transfer ? data.data.transfer : '', "Enter the class transfer", false );
+			html += modalLi( 'text', 'advisory', 'Advisory', data.data.advisory ? data.data.advisory : '', "Enter the class advisory", false, true );
+			html += modalLi( 'text', 'prereq', 'Prerequisite', data.data.prereq ? data.data.prereq : '', "Enter the class prerequisite", false, true );
+			html += modalLi( 'text', 'coreq', 'Corequisite', data.data.coreq ? data.data.coreq : '', "Enter the class corequisite", false, true );
+			html += modalLi( 'textarea', 'description', 'Description*', data.data.description, "Enter the class Description", false );
+			html += "</ul></form>";
+			setModalContent( modal, html );
+			displayModal( modal );
+			adjustTextarea( $( modal ).find( 'textarea' )[0] );
+		} else {
+			var modal = createModal( { title: 'Failed to load class', buttons: [{ value: 'Ok' }] } );
+			setModalContent( modal, data.data.error );
+			displayModal( modal, true )
+		}
+	}
 
 	function saveClass( id ) {
 		//assume the only modal open is the one we are saving
@@ -221,9 +290,9 @@ $( document ).ready( function () {
 		if( !regex['classTitle'].test( map['title'] ) ){ //if doesnt match the
 			$( form ).find( 'input[name=title]' ).closest( 'li' ).addClass( 'error' );
 			hasError = true;
-			var modal = createModal({ title: "Error", buttons : [{value: "Ok"}] });
-			setModalContent( modal, "<p>Title must match this pattern</p><p>EXA-1 - Example title for class example-1</p>");
-			displayModal( modal );
+			var modalNew = createModal({ title: "Error", buttons : [{value: "Ok"}] });
+			setModalContent( modalNew, "<p>Title must match this pattern</p><p>EXA-1 - Example title for class example-1</p>");
+			displayModal( modalNew );
 		}
 
 		if ( !hasError && !window.processing ) {
@@ -239,7 +308,7 @@ $( document ).ready( function () {
 			}
 			$.ajax( {
 				type: 'POST',
-				url: 'rest/classes/' + url,
+				url: CORE_URL + 'rest/classes/' + url,
 				dataType: 'json',
 				data: map,
 				async: false,
@@ -269,14 +338,14 @@ $( document ).ready( function () {
 					}
 				}
 			} );
-			return successful;
+			return true;
 		} else {
 			saveBtn.removeClass( 'processing' );
 			return false;
 		}
 	}
 
-	//classes edit option
+	//classes delete option
 	$( document ).on( 'click', '#main .classes li img.delete', function () {
 		//get the class info
 		var id = $( this ).closest( 'li' ).attr( 'data-id' );
@@ -289,7 +358,7 @@ $( document ).ready( function () {
 					var successful = false;
 					$.ajax( {
 						type: 'POST',
-						url: 'rest/classes/delete/',
+						url: CORE_URL + 'rest/classes/delete/',
 						data: {
 							id: id
 						},
@@ -363,7 +432,7 @@ $( document ).ready( function () {
 		var input = $( this ).closest( 'li' ).find( 'input' );
 		var prevModal = $( this ).closest( '.modal' );
 		var id = $( prevModal ).attr( 'data-id' );
-		if ( getStorage( "invalidateCache" ) && getStorage( 'classes' ) ) {
+		if ( false && getStorage( "invalidateCache" ) && getStorage( 'classes' ) ) {
 			var time = parseInt( getStorage( "invalidateCache" ) );
 			var curr = +new Date(); //gives unix time
 			if ( curr >= time ) {
@@ -375,12 +444,12 @@ $( document ).ready( function () {
 		} else {
 			$.ajax( {
 				type: 'POST',
-				url: 'rest/classes/listing',
+				url: CORE_URL + 'rest/classes/listing',
 				dataType: 'json',
 				//async : false,
 				success: function ( data ) {
 					if ( data.success ) {
-						setStorageJSON( 'classes', data.data );
+						setStorageJSON( 'classes', data.data.listing );
 						var t = +new Date(); //gives unix time
 						setStorage( 'invalidateCache', ( t + ( 5 * 60 * 1000 ) ) );
 						createClassModal( data.data );
@@ -416,9 +485,82 @@ $( document ).ready( function () {
 			html += '</select><span>Pick a class to add</span></li>';
 			setModalContent( modal, html );
 			displayModal( modal );
+			$( 'select', modal ).select2();
 		}
 	} );
 
+	$( '.classes input.search' ).on( 'keyup', function(e) {
+		clearTimeout( searchTypingTimer );
+		if( e.keyCode != 13 ){
+			searchTypingTimer = setTimeout( classSearch, 1000 );
+		}
+	} );
+
+	$( '.classes input.search' ).on( 'search', function( e ){
+		clearTimeout( searchTypingTimer );
+		classSearch();
+	} );
+
+	function classSearch(){
+		var value = $( '.classes input.search' ).val();
+		$.ajax({
+			type: 'POST',
+			url: CORE_URL + 'rest/classes/listing',
+			dataType: 'json',
+			data: {
+				page : 1,
+				search : value
+			},
+			success : function( data ){
+				if( data.success ){
+					var listing = $( '.listing ul');
+					$( listing ).html('');
+					var data = data.data;
+					for( var i = 0; i < data.listing.length; i++ ){
+						var item = data.listing[i];
+						var s = "<li data-id='" + item.id + "'>" + item.title;
+						s += '<img class="delete tooltip" title="Delete class" src="' + CORE_URL + 'assets/img/delete.png">';
+						s += '<img class="languageEdit tooltip" title="Edit in Different Language" src="' + CORE_URL + 'assets/img/region.png">';
+						s += '<img class="edit tooltip" title="Edit class" src="' + CORE_URL + 'assets/img/edit.svg">';
+						s += "</li>";
+						$( listing ).append( s );
+					}
+
+					var pagesDom = $( '.pages div' );
+					$( pagesDom ).html('');
+					var pages = Math.ceil( data.count / data.limit );
+					var currentPage = data.currentPage;
+					var amount = 3;
+					var str = '';
+					if(  currentPage > 1 ){
+						str += "<a href='" + CORE_URL + "editClass/1'/>|&lt;</a>";
+					}
+					//left side of current math
+					var left = 0;
+					if( currentPage <= amount ){
+						left = ( ( currentPage - amount ) + amount ) - 1;
+					} else{
+						left = amount;
+					}
+					for( var i = left; i >= 1; i-- ){
+						str += "<a href='" + CORE_URL + 'editClass/' + ( currentPage - $i ) + "?q=" + value + "'>" + ( currentPage - $i ) + "</a>";
+					}
+					str += "<a href='" + CORE_URL + 'editClass/' + ( currentPage ) + "?q=" + value + "' class='current'>"  + ( currentPage ) + "</a>";
+					//right side of current math
+					for( var i = 1; i <= amount; i++ ){
+						if( ( currentPage + i ) > pages ){ break; }
+						str += "<a href='" + CORE_URL + 'editClass/' + ( currentPage + i ) + "?q=" + value + "'>"  + ( currentPage + i ) + "</a>";
+					}
+					if(  currentPage < pages ){
+						str += "<a href='" + CORE_URL + "editClass/" + pages + "?q=" + value + "'>&gt;|</a>";
+					}
+					$( pagesDom ).html( str );
+				} else{
+					//TODO catch a search failure
+				};
+			}
+		});
+	}
 
 	/******************************************************************************/
 	/****************************certification edit********************************/
@@ -455,10 +597,10 @@ $( document ).ready( function () {
 							requestClassListing( function ( data ) {
 								if ( data.success ) {
 									//store classes in cache
-									setStorageJSON( 'classes', data.data );
+									setStorageJSON( 'classes', data.data.listing );
 									var t = +new Date(); //gives unix time
 									setStorage( 'invalidateCache', ( t + ( 5 * 60 * 1000 ) ) );
-									loadClassModal( data.data );
+									loadClassModal( data.data.listing );
 								}
 							} );
 						}
@@ -538,6 +680,7 @@ $( document ).ready( function () {
 					html += '</ul></form>';
 					setModalContent( modal, html );
 					displayModal( modal );
+					$( 'select', modal ).select2();
 				}
 
 				function failedAjax() {
@@ -549,6 +692,55 @@ $( document ).ready( function () {
 		} );
 	} catch ( ignore ) {
 	}
+
+	//language edit
+	$( document ).on( 'click', '#main .certs li img.languageEdit', function () {
+		//get the class info
+		var id = $( this ).closest( 'li' ).attr( 'data-id' );
+		$.ajax( {
+			type: 'POST',
+			url: CORE_URL + 'rest/language/listing',
+			dataType: 'json',
+			success: function ( data ) {
+				if ( data.success ) {
+					//alert( JSON.stringify( data ) );
+					var modal = createModal( {
+						title: 'Pick language to edit class in',
+						buttons: [
+							{
+								value: 'Edit',
+								name: 'edit',
+								onclick : function( id ){
+									var modal = $( '.modal[data-id=' + id + ']' ).eq( 0 );
+									var lang = $( 'select', modal ).val();
+									var certId = $( 'input[name="cert"]' ).val();
+									location.href = CORE_URL + 'certs/edit/' + certId + '/' + lang;
+									return true;
+								}
+							},
+							{
+								value: 'Cancel',
+								class: 'low'
+							}
+						]
+					} );
+					var html = '<form><input type="hidden" name="cert" value="' + id + '" />';
+					html += '<ul><li><label for="language">Languages</label><select name="language">';
+					for ( var i = 0; i < data.data.length; i++ ) {
+						html += "<option value='" + data.data[i].id + "'>" + data.data[i].code + ' - ' + data.data[i].fullName + "</option>";
+					}
+					html += '</select><span>Pick a class to add</span></li>';
+					setModalContent( modal, html );
+					displayModal( modal );
+					//adjustTextarea( $( modal ).find( 'textarea' )[0] );
+				} else {
+					var modal = createModal( { title: 'Failed to load class', buttons: [{ value: 'Ok' }] } );
+					setModalContent( modal, data.data.error );
+					displayModal( modal, true )
+				}
+			}
+		} );
+	} );
 
 	/******************************************************************************/
 	/***************************certification delete*******************************/
@@ -564,7 +756,7 @@ $( document ).ready( function () {
 					var successful = false;
 					$.ajax( {
 						type: 'POST',
-						url: 'rest/certs/delete/',
+						url: CORE_URL + 'rest/certs/delete/',
 						data: {
 							id: id
 						},
@@ -704,7 +896,7 @@ $( document ).ready( function () {
 		var id = $( this ).closest( 'li' ).attr( 'data-id' );
 		$.ajax( {
 			type: 'POST',
-			url: 'rest/users/get/' + id,
+			url: CORE_URL + 'rest/users/get/' + id,
 			dataType: 'json',
 			success: function ( data ) {
 				if ( data.success ) {
@@ -789,7 +981,7 @@ $( document ).ready( function () {
 			saveBtn.addClass( 'processing' );
 			$.ajax( {
 				type: 'POST',
-				url: 'rest/users/save',
+				url: CORE_URL + 'rest/users/save',
 				dataType: 'json',
 				data: {
 					id: map.id,
@@ -833,7 +1025,7 @@ $( document ).ready( function () {
 		var userId = modal.find( 'input[name=id]' ).val();
 		$.ajax( {
 			type: 'POST',
-			url: 'rest/users/createResetPassword/' + userId,
+			url: CORE_URL + 'rest/users/createResetPassword/' + userId,
 			dataType: 'json',
 			async: false,
 			success: function ( data ) {
@@ -865,7 +1057,7 @@ $( document ).ready( function () {
 					var successful = false;
 					$.ajax( {
 						type: 'POST',
-						url: 'rest/users/delete/',
+						url: CORE_URL + 'rest/users/delete/',
 						data: {
 							id: id
 						},
@@ -1111,6 +1303,13 @@ $( document ).ready( function () {
 			}
 		}
 	} );
+
+	//modal reposition after resize
+	$( window ).on( 'resize', function(){
+		$( '.modal' ).each( function( idx, elem ){
+			$( elem ).css( 'left', ( $( 'body' ).width() / 2 ) - ( $( elem ).width() / 2 ) + 'px' );
+		} );
+	} );
 } );
 
 
@@ -1154,8 +1353,9 @@ function createModal( options ) {
 	} else {
 		id = window.modals.ids[window.modals.ids.length - 1] + 1;
 	}
-	var html = '<div data-id="' + id + '" class="modal none">' +
-		'<div class="modalWrapper">'
+	var zIndex = ' style="z-index: ' + ( 5 + ( id - 1 ) ) + '" ';
+	var html = '<div data-id="' + id + '" class="modal none"' + zIndex + '>' +
+		'<div class="modalWrapper">';
 	if ( options.title ) { //insert the header
 		html += '<div class="modalHeader clearfix">' +
 			'<span class="title">' + options.title + '</span>' +
@@ -1177,7 +1377,7 @@ function createModal( options ) {
 		}
 		html += '</div>';
 	}
-	$( 'body' ).append( html );
+	$( 'body' ).append( '<div class="modalShadow" data-id="' + id + '"' + zIndex + '>&nbsp;</div>' ).append( html );
 	window.modals.data[id] = options
 	window.modals.ids.push( id );
 	return $( '.modal[data-id=' + id + ']' );
@@ -1192,24 +1392,33 @@ function appendModalContent( modal, html ){
 }
 
 function displayModal( modal, focusIndex ) {
+	//center the modal on the screen
+	$( modal ).css( 'left', ( $( 'body' ).width() / 2 ) - ( $( modal ).width() / 2 ) + 'px' );
+	$( modal ).css( 'top', ( $(document ).scrollTop() ) + 'px' );
 	$( modal ).fadeIn( 300 );
+	//$('html, body').animate({
+	//	scrollTop: $( modal ).offset().top
+	//}, 200);
 	window.modals.displaying = $( modal ).attr( 'data-id' );
 }
 
 function closeModal( modal ) {
-	modal.find( '.modalWrapper' ).hide();
+	//modal.find( '.modalWrapper' ).hide();
 	var id = $( modal ).attr( 'data-id' );
+	delete window.modals.data[id];
+	window.modals.ids.splice( window.modals.ids.indexOf( id ), 1 );
+	if( $( '.modal:not([data-id=' + id + '])' ).last().length ){
+		window.modals.displaying = $( '.modal' ).last().attr( 'data-id' );
+	} else {
+		window.modals.displaying = false;
+	}
 	$( modal ).fadeOut( 300, function () {
 		$( modal ).remove();
-		delete window.modals.data[id];
-		window.modals.ids.splice( window.modals.ids.indexOf( id ), 1 );
-		if ( $( '.modal' ).last().length ) {
-			window.modals.displaying = $( '.modal' ).last().attr( 'data-id' );
-		} else {
-			window.modals.displaying = false;
-		}
-
 	} );
+	$( '.modalShadow[data-id=' + id + ']' ).fadeOut( 300, function(){
+		$(this ).remove();
+	});
+
 }
 
 function modalLi( type, name, label, data, text ) {
@@ -1250,6 +1459,11 @@ function modalLi( type, name, label, data, text, readOnly, addClass, tooltip ) {
 	return html;
 }
 
+/**
+ * read a cookie from storage
+ * @param name
+ * @returns {*}
+ */
 function readCookie( name ) {
 	var cookiename = name + "=";
 	var ca = document.cookie.split( ';' );
@@ -1261,6 +1475,12 @@ function readCookie( name ) {
 	return null;
 }
 
+/**
+ * put a cokkie into storage
+ * @param name
+ * @param data
+ * @param expires
+ */
 function setCookie( name, data, expires ){
 	if( expires ){
 		var date = new Date();
@@ -1272,6 +1492,12 @@ function setCookie( name, data, expires ){
 	}
 }
 
+/**
+ * insert whole objects into localStorage JSON.stringifies for you
+ * @param key
+ * @param data
+ * @returns {boolean}
+ */
 function setStorageJSON( key, data ) {
 	if ( typeof(Storage) !== "undefined" ) {
 		localStorage.setItem( key, JSON.stringify( data ) );
@@ -1281,6 +1507,11 @@ function setStorageJSON( key, data ) {
 	}
 }
 
+/**
+ * Retrieve an object from localStroage JSON.parses for you
+ * @param key
+ * @returns {boolean}
+ */
 function getStorageJSON( key ) {
 	if ( typeof(Storage) !== "undefined" ) {
 		return JSON.parse( localStorage.getItem( key ) );
@@ -1289,6 +1520,12 @@ function getStorageJSON( key ) {
 	}
 }
 
+/**
+ * insert a string into localStorage
+ * @param key
+ * @param data
+ * @returns {boolean}
+ */
 function setStorage( key, data ) {
 	if ( typeof(Storage) !== "undefined" ) {
 		localStorage.setItem( key, ( data ) );
@@ -1298,6 +1535,11 @@ function setStorage( key, data ) {
 	}
 }
 
+/**
+ * retrieve a string from localStorage
+ * @param key
+ * @returns {boolean}
+ */
 function getStorage( key ) {
 	if ( typeof(Storage) !== "undefined" ) {
 		return localStorage.getItem( key );
