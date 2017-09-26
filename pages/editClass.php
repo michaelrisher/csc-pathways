@@ -90,6 +90,7 @@
 </div>
 <?php
 	include_once CORE_PATH . 'assets/inc/footer.php';
+	Core::queueScript( 'assets/js/class.js' );
 	Core::queueScript( 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js' );
 	Core::includeScripts();
 ?>

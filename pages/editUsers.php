@@ -48,6 +48,7 @@
 </div>
 <?php
 	include_once CORE_PATH . 'assets/inc/footer.php';
+	Core::queueScript( 'assets/js/users.js' );
 	Core::includeScripts();
 ?>
 
