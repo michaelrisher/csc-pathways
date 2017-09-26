@@ -8,6 +8,7 @@
 	define( 'MODE', 'local' );
 	
 
+	define( 'NO_TIMEOUT', true );
 	if( MODE == 'local' ) {
 		define( 'CORE_DIR', 'lab/' );
 		define( 'CORE_PATH', $_SERVER['DOCUMENT_ROOT'] . substr( $_SERVER['SCRIPT_NAME'], 0, -9 ) );

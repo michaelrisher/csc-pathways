@@ -35,6 +35,7 @@
 					'hasCe' => $row['hasCe'],
 					'units' => $row['units'],
 					'sort' => $row['sort'],
+					'active' => $row['active']
 				);
 				array_push( $return, $a );
 			}
@@ -126,6 +127,7 @@ certificateList.units,
 certificateList.category,
 certificateList.description AS title,
 certificateList.sort,
+certificateList.active,
 certificateData.description,
 certificateData.elo,
 certificateData.schedule
@@ -216,6 +218,7 @@ EOD;
 				$language = intval( Core::sanitize( $_POST['language'] ) );
 				$hasCe = isset( $_POST['hasCe'] ) ? 1 : 0; //js returns something like hasCe=on if its on else its not set
 				$hasAs = isset( $_POST['hasAs'] ) ? 1 : 0; //js returns something like hasCe=on if its on else its not set
+				$active = isset( $_POST['active'] ) ? 1 : 0; //js returns something like hasCe=on if its on else its not set
 
 
 				//separate the two tables data
@@ -226,7 +229,8 @@ EOD;
 					'category' => (int)$_POST['category'],
 					'units' => (int)$_POST['units'],
 					'description' => $_POST['title'],
-					'sort' => (int)$_POST['sort']
+					'sort' => (int)$_POST['sort'],
+					'active' => $active
 				) );
 
 				$error = '';

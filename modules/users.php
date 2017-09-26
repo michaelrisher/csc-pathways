@@ -423,7 +423,7 @@
 		public function checkExpiredSession( $refresh = true ){
 			if ( isset( $_SESSION['session'] ) ) {
 				//if the expire time is less than the current time log the user out
-				if( $_SESSION['session']['expires'] <= time() ){
+				if( $_SESSION['session']['expires'] <= time() && !NO_TIMEOUT ){
 					$this->logout();
 				} else {
 					//if not expired then refresh the expire time to current time
@@ -441,7 +441,7 @@
 		 */
 		public function isLoggedIn(){
 			if( isset( $_SESSION['session'] ) && isset( $_SESSION['session']['username'] ) ) {
-				if ( $_SESSION['session']['expires'] > time() ) {
+				if ( $_SESSION['session']['expires'] > time() || NO_TIMEOUT) {
 					return true;
 				}
 			}

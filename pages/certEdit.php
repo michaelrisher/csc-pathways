@@ -96,6 +96,11 @@
 							<input type="number" name="sort" value="<?=isset( $data['sort'] ) ? $data['sort'] : 0?>">
 							<span>Enter the number to place it in the listing</span>
 						</li>
+						<li class="alignleft">
+							<label for="active">Active Certificate</label>
+							<div><input type="checkbox" name="active" <?=$data['active'] == 1 ? 'checked' : ''?>/>Check if this certificate is active</div>
+							<span>Enter the number to place it in the listing</span>
+						</li>
 						<li>
 							<input type="submit" value="Save" />
 						</li>

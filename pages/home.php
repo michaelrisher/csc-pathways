@@ -44,18 +44,20 @@
 							</tr>
 							<?php
 								foreach( $category[1] as $item ){
-									echo "<tr class='treeCert'>";
-									echo "<td>" . Core::fakeLink( 'cert', $item['id'], $item['description']) . "</td>";
-									echo "<td>";
-									if( $item['hasAs'] ){
-										echo 'AS/';
+									if( $item['active'] ) {
+										echo "<tr class='treeCert'>";
+										echo "<td>" . Core::fakeLink( 'cert', $item['id'], $item['description'] ) . "</td>";
+										echo "<td>";
+										if ( $item['hasAs'] ) {
+											echo 'AS/';
+										}
+										if ( $item['hasCe'] ) {
+											echo 'CE';
+										}
+										echo $item['code'] . "</td>";
+										echo "<td>${item['units']}</td>";
+										echo "</tr>";
 									}
-									if( $item['hasCe'] ){
-										echo 'CE';
-									}
-									echo $item['code'] . "</td>";
-									echo "<td>${item['units']}</td>";
-									echo "</tr>";
 								}
 							?>
 						</table>
