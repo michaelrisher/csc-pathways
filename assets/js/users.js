@@ -56,7 +56,12 @@ $( document ).ready( function(){
 			modalData.title = "Create User";
 		}
 		var modal = createModal( modalData );
-		var html = "<form><ul>";
+		var html = "<div class='tabWrapper users'>"+
+			"<div class='tab active' data-tab='edit' >Edit</div>"+
+			"<div class='tab' data-tab='roles' >Roles</div>"+
+			"<div class='tab' data-tab='dept' >Discipline</div>"+
+			"</div>" +
+			"<form><ul>";
 		//type, name, label, data, text
 		html += "<input type='hidden' name='id' value='" + ( data.data.id ? data.data.id : -1 ) + "'/>";
 		if ( create ) {

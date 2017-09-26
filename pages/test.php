@@ -1,78 +1,41 @@
 <?php
-	/**
-	 * Created by IntelliJ IDEA.
-	 * User: Michael Risher
-	 * Date: 7/10/2017
-	 * Time: 09:47
-	 */
 	if( !$GLOBALS['main']->users->isLoggedIn() ){
-		die( "not logged in" );
+		Core::errorPage( 404 );
 	}
-//	bind_textdomain_codeset('default', 'ISO-8859-1');
-//	$language = $_GET['lang'];
-//	echo $language . '<br>';
-//	putenv( "LANG=$language" );
-//	setlocale( LC_ALL, $language );
-//
-//	$domain = 'messages';
-//	echo CORE_PATH . "locale";
-//	echo '<br>';
-//	bindtextdomain( $domain, CORE_PATH . "locale" );
-//	textdomain( $domain );
-//
-//	echo gettext( "A string to be translated would go here" );
-//	echo '<br>';
-//	echo _( 'test' );
-//	echo '<br>';
-//
-//	phpinfo();
-
-//	$db = new DB();
-//	$con = $db->createConnection();
-//
-//	$query = "SELECT * FROM audit WHERE user=?";
-//	$state = $con->prepare( $query );
-//	$id = 2;
-//	$str = "\$state->bind_param( 'i', \$id );";
-//	eval( $str );
-//	$result = $state->execute();
-//	Core::debug( $result );
-
-	$data = array(
-		'id' => 0,
-		'title' => 'tile',
-		'hasAs' => 0.0,
-		'sort' => true,
-	);
-
-	$query = "UPDATE table SET ";
-	$evalStr = "\$state->bind_param(";
-	$paramsStr = '';
-	$bindType = '';
-	foreach( $data as $key => $val ){
-		$query .= $key . '=?,';
-		$paramsStr .= "\$data['$key'], ";
-		$type = gettype( $val );
-		if ( $type == 'string' ) {
-			$bindType .= 's';
-		} elseif( $type == 'double' ) {
-			$bindType .= 'd';
-		} elseif( $type == 'integer' || $type == 'boolean' ){
-			$bindType .= 'i';
-		} else {
-			$bindType .= 'b';
-		}
-	}
-
-	$query = rtrim( $query, "," );
-	$paramsStr = rtrim( $paramsStr, ", " );
-	$query .= " WHERE \$where";
-	$evalStr .= "\"$bindType\"," .$paramsStr . ");";
-
-
-	Core::debug( array(
-		'query' => $query,
-		'eval' => $evalStr,
-		'param' => $paramsStr,
-		'bind' => $bindType
-	) );
+?>
+<!DOCTYPE html>
+<html>
+<head>
+	<?php
+		include_once CORE_PATH . 'assets/inc/header.php';
+		Core::includeStyles();
+	?>
+</head>
+<body>
+<div class="modal none" data-id="1" style="z-index: 5; left: 497px; top: 0px; display: block;">
+	<div class="modalWrapper">
+		<div class="modalHeader clearfix">
+			<span class="title">Edit User</span><span class="close">&times;</span>
+		</div>
+		<div class="modalContent">
+			<div class='tabWrapper users'>
+				<div class="tab active" data-tab="edit" >Edit</div>
+				<div class="tab" data-tab="roles" >Roles</div>
+				<div class="tab" data-tab="dept" >Discipline</div>
+			</div>
+			<form>
+				<input name="id" type="hidden" value="10">
+				<ul>
+					<li><label for="username">User name</label><input name="username" type="text" value="joe"><span>Enter the username</span></li>
+					<li><label for="isAdmin">Admin</label><input name="isAdmin" type="checkbox" value="1">Check if the user should be able to edit users<span>Check if the user should be able to edit users</span></li>
+					<li><label for="active">Active User</label><input checked="checked" name="active" type="checkbox" value="1">Check if the user should be allowed to login<span>Check if the user should be allowed to login</span></li>
+				</ul>
+			</form>
+		</div>
+		<div class="modalFooter">
+			<input class="" name="save" type="button" value="Save"><input class="low" name="" type="button" value="Reset Password"><input class="low" name="" type="button" value="Cancel">
+		</div>
+	</div>
+</div>
+</body>
+</html>

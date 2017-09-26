@@ -553,6 +553,24 @@ input[type="submit"],  input[type="button"]{
 			text-decoration: underline;
 			cursor: pointer;
 		}
+		
+		.tabWrapper{
+			margin: 10px auto;
+			width: 450px;
+			.tab{
+				margin-right: 2px;
+				display: inline-block;
+				border: 1px solid #4e4e4e;
+				padding: 5px;
+				border-top-left-radius: 5px;
+				border-top-right-radius: 5px;
+				cursor: pointer;
+				&.active{
+					background-color: #d5d5d5;
+				}
+			}
+
+		}
 	}
 }
 #loadOff {
