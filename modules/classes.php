@@ -31,7 +31,10 @@
 					}
 				}
 //				$search = isset( $_POST['search'] ) ? $_POST['search'] : '' ;
-				if( empty( $search ) ){
+				if( isset( $_POST['all'] ) ){
+					$query = "SELECT * FROM classes ORDER BY sort";
+				}
+				else if( empty( $search ) ){
 					$query = "SELECT * FROM classes ORDER BY sort LIMIT $offset,$limit";//remove limit for a time LIMIT $page,50
 				} else {
 					$query = "SELECT * FROM classes WHERE title LIKE '%$search%'ORDER BY sort LIMIT $offset,$limit";

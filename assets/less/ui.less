@@ -524,8 +524,9 @@ input[type="submit"],  input[type="button"]{
 
 		form {
 			margin: 10px auto;
-			max-width: 450px;
+			max-width: 500px;
 			background: #fff;
+			padding: 10px;
 
 			ul {
 				li {
@@ -555,21 +556,50 @@ input[type="submit"],  input[type="button"]{
 		}
 		
 		.tabWrapper{
-			margin: 10px auto;
-			width: 450px;
-			.tab{
-				margin-right: 2px;
-				display: inline-block;
-				border: 1px solid #4e4e4e;
-				padding: 5px;
-				border-top-left-radius: 5px;
-				border-top-right-radius: 5px;
-				cursor: pointer;
-				&.active{
-					background-color: #d5d5d5;
+			.tabs {
+				margin: 10px auto;
+				width: 500px;
+				.tab {
+					margin-right: -2px;
+					display: inline-block;
+					border: 1px solid #4e4e4e;
+					padding: 5px;
+					border-top-left-radius: 5px;
+					border-top-right-radius: 5px;
+					cursor: pointer;
+					&.active {
+						background-color: #d5d5d5;
+					}
 				}
 			}
+		}
 
+		.userRoles {
+			.listing {
+				max-height: 320px;
+				overflow-y: scroll;
+				li {
+					padding: 10px;
+					list-style: none;
+					border: 1px solid black;
+					border-bottom: none;
+					&:nth-child(even) {
+						background: #b1bcc7;
+					}
+					&:last-child{
+						border-bottom: 1px solid black;
+					}
+
+					img {
+						float: right;
+						padding: 0 5px 0 5px;
+						vertical-align: text-top;
+					}
+				}
+			}
+			.add{
+				.padding10Top;
+			}
 		}
 	}
 }
@@ -603,4 +633,9 @@ input[type="submit"],  input[type="button"]{
 
 input:focus{
 	//border: 2px solid red !important;
+}
+
+img.delete.tooltip{
+	height: 20px;
+	cursor: pointer;
 }

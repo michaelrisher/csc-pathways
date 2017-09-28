@@ -351,6 +351,24 @@ $( document ).ready( function () {
 			$( elem ).css( 'left', ( $( 'body' ).width() / 2 ) - ( $( elem ).width() / 2 ) + 'px' );
 		} );
 	} );
+
+	/******************************************************************************/
+	/******************************modal tab switcher******************************/
+	/******************************************************************************/
+	$( document ).on( 'click', '.tabWrapper .tab', function(){
+		if( $( this ).hasClass( 'active' ) ) return;
+		var tab = $( this ).attr( 'data-tab' );
+		var active = $( this ).siblings( '.active' );
+		var activeTab = $( active ).attr( 'data-tab' );
+
+		//change active tab to that you clicked
+		$( active ).removeClass( 'active' );
+		$( this ).addClass( 'active' );
+
+		//switch the content tab
+		$( '.tabContent[data-tab="' + tab + '"]' ).toggleClass( 'none' );
+		$( '.tabContent[data-tab="' + activeTab + '"]' ).toggleClass( 'none' );
+	} );
 } );
 
 
@@ -426,6 +444,10 @@ function createModal( options ) {
 
 function setModalContent( modal, html ) {
 	$( modal ).find( '.modalContent' ).html( html );
+}
+
+function appendModalContent( modal, html ){
+	$( modal ).find( '.modalContent' ).append( html );
 }
 
 function appendModalContent( modal, html ){

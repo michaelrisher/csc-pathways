@@ -105,6 +105,66 @@
 .margin15Left {
   margin-left: 15px;
 }
+.margin0Important {
+  margin: 0px !important;
+}
+.margin0TopImportant {
+  margin-top: 0px !important;
+}
+.margin0RightImportant {
+  margin-right: 0px !important;
+}
+.margin0BottomImportant {
+  margin-bottom: 0px !important;
+}
+.margin0LeftImportant {
+  margin-left: 0px !important;
+}
+.margin5Important {
+  margin: 5px !important;
+}
+.margin5TopImportant {
+  margin-top: 5px !important;
+}
+.margin5RightImportant {
+  margin-right: 5px !important;
+}
+.margin5BottomImportant {
+  margin-bottom: 5px !important;
+}
+.margin5LeftImportant {
+  margin-left: 5px !important;
+}
+.margin10Important {
+  margin: 10px !important;
+}
+.margin10TopImportant {
+  margin-top: 10px !important;
+}
+.margin10RightImportant {
+  margin-right: 10px !important;
+}
+.margin10BottomImportant {
+  margin-bottom: 10px !important;
+}
+.margin10LeftImportant {
+  margin-left: 10px !important;
+}
+.margin15Important {
+  margin: 15px !important;
+}
+.margin15TopImportant {
+  margin-top: 15px !important;
+}
+.margin15RightImportant {
+  margin-right: 15px !important;
+}
+.margin15BottomImportant {
+  margin-bottom: 15px !important;
+}
+.margin15LeftImportant {
+  margin-left: 15px !important;
+}
 .padding0 {
   padding: 0px;
 }
@@ -164,6 +224,66 @@
 }
 .padding15Left {
   padding-left: 15px;
+}
+.padding0Important {
+  padding: 0px !important;
+}
+.padding0TopImportant {
+  padding-top: 0px !important;
+}
+.padding0RightImportant {
+  padding-right: 0px !important;
+}
+.padding0BottomImportant {
+  padding-bottom: 0px !important;
+}
+.padding0LeftImportant {
+  padding-left: 0px !important;
+}
+.padding5Important {
+  padding: 5px !important;
+}
+.padding5TopImportant {
+  padding-top: 5px !important;
+}
+.padding5RightImportant {
+  padding-right: 5px !important;
+}
+.padding5BottomImportant {
+  padding-bottom: 5px !important;
+}
+.padding5LeftImportant {
+  padding-left: 5px !important;
+}
+.padding10Important {
+  padding: 10px !important;
+}
+.padding10TopImportant {
+  padding-top: 10px !important;
+}
+.padding10RightImportant {
+  padding-right: 10px !important;
+}
+.padding10BottomImportant {
+  padding-bottom: 10px !important;
+}
+.padding10LeftImportant {
+  padding-left: 10px !important;
+}
+.padding15Important {
+  padding: 15px !important;
+}
+.padding15TopImportant {
+  padding-top: 15px !important;
+}
+.padding15RightImportant {
+  padding-right: 15px !important;
+}
+.padding15BottomImportant {
+  padding-bottom: 15px !important;
+}
+.padding15LeftImportant {
+  padding-left: 15px !important;
 }
 .relative {
   position: relative;
@@ -772,8 +892,9 @@ input[type="button"].processing {
 }
 .modal .modalWrapper form {
   margin: 10px auto;
-  max-width: 450px;
+  max-width: 500px;
   background: #fff;
+  padding: 10px;
 }
 .modal .modalWrapper form ul li {
   border: 1px solid #4e4e4e;
@@ -796,12 +917,12 @@ input[type="button"].processing {
   text-decoration: underline;
   cursor: pointer;
 }
-.modal .modalWrapper .tabWrapper {
+.modal .modalWrapper .tabWrapper .tabs {
   margin: 10px auto;
-  width: 450px;
+  width: 500px;
 }
-.modal .modalWrapper .tabWrapper .tab {
-  margin-right: 2px;
+.modal .modalWrapper .tabWrapper .tabs .tab {
+  margin-right: -2px;
   display: inline-block;
   border: 1px solid #4e4e4e;
   padding: 5px;
@@ -809,8 +930,32 @@ input[type="button"].processing {
   border-top-right-radius: 5px;
   cursor: pointer;
 }
-.modal .modalWrapper .tabWrapper .tab.active {
+.modal .modalWrapper .tabWrapper .tabs .tab.active {
   background-color: #d5d5d5;
+}
+.modal .modalWrapper .userRoles .listing {
+  max-height: 320px;
+  overflow-y: scroll;
+}
+.modal .modalWrapper .userRoles .listing li {
+  padding: 10px;
+  list-style: none;
+  border: 1px solid black;
+  border-bottom: none;
+}
+.modal .modalWrapper .userRoles .listing li:nth-child(even) {
+  background: #b1bcc7;
+}
+.modal .modalWrapper .userRoles .listing li:last-child {
+  border-bottom: 1px solid black;
+}
+.modal .modalWrapper .userRoles .listing li img {
+  float: right;
+  padding: 0 5px 0 5px;
+  vertical-align: text-top;
+}
+.modal .modalWrapper .userRoles .add {
+  padding-top: 10px;
 }
 #loadOff {
   position: absolute;
@@ -835,4 +980,8 @@ input[type="button"].processing {
   color: #fff;
   font-size: 12px;
   z-index: 70001;
+}
+img.delete.tooltip {
+  height: 20px;
+  cursor: pointer;
 }

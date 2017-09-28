@@ -308,6 +308,7 @@ $( document ).ready( function(){
 			$.ajax( {
 				type: 'POST',
 				url: CORE_URL + 'rest/classes/listing',
+				data : { all : true },
 				dataType: 'json',
 				//async : false,
 				success: function ( data ) {

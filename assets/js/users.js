@@ -11,14 +11,13 @@ $( document ).ready( function(){
 		var id = $( this ).closest( 'li' ).attr( 'data-id' );
 		$.ajax( {
 			type: 'POST',
-			url: CORE_URL + 'rest/users/get/' + id,
-			dataType: 'json',
+			url: CORE_URL + 'rest/users/edit/' + id,
 			success: function ( data ) {
-				if ( data.success ) {
+				if ( data ) {
 					createUserModal( data, false );
 				} else {
-					var modal = createModal( { title: 'Failed to load class', buttons: [{ value: 'Ok', focus : true }] } );
-					setModalContent( modal, data.data.error );
+					var modal = createModal( { title: 'Failed to load user', buttons: [{ value: 'Ok', focus : true }] } );
+					setModalContent( modal, "An error occurred." );
 					displayModal( modal, true )
 				}
 			}
@@ -26,9 +25,19 @@ $( document ).ready( function(){
 	} );
 
 	$( '.users input[name=createUser]' ).on( 'click', function () {
-		var data = {};
-		data.data = { id: -1, username: '', isAdmin: 0, active: 0 };
-		createUserModal( data, true );
+		$.ajax( {
+			type: 'POST',
+			url: CORE_URL + 'rest/users/edit/-1',
+			success: function ( data ) {
+				if ( data ) {
+					createUserModal( data, false );
+				} else {
+					var modal = createModal( { title: 'Failed to load user', buttons: [{ value: 'Ok', focus : true }] } );
+					setModalContent( modal, "An error occurred." );
+					displayModal( modal, true )
+				}
+			}
+		} );
 	} );
 
 	function createUserModal( data, create ) {
@@ -56,22 +65,7 @@ $( document ).ready( function(){
 			modalData.title = "Create User";
 		}
 		var modal = createModal( modalData );
-		var html = "<div class='tabWrapper users'>"+
-			"<div class='tab active' data-tab='edit' >Edit</div>"+
-			"<div class='tab' data-tab='roles' >Roles</div>"+
-			"<div class='tab' data-tab='dept' >Discipline</div>"+
-			"</div>" +
-			"<form><ul>";
-		//type, name, label, data, text
-		html += "<input type='hidden' name='id' value='" + ( data.data.id ? data.data.id : -1 ) + "'/>";
-		if ( create ) {
-			html += "<input type='hidden' name='create' value='create'/>";
-		}
-		html += modalLi( 'text', 'username', 'User name', data.data.username, "Enter the username", false );
-		html += modalLi( 'checkbox', 'isAdmin', 'Admin', data.data.isAdmin, "Check if the user should be able to edit users", false );
-		html += modalLi( 'checkbox', 'active', 'Active User', data.data.active, "Check if the user should be allowed to login", false );
-		html += "</ul></form>";
-		setModalContent( modal, html );
+		setModalContent( modal, data );
 		displayModal( modal );
 	}
 
@@ -212,4 +206,65 @@ $( document ).ready( function(){
 		setModalContent( modal, "<p>Are you sure you want to delete. This can not be undone</p>" );
 		displayModal( modal );
 	} );
+
+	/******************************************************************************/
+	/*******************************Add user role**********************************/
+	/******************************************************************************/
+	$( document ).on( 'click', '.modal .userRoles .add input[type=button]', function(){
+		$.ajax( {
+			type: 'POST',
+			url: CORE_URL + 'rest/roles/modalUserAddRole',
+			success: function ( data ) {
+				//alert( JSON.stringify( data ) );
+				if ( data ) {
+					var modal = createModal( {
+						title: "Add Role",
+						buttons: [{
+							value: 'Add',
+							onclick : function( id ){
+								//get value
+								var value = $( '.modal[data-id=' + id + '] select' ).val();
+								//get ids already displayed in the listing
+								var idsSet = JSON.parse( $( '.userRoles input[name=roles]' ).val() );
+								//check id isnt already there
+								for( var i = 0; i < idsSet.length; i++ ){
+									if( idsSet[i] == value ){
+										var modal = createModal( { title: "Error", buttons: [{ value: 'Ok', focus:true }] } );
+										setModalContent( modal, "You cannot add the same role twice." );
+										displayModal( modal );
+										return false;
+									}
+								}
+								idsSet.push( value );
+								var html = "<li>";
+								html += $( '.modal[data-id=' + id + '] select option:selected' ).text();
+								html += '<img class="delete tooltip" src="' + CORE_URL + 'assets/img/delete.png" title="Delete Role">'
+								html += '</li>';
+								//add to listing
+								$( '.userRoles .listing' ).append( html );
+								//add to input
+								$( '.userRoles input[name=roles]' ).val( JSON.stringify( idsSet ) );
+								return true;
+							}
+						},{
+							value: 'Cancel',
+							class: 'low'
+						}]
+					} );
+					setModalContent( modal, data );
+					displayModal( modal );
+				} else {
+					var modal = createModal( { title: "Error Saving User", buttons: [{ value: 'Ok' }] } );
+					setModalContent( modal, data.data.error );
+					displayModal( modal );
+				}
+			}
+		} );
+	} );
+
+
+	/******************************************************************************/
+	/******************************delete user role********************************/
+	/******************************************************************************/
+
 } );

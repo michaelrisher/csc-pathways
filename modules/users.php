@@ -38,8 +38,7 @@
 		 * @return array|void array if forceReturn is true echos echos json otherwise
 		 */
 		public function get( $id, $forceReturn = false ){
-			$this->loadModule( 'users' );
-			if( $this->users->isAdmin() ) {
+			if( $this->isAdmin() ) {
 				$query = "SELECT * FROM users WHERE id = '$id'";
 
 				if ( !$result = $this->db->query( $query ) ) {
@@ -62,6 +61,92 @@
 			} else {
 				echo Core::ajaxResponse( array( 'error' => 'Session expired.<br>Please log in again'), false );
 			}
+		}
+
+		/**
+		 * this function is used to ajax the edit modal from javascript
+		 * @param $id
+		 */
+		public function edit( $id ){
+			$this->loadModule( "roles" );
+			if( $this->isAdmin() && IS_AJAX ){
+				//get user and force return
+				if( $id != -1 ) {
+					$user = $this->get( $id, true );
+				} else {
+					$user = array(
+						'id' => -1,
+						'username' => '',
+						'isAdmin' => 0,
+						'active' => 0
+					);
+				}
+//				Core::debug( $user );
+				?>
+				<div class='tabWrapper users'>
+					<div class="tabs">
+						<div class='tab' data-tab='edit' >Edit</div>
+						<div class='tab active' data-tab='roles' >Roles</div>
+						<div class='tab' data-tab='dept' >Discipline</div>
+					</div>
+
+					<div class="tabContent none" data-tab="edit">
+						<form>
+							<ul>
+								<input type="hidden" name="id" value="2">
+								<li>
+									<label for="username">User name</label>
+									<input name="username" type="text" value="<?= $user['username'] ?>">
+									<span>Enter the username</span>
+								</li>
+								<li>
+									<label for="isAdmin">Admin</label>
+									<input name="isAdmin" type="checkbox" value="1" <?= $user['isAdmin'] ? 'checked' : '' ?>>Check if the user should be able to edit users
+									<span>Check if the user should be able to edit users</span>
+								</li>
+								<li>
+									<label for="active">Active User</label>
+									<input name="active" type="checkbox" value="1" <?= $user['active'] ? 'checked' : '' ?>>Check if the user should be allowed to login
+									<span>Check if the user should be allowed to login</span>
+								</li>
+							</ul>
+						</form>
+					</div>
+					<div class="tabContent" data-tab="roles">
+						<div class="userRoles">
+							<?php
+								$roles = $this->roles->getAllForUser( $user['id'] );
+								$list = array();
+								foreach( $roles as $role ){
+									array_push( $list, $role['id'] );
+								}
+								echo "<form class='none'>".
+										"<input type='hidden' value='" . json_encode( $list ) . "' name='roles'/>".
+									"</form>"
+							?>
+							<ul class="listing">
+								<?php
+									foreach( $roles as $role ){
+										echo "<li>";
+										echo $role['description'];
+										echo '<img class="delete tooltip" src="http://localhost/lab/assets/img/delete.png" title="Delete Role">';
+										echo "</li>";
+									}
+								?>
+							</ul>
+							<div class="add">
+								<input type="button" value="Add Role" name="addRole">
+							</div>
+						</div>
+					</div>
+					<div class="tabContent none" data-tab="dept">
+						d
+					</div>
+				</div>
+
+				<?php
+			}
+
 		}
 
 		private function find( $username ){
