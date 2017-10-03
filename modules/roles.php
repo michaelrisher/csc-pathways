@@ -105,18 +105,82 @@ EOD;
 			return $return;
 		}
 
+
+		/**
+		 * gets all the roles for a user based on module in a flat array of the role name
+		 * eg ['gClassView', 'gClassEdit' ]
+		 * return null if has no roles
+		 * @param int $userId id for the user
+		 * @param string $module name of module ie ( class, cert, user )
+		 * @return array|null
+		 */
+		public function getRolesByModule( $userId, $module ){
+			$query = <<<EOD
+SELECT
+    users.id as userId,
+    roles.id as roleId,
+    roles.name,
+    roles.description
+FROM
+    userXroles,
+    users,
+    roles
+WHERE
+    userXroles.userId = users.id AND roles.id = userXroles.roleId AND users.id = $userId AND roles.name LIKE '%$module%'
+ORDER BY
+    roles.module ASC, roles.id DESC
+EOD;
+			if ( !$result = $this->db->query( $query ) ) {
+				return null;
+			}
+
+			$return = array();
+			while ( $row = $result->fetch_assoc() ) {
+				array_push( $return, $row['name'] );
+			}
+
+			return $return;
+		}
 		/**
 		 * check if user has a role
 		 * @param $userId int id for the user
 		 * @param $roleName string name of the role
+		 * @return bool
 		 */
 		public function doesUserHaveRole( $userId, $roleName ){
+			$query = <<<EOD
+SELECT
+    users.id as userId,
+    roles.id as roleId,
+    roles.name,
+    roles.description
+FROM
+    userXroles,
+    users,
+    roles
+WHERE
+    userXroles.userId = users.id AND roles.id = userXroles.roleId AND users.id = $userId AND roles.name = '$roleName'
+ORDER BY
+    roles.module ASC, roles.id DESC
+EOD;
+			if( !$result = $this->db->query( $query ) ){
+				echo Core::ajaxResponse( array( 'error' => "An error occurred please try again" ), false );
+				return false;
+			}
 
+			if( $result->num_rows == 1 ){
+				//double check
+				$row = $result->fetch_assoc();
+				if( $row['name'] == $roleName ){
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		public function modalUserAddRole(){
 			$roles = $this->listing( 'module', true );
-//			Core::debug( $roles );
 			?>
 			<form>
 				<ul>
@@ -138,7 +202,6 @@ EOD;
 									$firstRun = false;
 								}
 							?>
-<!--							<option value=''>test</option>-->
 						</select>
 						<span>Pick a class to add</span>
 					</li>

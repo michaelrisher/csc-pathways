@@ -383,9 +383,12 @@ $( document ).ready( function(){
 					for( var i = 0; i < data.listing.length; i++ ){
 						var item = data.listing[i];
 						var s = "<li data-id='" + item.id + "'>" + item.title;
-						s += '<img class="delete tooltip" title="Delete class" src="' + CORE_URL + 'assets/img/delete.png">';
-						s += '<img class="languageEdit tooltip" title="Edit in Different Language" src="' + CORE_URL + 'assets/img/region.png">';
-						s += '<img class="edit tooltip" title="Edit class" src="' + CORE_URL + 'assets/img/edit.svg">';
+						if( item.delete )
+							s += '<img class="delete tooltip" title="Delete class" src="' + CORE_URL + 'assets/img/delete.png">';
+						if( item.edit ) {
+							s += '<img class="languageEdit tooltip" title="Edit in Different Language" src="' + CORE_URL + 'assets/img/region.png">';
+							s += '<img class="edit tooltip" title="Edit class" src="' + CORE_URL + 'assets/img/edit.svg">';
+						}
 						s += "</li>";
 						$( listing ).append( s );
 					}

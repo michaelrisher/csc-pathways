@@ -73,7 +73,12 @@ $( document ).ready( function(){
 		var modal = $( '.modal[data-id=' + id + ']' );
 		var form = $( modal ).find( 'form' );
 		var saveBtn = $( modal ).find( 'input[name="save"]' );
-		var data = $( form ).serializeArray();
+		var data = [];
+		form.each( function( i, elem ){
+			var a = $( elem ).serializeArray();
+			data = data.concat( a );
+		} );
+		//var data = $( form ).serializeArray();
 		var map = {};
 		jQuery.each( data, function ( i, field ) {
 			map[field.name] = field.value;
@@ -102,7 +107,8 @@ $( document ).ready( function(){
 					create: (map.create) ? map.create : 0,
 					username: map.username,
 					isAdmin: ( map.isAdmin ) ? map.isAdmin : 0,
-					active: ( map.active ) ? map.active : 0
+					active: ( map.active ) ? map.active : 0,
+					roles: map.roles
 				},
 				async: false,
 				success: function ( data ) {
@@ -129,6 +135,7 @@ $( document ).ready( function(){
 			} );
 			return successful;
 		} else {
+			window.processing = false;
 			saveBtn.removeClass( 'processing' );
 			return false;
 		}
@@ -266,5 +273,17 @@ $( document ).ready( function(){
 	/******************************************************************************/
 	/******************************delete user role********************************/
 	/******************************************************************************/
+	$( document ).on( 'click', '.modal .userRoles img.delete', function(){
+		var li = $( this ).closest( 'li' );
+		var id = $( li ).attr( 'data-id' );
+		//get ids already displayed in the listing
+		var idsSet = JSON.parse( $( '.userRoles input[name=roles]' ).val() );
 
+		var index = idsSet.indexOf( id );
+		idsSet.splice( index, 1 );
+		$( '.userRoles input[name=roles]' ).val( JSON.stringify( idsSet ) );
+
+		$( li ).slideUp( 400 );
+
+	} );
 } );

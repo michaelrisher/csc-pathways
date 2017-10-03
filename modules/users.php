@@ -93,7 +93,7 @@
 					<div class="tabContent none" data-tab="edit">
 						<form>
 							<ul>
-								<input type="hidden" name="id" value="2">
+								<input type="hidden" name="id" value="<?= $user['id']?>">
 								<li>
 									<label for="username">User name</label>
 									<input name="username" type="text" value="<?= $user['username'] ?>">
@@ -127,7 +127,7 @@
 							<ul class="listing">
 								<?php
 									foreach( $roles as $role ){
-										echo "<li>";
+										echo "<li data-id='${role['id']}'>";
 										echo $role['description'];
 										echo '<img class="delete tooltip" src="http://localhost/lab/assets/img/delete.png" title="Delete Role">';
 										echo "</li>";
@@ -146,7 +146,6 @@
 
 				<?php
 			}
-
 		}
 
 		private function find( $username ){
@@ -167,21 +166,53 @@
 		 * only allowed if the user is admin
 		 */
 		public function save(){
+			//TODO save roles
 			$this->loadModule( 'audit' );
+			$this->loadModule( 'roles' );
 			$obj = array();
-			$_POST = Core::sanitize( $_POST, true );
+//			$_POST = Core::sanitize( $_POST, true );
+			$_POST['id'] = Core::sanitize( $_POST['id'] );
+			$_POST['username'] = Core::sanitize( $_POST['username'] );
+			$_POST['active'] = Core::sanitize( $_POST['active'] );
+			$_POST['isAdmin'] = Core::sanitize( $_POST['isAdmin'] );
 			if( isset( $_POST['create'] ) && $_POST['create'] == 'create' ){
 				$this->create( $_POST );
 			} else{
+				$id = $_POST['id'];
 				if( $this->isAdmin() ) {
-					$statement = $this->db->prepare("UPDATE users SET username=?, isAdmin=?, active=? WHERE id=?");
-					$statement->bind_param( "siii", $_POST['username'], $_POST['isAdmin'], $_POST['active'], $_POST['id']);
-					if( $statement->execute() ){
+					//statement to save the user
+					$editUserState = $this->db->prepare("UPDATE users SET username=?, isAdmin=?, active=? WHERE id=?");
+					$editUserState->bind_param( "siii", $_POST['username'], $_POST['isAdmin'], $_POST['active'], $_POST['id']);
+					//save roles
+					//todo check rights to save roles
+					//get all the roles for user and compare to whats is in the database already
+					$roles = $this->roles->getAllForUser( $id );
+					//convert array to flat array with ids
+					$flatRoles = array();
+					foreach( $roles as $val ){
+						array_push( $flatRoles, $val['id'] );
+					}
+					$postRoles = json_decode( $_POST['roles'] );
+					$addedRoles = array_diff( $postRoles, $flatRoles );
+					$removedRoles = array_diff( $flatRoles, $postRoles );
+
+					/*
+					$a = array("12", "11", "15"); // saved roles
+					$b = array("12", "11", "21"); //adding into main
+
+					print_r( array_diff( $b, $a ) );  //gets the additions
+					print_r( array_diff( $a, $b ) );  //gets the subtractions
+					*/
+					if( false/*$editUserState->execute()*/ ){
 						$obj['msg'] = "Saved successfully.";
 						$this->audit->newEvent( "Updated user: " . $_POST['username'] );
 						echo Core::ajaxResponse( $obj );
 					} else{
-						$obj['error'] = $statement->error;
+						$obj['error'] = $editUserState->error;
+						$obj['1'] = $flatRoles;
+						$obj['2'] = $postRoles;
+						$obj['added'] = $addedRoles;
+						$obj['removed'] = $removedRoles;
 						echo Core::ajaxResponse( $obj, false );
 					}
 				} else{

@@ -72,6 +72,7 @@
 		 */
 		public function edit( $params ) {
 			$this->loadModule( 'users' );
+//			if( $this->rol)
 			if ( $this->users->isLoggedIn() ) {
 				Core::queueStyle( 'assets/css/reset.css' );
 				Core::queueStyle( 'assets/css/ui.css' );

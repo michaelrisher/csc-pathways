@@ -7,7 +7,6 @@
 	 * Time: 10:15
 	 */
 	class classes extends Main {
-
 		/**
 		 * get a simple listing of classes only id and title are returned
 		 * only allowed if the user is admin
@@ -15,8 +14,10 @@
 		 * @return array
 		 */
 		public function listing( $page = 1 ) {
-			$this->loadModule( 'users' );
-			if ( $this->users->isLoggedIn() ) {
+			$this->loadModule( 'roles' );
+			$userRoles = $this->roles->getRolesByModule( $_SESSION['session']['id'], 'class' );
+			//if user has class view role then do it
+			if ( array_search( 'gClassView', $userRoles ) !== false || array_search( 'dClassView', $userRoles ) !== false) {
 				$limit = 25;
 				$page--;//to make good looking page numbers for users
 				$offset = $page * $limit;
@@ -49,8 +50,16 @@
 				while ( $row = $result->fetch_assoc() ) {
 					$a = array(
 						'id' => $row['id'],
-						'title' => $row['title']
+						'title' => $row['title'],
+						'edit' => false,
+						'delete' => false
 					);
+					if( array_search( 'gClassEdit', $userRoles ) !== false || array_search( 'dClassEdit', $userRoles ) !== false ){
+						$a['edit'] = true;
+					}
+					if( array_search( 'gClassDelete', $userRoles ) !== false || array_search( 'dClassDelete', $userRoles ) !== false ){
+						$a['delete'] = true;
+					}
 					array_push( $return, $a );
 				}
 
@@ -370,5 +379,27 @@ EOD;
 		public function show( $id ) {
 			$data['params'] = $id;
 			include CORE_PATH . 'pages/class.php';
+		}
+
+		/**
+		 * removes the old prereq, coreq, advisory, and description from the classes table
+		 * @deprecated
+		 */
+		public function removeOldData(){
+			$this->loadModule( 'roles' );
+			if( $this->roles->doesUserHaveRole( $_SESSION['session']['id'], 'dataManage' ) ) {
+				$query = <<<EOD
+ALTER TABLE `classes`
+  DROP `prereq`,
+  DROP `coreq`,
+  DROP `advisory`,
+  DROP `description`;
+EOD;
+				if ( $this->db->query( $query ) ) {
+					echo "ran successfully";
+				} else {
+					echo "failed update";
+				}
+			}
 		}
 	}
