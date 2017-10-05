@@ -5,7 +5,7 @@
 	 * Date: 6/21/2017
 	 * Time: 11:47
 	 */
-	if( !$GLOBALS['main']->users->isAdmin() ){
+	if( !$GLOBALS['main']->users->isLoggedIn() ){
 		Core::errorPage( 404 );
 	}
 ?>
@@ -31,8 +31,10 @@
 							$data = $GLOBALS['main']->users->listing();
 							foreach ( $data as $user ) {
 								echo "<li data-id='${user['id']}'>${user['username']}";
-								echo "<img class='delete tooltip' src='". CORE_URL ."assets/img/delete.png' title='Delete User'/>";
-								echo "<img class='edit tooltip' src='". CORE_URL ."assets/img/edit.svg' title='Edit User'/>";
+								if( $user['delete'] )
+									echo "<img class='delete tooltip' src='". CORE_URL ."assets/img/delete.png' title='Delete User'/>";
+								if( $user['edit'] )
+									echo "<img class='edit tooltip' src='". CORE_URL ."assets/img/edit.svg' title='Edit User'/>";
 								echo "</li>";
 							}
 						?>

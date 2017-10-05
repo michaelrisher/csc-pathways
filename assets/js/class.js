@@ -184,7 +184,9 @@ $( document ).ready( function(){
 						successful = true;
 						if ( url == 'create' ) {
 							$( '.classes .listing ul' ).append( '<li data-id="' + map['id'] + '">' +
-								map['title'] + '<img class="delete" src="assets/img/delete.png"><img class="edit" src="assets/img/edit.svg"></li>' );
+								map['title'] + '<img class="delete" src="' + CORE_URL + 'assets/img/delete.png">'+
+								'<img class="languageEdit tooltip" src="' + CORE_URL + 'assets/img/region.png" title="Edit in Different Language">'+
+								'<img class="edit" src="' + CORE_URL + 'assets/img/edit.svg"></li>' );
 						}
 						//remove the class cache
 						if ( getStorage( 'invalidateCache' ) ) {
@@ -201,7 +203,7 @@ $( document ).ready( function(){
 					}
 				}
 			} );
-			return true;
+			return successful;
 		} else {
 			saveBtn.removeClass( 'processing' );
 			return false;
@@ -277,6 +279,7 @@ $( document ).ready( function(){
 		html+="<form><ul>";
 		//type, name, label, data, text
 		html += "<input type='hidden' name='create' value='create' />";
+		html += "<input type='hidden' name='language' value='0' />";
 		html += modalLi( 'text', 'id', 'ID*', '', "Enter the class ID", false, false, 'An sample id for CIS-1A would be c1a' );
 		html += modalLi( 'text', 'title', 'Title*', '', "Enter the class title", false, false, 'Class title should look like: CIS-1 - Title' );
 		html += modalLi( 'number', 'units', 'Units*', 0, "Enter the class units", false );

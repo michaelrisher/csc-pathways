@@ -199,6 +199,12 @@ $( document ).ready( function(){
 								} );
 							} else {
 								successful = false;
+								var modal = createModal( {
+									title: "An Error Occurred",
+									buttons: [{ value: 'Ok' }]
+								} );
+								setModalContent( modal, data.data.error );
+								displayModal( modal );
 							}
 						}
 					} );

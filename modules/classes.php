@@ -47,19 +47,15 @@
 				}
 
 				$return = array();
+				$canEdit = Core::inArray( 'gClassEdit', $userRoles );
+				$canDelete = Core::inArray( 'gClassDelete', $userRoles );
 				while ( $row = $result->fetch_assoc() ) {
 					$a = array(
 						'id' => $row['id'],
 						'title' => $row['title'],
-						'edit' => false,
-						'delete' => false
+						'edit' => $canEdit,
+						'delete' => $canDelete
 					);
-					if( array_search( 'gClassEdit', $userRoles ) !== false || array_search( 'dClassEdit', $userRoles ) !== false ){
-						$a['edit'] = true;
-					}
-					if( array_search( 'gClassDelete', $userRoles ) !== false || array_search( 'dClassDelete', $userRoles ) !== false ){
-						$a['delete'] = true;
-					}
 					array_push( $return, $a );
 				}
 
@@ -180,43 +176,52 @@ EOD;
 		 * save a class from the admin page
 		 * only allowed if the user is admin
 		 */
-		public function save() {
+		public function save( $create = false ) {
 			$this->loadModule( 'users' );
 			$this->loadModule( 'audit' );
+			$this->loadModule( 'roles' );
+			$ROLES = $this->roles->getRolesByModule( $_SESSION['session']['id'], 'class' );
 			$lang = new Lang( Lang::getCode() );
 			$obj = array();
 			$_POST = Core::sanitize( $_POST, true );
 			if ( $this->users->isLoggedIn() ) {
-				//get the sort from the title
-				$sort = explode( ' - ', $_POST['title'] )[0];
-				$sort = preg_replace( '/\D/', '', $sort );
+				if( Core::inArray( 'gClassEdit', $ROLES ) ) {
+					//get the sort from the title
+					$sort = explode( ' - ', $_POST['title'] )[0];
+					$sort = preg_replace( '/\D/', '', $sort );
 
-				$setClass = $this->upsertRecord( 'classes', "id='${_POST['id']}'", array(
-					'title' => $_POST['title'],
-					'units' => intval( $_POST['units'] ),
-					'transfer' => $_POST['transfer'],
-					'sort' => intval( $sort )
-				));
+					$setClass = $this->upsertRecord( 'classes', "id='${_POST['id']}'", array(
+						'id' => $_POST['id'],
+						'title' => $_POST['title'],
+						'units' => intval( $_POST['units'] ),
+						'transfer' => $_POST['transfer'],
+						'sort' => intval( $sort )
+					) );
 
-				$setClassData = $this->upsertRecord( 'classData', "class='${_POST['id']}' AND language=${_POST['language']}", array(
-					'class' => $_POST['id'],
-					'language' => $_POST['language'],
-					'prereq' => $_POST['prereq'],
-					'advisory' => $_POST['advisory'],
-					'coreq' => $_POST['coreq'],
-					'description' => $_POST['description'],
-				) );
+					$setClassData = $this->upsertRecord( 'classData', "class='${_POST['id']}' AND language=${_POST['language']}", array(
+						'class' => $_POST['id'],
+						'language' => $_POST['language'],
+						'prereq' => $_POST['prereq'],
+						'advisory' => $_POST['advisory'],
+						'coreq' => $_POST['coreq'],
+						'description' => $_POST['description'],
+					) );
 
-				if ( $setClass && $setClassData ) {
-					$obj['msg'] = $lang->o( 'ajaxSaved' );
-					$this->audit->newEvent( "Updated class: " . $_POST['title'] );
-					echo Core::ajaxResponse( $obj );
+					if ( $setClass && $setClassData ) {
+						$obj['msg'] = 'Saved successfully.';
+						$this->audit->newEvent( "Updated class: " . $_POST['title'] );
+						echo Core::ajaxResponse( $obj );
+					} else {
+						$obj['error'] = "An error occurred please contact administrator";
+						$obj['why'] = $ROLES;
+						echo Core::ajaxResponse( $obj, false );
+					}
 				} else {
-					$obj['error'] = $lang->o( 'ajaxErrorOccurred' );
+					$obj['error'] = "Insufficient permissions to edit classes";
 					echo Core::ajaxResponse( $obj, false );
 				}
 			} else {
-				$obj['error'] = $lang->o( 'ajaxSessionExpire' );
+				$obj['error'] = "Session expired. Please log in again.";
 				echo Core::ajaxResponse( $obj, false );
 			}
 		}
@@ -261,13 +266,15 @@ EOD;
 		 * only allowed if the user is admin
 		 */
 		public function create() {
+			$this->save( true );
+			/*
 			$this->loadModule( 'users' );
 			$this->loadModule( 'audit' );
 			$lang = new Lang( Lang::getCode() );
 			$obj = array();
 			$_POST = Core::sanitize( $_POST );
 			if ( $this->users->isLoggedIn() ) {
-				//TODO add the sort column in this too
+
 				$statement = $this->db->prepare( "INSERT INTO classes(id, title, units, transfer, prereq, advisory, coreq, description) VALUES (?,?,?,?,?,?,?,?)" );
 				$statement->bind_param( "ssdsssss", $_POST['id'], $_POST['title'], $_POST['units'], $_POST['transfer'], $_POST['prereq'], $_POST['advisory'], $_POST['coreq'], $_POST['description'] );
 				if ( $statement->execute() ) {
@@ -289,6 +296,7 @@ EOD;
 				$obj['error'] = $lang->o( 'ajaxSessionExpire' );
 				echo Core::ajaxResponse( $obj, false );
 			}
+			*/
 		}
 
 		/**

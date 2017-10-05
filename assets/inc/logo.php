@@ -18,9 +18,9 @@
 				<li><a href="<?= CORE_URL ?>admin">Admin Home</a></li>
 				<li><a href="<?= CORE_URL ?>editClass">Classes</a></li>
 				<li><a href="<?= CORE_URL ?>editCerts">Certificates</a></li>
-				<?php if( $GLOBALS['main']->users->isAdmin() ) { ?>
+<!--				--><?php //if( $GLOBALS['main']->users->isAdmin() ) { ?>
 					<li><a href="<?= CORE_URL ?>editUsers">Users</a></li>
-				<?php } ?>
+<!--				--><?php //} ?>
 			</ul>
 			<div class="floatright">
 				<a href="<?= CORE_URL ?>help">Help</a>

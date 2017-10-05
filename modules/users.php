@@ -8,7 +8,9 @@
 	class users extends Main{
 
 		public function listing( $order = 'username' ){
-			if( $this->isAdmin() ){
+			$this->loadModule( 'roles' );
+			$ROLES = $this->roles->getRolesByModule( $_SESSION['session']['id'], 'user' );
+			if( Core::inArray( 'gUserView', $ROLES ) ){
 				$query = "SELECT * FROM users ORDER BY " . $order;//remove limit for a time LIMIT $page,50
 
 				if ( !$result = $this->db->query( $query ) ) {
@@ -16,10 +18,14 @@
 				}
 
 				$return = array();
+				$canEdit = Core::inArray( 'gUserEdit', $ROLES );
+				$canDelete = Core::inArray( 'gUserDelete', $ROLES );
 				while ( $row = $result->fetch_assoc() ) {
 					$a = array(
 						'id' => $row['id'],
-						'username' => $row['username']
+						'username' => $row['username'],
+						'edit' => $canEdit,
+						'delete' => $canDelete
 					);
 					array_push( $return, $a );
 				}
@@ -69,7 +75,9 @@
 		 */
 		public function edit( $id ){
 			$this->loadModule( "roles" );
-			if( $this->isAdmin() && IS_AJAX ){
+			$ROLES = $this->roles->getRolesByModule( $_SESSION['session']['id'], 'user' );
+			//check if user can edit
+			if( Core::inArray( 'gUserEdit', $ROLES) && IS_AJAX ){
 				//get user and force return
 				if( $id != -1 ) {
 					$user = $this->get( $id, true );
@@ -145,6 +153,8 @@
 				</div>
 
 				<?php
+			} else {
+				echo "<p>You do not have access to edit users</p>";
 			}
 		}
 
@@ -176,65 +186,70 @@
 			$_POST['active'] = Core::sanitize( $_POST['active'] );
 			$_POST['isAdmin'] = Core::sanitize( $_POST['isAdmin'] );
 
-			if( isset( $_POST['create'] ) && $_POST['create'] == 'create' ){
-				$this->create( $_POST );
-			} else {
-				//save the normal stuff
-				$error = false;
-				if ( Core::inArray( 'gUserEdit', $USER_ROLES ) ) {
-					$statement = $this->db->prepare( "UPDATE users SET username=?, isAdmin=?, active=? WHERE id=? " );
-					$statement->bind_param( "siii", $_POST['username'], $_POST['isAdmin'], $_POST['active'], $_POST['id'] );
-					if( $statement->execute() ){
-						$obj['msg'] = "User saved successfully.";
-						$this->audit->newEvent( "Updated user: " . $_POST['username'] );
-					} else {
-						$error = true;
-						$obj['error'] = "An error occurred saving a user.<br>";
-					}
-				}
-				//if editing roles
-				if ( Core::inArray( 'gUserRoles', $USER_ROLES ) ) {
-					//get all the roles for user and compare to whats is in the database already
-					$roles = $this->roles->getAllForUser( $_POST['id'] );
-					//convert roles into a flat array
-					$flatRoles = array();
-					foreach( $roles as $val ){
-						array_push( $flatRoles, $val['id'] );
-					}
-					//roles that were posted
-					$postedRoles = json_decode( $_POST['roles'] );
-					//get any changes in the roles
-					$addedRoles = Core::assocToFlat( array_diff( $postedRoles, $flatRoles ) );
-					$removedRoles = Core::assocToFlat( array_diff( $flatRoles, $postedRoles ) );
-
-					$roleError = false;
-					//remove roles
-					foreach ( $removedRoles as $item ) {
-						$temp = $this->roles->delete( $_POST['id'], $item );
-						if( $temp == false )
-							$roleError = true;
-					}
-
-					//add roles
-					foreach ( $addedRoles as $item ) {
-						$this->roles->add( $_POST['id'], $item );
-						if( $temp == false )
-							$roleError = true;
-					}
-
-					if( $roleError ){
-						$obj['error'] = "An error occurred saving the roles<br>";
-						$error = true;
-					}
-
-				}
-
-				//TODO save the disciplines
-				if( error ){
-					echo Core::ajaxResponse( $obj, false );
+			if( $this->isLoggedIn() ) {
+				if ( isset( $_POST['create'] ) && $_POST['create'] == 'create' ) {
+					$this->create( $_POST );
 				} else {
-					echo Core::ajaxResponse( $obj );
+					//save the normal stuff
+					$error = false;
+					if ( Core::inArray( 'gUserEdit', $USER_ROLES ) ) {
+						$statement = $this->db->prepare( "UPDATE users SET username=?, isAdmin=?, active=? WHERE id=? " );
+						$statement->bind_param( "siii", $_POST['username'], $_POST['isAdmin'], $_POST['active'], $_POST['id'] );
+						if ( $statement->execute() ) {
+							$obj['msg'] = "User saved successfully.";
+							$this->audit->newEvent( "Updated user: " . $_POST['username'] );
+						} else {
+							$error = true;
+							$obj['error'] = "An error occurred saving a user.<br>";
+						}
+					}
+					//if editing roles
+					if ( Core::inArray( 'gUserRoles', $USER_ROLES ) ) {
+						//get all the roles for user and compare to whats is in the database already
+						$roles = $this->roles->getAllForUser( $_POST['id'] );
+						//convert roles into a flat array
+						$flatRoles = array();
+						foreach ( $roles as $val ) {
+							array_push( $flatRoles, $val['id'] );
+						}
+						//roles that were posted
+						$postedRoles = json_decode( $_POST['roles'] );
+						//get any changes in the roles
+						$addedRoles = Core::assocToFlat( array_diff( $postedRoles, $flatRoles ) );
+						$removedRoles = Core::assocToFlat( array_diff( $flatRoles, $postedRoles ) );
+
+						$roleError = false;
+						//remove roles
+						foreach ( $removedRoles as $item ) {
+							$temp = $this->roles->delete( $_POST['id'], $item );
+							if ( $temp == false )
+								$roleError = true;
+						}
+
+						//add roles
+						foreach ( $addedRoles as $item ) {
+							$this->roles->add( $_POST['id'], $item );
+							if ( $temp == false )
+								$roleError = true;
+						}
+
+						if ( $roleError ) {
+							$obj['error'] = "An error occurred saving the roles<br>";
+							$error = true;
+						}
+
+					}
+
+					//TODO save the disciplines
+					if ( error ) {
+						echo Core::ajaxResponse( $obj, false );
+					} else {
+						echo Core::ajaxResponse( $obj );
+					}
 				}
+			} else {
+				$obj['error'] = "Session expired.<br>Please log in again";
+				echo Core::ajaxResponse( $obj, false );
 			}
 		}
 
@@ -282,30 +297,37 @@
 		 * only allowed if the user is admin
 		 */
 		public function delete(){
+			$this->loadModule( 'roles' );
 			$this->loadModule( 'audit' );
+			$ROLES = $this->roles->getRolesByModule( $_SESSION['session']['id'], 'user' );
 			$obj = array();
 			$_POST = Core::sanitize( $_POST, true );
-			if( $this->isAdmin() ) {
-				$query = "SELECT username FROM users WHERE id = '${_POST['id']}'";
-				$event = '';
-				if ( !$result = $this->db->query( $query ) ) {
-					$event = $_POST['id'];
-				}
-				$row = $result->fetch_assoc();
-				$event = $row['username'];
+			if( $this->isLoggedIn() ) {
+				if ( Core::inArray( 'gUserEdit', $ROLES ) && $this->isLoggedIn() ) {
+					$query = "SELECT username FROM users WHERE id = '${_POST['id']}'";
+					$event = '';
+					if ( !$result = $this->db->query( $query ) ) {
+						$event = $_POST['id'];
+					}
+					$row = $result->fetch_assoc();
+					$event = $row['username'];
 
-				$statement = $this->db->prepare("DELETE FROM users WHERE id=?");
-				$statement->bind_param( "s", $_POST['id']);
-				if( $statement->execute() ){
-					$obj['msg'] = "Deleted successfully.";
-					$this->audit->newEvent( "Deleted user: " . $event );
-					echo Core::ajaxResponse( $obj );
-				} else{
-					$obj['error'] = $statement->error;
+					$statement = $this->db->prepare( "DELETE FROM users WHERE id=?" );
+					$statement->bind_param( "s", $_POST['id'] );
+					if ( $statement->execute() ) {
+						$obj['msg'] = "Deleted successfully.";
+						$this->audit->newEvent( "Deleted user: " . $event );
+						echo Core::ajaxResponse( $obj );
+					} else {
+						$obj['error'] = $statement->error;
+						echo Core::ajaxResponse( $obj, false );
+					}
+				} else {
+					$obj['error'] = "Insufficient permissions to delete users";
 					echo Core::ajaxResponse( $obj, false );
 				}
-			} else{
-				$obj['error'] = "Session expired.<br>Please log in again";
+			} else {
+				$obj['error'] = "Session expired<br>Please log in again";
 				echo Core::ajaxResponse( $obj, false );
 			}
 		}
