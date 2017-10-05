@@ -141,6 +141,46 @@ EOD;
 
 			return $return;
 		}
+
+		/**
+		 * this function assumes that you have gUserRole || dUserRole
+		 * @param $uid
+		 * @param $rid
+		 * @return bool
+		 */
+		public function delete( $uid, $rid ){
+			$this->loadModule( 'audit' );
+			$this->loadModule( 'users' );
+			$user = $this->users->get( $uid, true );
+			$role = $this->get( $rid, true );
+			$statement = $this->db->prepare( "DELETE FROM userXroles where userId = ? AND roleId = ?" );
+			$statement->bind_param( "ii", $uid, $rid );
+			if( $statement->execute() ){
+				$this->audit->newEvent( $_SESSION['session']['username'] . " deleted " . $role['description'] . " from " . $user['username'] );
+				return true;
+			}
+			return false;
+		}
+
+		/**
+		 * Add a userRole
+		 * @param $uid
+		 * @param $rid
+		 * @return bool
+		 */
+		public function add( $uid, $rid ){
+			$this->loadModule( 'audit' );
+			$this->loadModule( 'users' );
+			$user = $this->users->get( $uid, true );
+			$role = $this->get( $rid, true );
+			$statement = $this->db->prepare( "INSERT INTO userXroles( userId, roleId ) VALUES(?,?)" );
+			$statement->bind_param( "ii", $uid, $rid );
+			if( $statement->execute() ){
+				$this->audit->newEvent( "Deleted " . $role['description'] . " role from " . $user['username'] );
+				return true;
+			}
+			return false;
+		}
 		/**
 		 * check if user has a role
 		 * @param $userId int id for the user

@@ -246,6 +246,26 @@
 		 */
 		public static function getIp(){
 			return $_SERVER['REMOTE_ADDR'];
+		}
 
+		/**
+		 * converts an assoc array to a flat indexed array
+		 * @param array $array
+		 * @return array
+		 */
+		public static function assocToFlat( $array ){
+			$temp = array();
+			foreach ( $array as $item ) {
+				array_push( $temp, $item );
+			}
+			return $temp;
+		}
+
+		public static function inArray( $needle, $array ){
+			if( array_search( $needle, $array ) !== false ){
+				return true;
+			} else {
+				return false;
+			}
 		}
 	}

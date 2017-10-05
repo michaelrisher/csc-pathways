@@ -7,6 +7,7 @@
 	 */
 	$language = Lang::getCode();
 	$lang = new Lang( $language );
+	if( MODE != 'local' ){
 ?>
 <!-- Global Site Tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-107370866-1"></script>
@@ -17,6 +18,7 @@
 
 	gtag('config', 'UA-107370866-1');
 </script>
+	<?php } ?>
 <link rel="shortcut icon" href="<?=CORE_URL?>assets/img/favicon.ico" type="image/x-icon">
 <link rel="icon" href="<?=CORE_URL?>assets/img/favicon.ico" type="image/x-icon">
 <title>CSC Pathways</title>

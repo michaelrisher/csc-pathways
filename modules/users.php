@@ -166,58 +166,74 @@
 		 * only allowed if the user is admin
 		 */
 		public function save(){
-			//TODO save roles
+			//new save method
 			$this->loadModule( 'audit' );
 			$this->loadModule( 'roles' );
+			$USER_ROLES = $this->roles->getRolesByModule( $_SESSION['session']['id'], 'user' );
 			$obj = array();
-//			$_POST = Core::sanitize( $_POST, true );
 			$_POST['id'] = Core::sanitize( $_POST['id'] );
 			$_POST['username'] = Core::sanitize( $_POST['username'] );
 			$_POST['active'] = Core::sanitize( $_POST['active'] );
 			$_POST['isAdmin'] = Core::sanitize( $_POST['isAdmin'] );
+
 			if( isset( $_POST['create'] ) && $_POST['create'] == 'create' ){
 				$this->create( $_POST );
-			} else{
-				$id = $_POST['id'];
-				if( $this->isAdmin() ) {
-					//statement to save the user
-					$editUserState = $this->db->prepare("UPDATE users SET username=?, isAdmin=?, active=? WHERE id=?");
-					$editUserState->bind_param( "siii", $_POST['username'], $_POST['isAdmin'], $_POST['active'], $_POST['id']);
-					//save roles
-					//todo check rights to save roles
+			} else {
+				//save the normal stuff
+				$error = false;
+				if ( Core::inArray( 'gUserEdit', $USER_ROLES ) ) {
+					$statement = $this->db->prepare( "UPDATE users SET username=?, isAdmin=?, active=? WHERE id=? " );
+					$statement->bind_param( "siii", $_POST['username'], $_POST['isAdmin'], $_POST['active'], $_POST['id'] );
+					if( $statement->execute() ){
+						$obj['msg'] = "User saved successfully.";
+						$this->audit->newEvent( "Updated user: " . $_POST['username'] );
+					} else {
+						$error = true;
+						$obj['error'] = "An error occurred saving a user.<br>";
+					}
+				}
+				//if editing roles
+				if ( Core::inArray( 'gUserRoles', $USER_ROLES ) ) {
 					//get all the roles for user and compare to whats is in the database already
-					$roles = $this->roles->getAllForUser( $id );
-					//convert array to flat array with ids
+					$roles = $this->roles->getAllForUser( $_POST['id'] );
+					//convert roles into a flat array
 					$flatRoles = array();
 					foreach( $roles as $val ){
 						array_push( $flatRoles, $val['id'] );
 					}
-					$postRoles = json_decode( $_POST['roles'] );
-					$addedRoles = array_diff( $postRoles, $flatRoles );
-					$removedRoles = array_diff( $flatRoles, $postRoles );
+					//roles that were posted
+					$postedRoles = json_decode( $_POST['roles'] );
+					//get any changes in the roles
+					$addedRoles = Core::assocToFlat( array_diff( $postedRoles, $flatRoles ) );
+					$removedRoles = Core::assocToFlat( array_diff( $flatRoles, $postedRoles ) );
 
-					/*
-					$a = array("12", "11", "15"); // saved roles
-					$b = array("12", "11", "21"); //adding into main
-
-					print_r( array_diff( $b, $a ) );  //gets the additions
-					print_r( array_diff( $a, $b ) );  //gets the subtractions
-					*/
-					if( false/*$editUserState->execute()*/ ){
-						$obj['msg'] = "Saved successfully.";
-						$this->audit->newEvent( "Updated user: " . $_POST['username'] );
-						echo Core::ajaxResponse( $obj );
-					} else{
-						$obj['error'] = $editUserState->error;
-						$obj['1'] = $flatRoles;
-						$obj['2'] = $postRoles;
-						$obj['added'] = $addedRoles;
-						$obj['removed'] = $removedRoles;
-						echo Core::ajaxResponse( $obj, false );
+					$roleError = false;
+					//remove roles
+					foreach ( $removedRoles as $item ) {
+						$temp = $this->roles->delete( $_POST['id'], $item );
+						if( $temp == false )
+							$roleError = true;
 					}
-				} else{
-					$obj['error'] = "Session expired.<br>Please log in again";
+
+					//add roles
+					foreach ( $addedRoles as $item ) {
+						$this->roles->add( $_POST['id'], $item );
+						if( $temp == false )
+							$roleError = true;
+					}
+
+					if( $roleError ){
+						$obj['error'] = "An error occurred saving the roles<br>";
+						$error = true;
+					}
+
+				}
+
+				//TODO save the disciplines
+				if( error ){
 					echo Core::ajaxResponse( $obj, false );
+				} else {
+					echo Core::ajaxResponse( $obj );
 				}
 			}
 		}
@@ -226,6 +242,7 @@
 		 * get the next unused id in the table
 		 */
 		private function create( $data ){
+			//TODO if the user can not edit the roles make the default roles be view only
 			if( $this->isAdmin() ) {
 				$this->loadModule( 'audit' );
 				$query = "SHOW TABLE STATUS LIKE 'users'";
