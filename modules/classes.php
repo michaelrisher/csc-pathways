@@ -170,7 +170,7 @@ EOD;
 		 * save a class from the admin page
 		 * only allowed if the user is admin
 		 */
-		public function save() {
+		public function save( $create = true ) {
 			$this->loadModule( 'users' );
 			$this->loadModule( 'audit' );
 			$lang = new Lang( Lang::getCode() );
@@ -182,6 +182,7 @@ EOD;
 				$sort = preg_replace( '/\D/', '', $sort );
 
 				$setClass = $this->upsertRecord( 'classes', "id='${_POST['id']}'", array(
+					'id' => $_POST['id'],
 					'title' => $_POST['title'],
 					'units' => intval( $_POST['units'] ),
 					'transfer' => $_POST['transfer'],
@@ -199,7 +200,11 @@ EOD;
 
 				if ( $setClass && $setClassData ) {
 					$obj['msg'] = $lang->o( 'ajaxSaved' );
-					$this->audit->newEvent( "Updated class: " . $_POST['title'] );
+					if( !$create ) {
+						$this->audit->newEvent( "Updated class: " . $_POST['title'] );
+					} else {
+						$this->audit->newEvent( "Created class: " . $_POST['title'] );
+					}
 					echo Core::ajaxResponse( $obj );
 				} else {
 					$obj['error'] = $lang->o( 'ajaxErrorOccurred' );
@@ -251,13 +256,14 @@ EOD;
 		 * only allowed if the user is admin
 		 */
 		public function create() {
+			$this->save( true );
+			/*
 			$this->loadModule( 'users' );
 			$this->loadModule( 'audit' );
 			$lang = new Lang( Lang::getCode() );
 			$obj = array();
 			$_POST = Core::sanitize( $_POST );
 			if ( $this->users->isLoggedIn() ) {
-				//TODO add the sort column in this too
 				$statement = $this->db->prepare( "INSERT INTO classes(id, title, units, transfer, prereq, advisory, coreq, description) VALUES (?,?,?,?,?,?,?,?)" );
 				$statement->bind_param( "ssdsssss", $_POST['id'], $_POST['title'], $_POST['units'], $_POST['transfer'], $_POST['prereq'], $_POST['advisory'], $_POST['coreq'], $_POST['description'] );
 				if ( $statement->execute() ) {
@@ -279,6 +285,7 @@ EOD;
 				$obj['error'] = $lang->o( 'ajaxSessionExpire' );
 				echo Core::ajaxResponse( $obj, false );
 			}
+			*/
 		}
 
 		/**
