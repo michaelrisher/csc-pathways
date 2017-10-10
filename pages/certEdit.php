@@ -103,6 +103,8 @@
 						</li>
 						<li>
 							<input type="submit" value="Save" />
+<!--							TODO activate this button-->
+<!--							<input type="button" class="margin15Left low" value="Cancel" />-->
 						</li>
 
 					</ul>
@@ -118,6 +120,7 @@
 	Core::queueScript( 'assets/js/certs.js');
 	Core::queueScript( 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js' );
 	Core::includeScripts();
+
 ?>
 
 </body>

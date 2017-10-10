@@ -119,6 +119,7 @@ EOD;
 SELECT
     users.id as userId,
     roles.id as roleId,
+    roles.module,
     roles.name,
     roles.description
 FROM
@@ -126,7 +127,7 @@ FROM
     users,
     roles
 WHERE
-    userXroles.userId = users.id AND roles.id = userXroles.roleId AND users.id = $userId AND roles.name LIKE '%$module%'
+    userXroles.userId = users.id AND roles.id = userXroles.roleId AND users.id = $userId AND roles.module LIKE '%$module%'
 ORDER BY
     roles.module ASC, roles.id DESC
 EOD;

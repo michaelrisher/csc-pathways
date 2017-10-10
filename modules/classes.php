@@ -7,6 +7,8 @@
 	 * Time: 10:15
 	 */
 	class classes extends Main {
+
+		private $moduleName = 'classes';
 		/**
 		 * get a simple listing of classes only id and title are returned
 		 * only allowed if the user is admin
@@ -15,9 +17,9 @@
 		 */
 		public function listing( $page = 1 ) {
 			$this->loadModule( 'roles' );
-			$userRoles = $this->roles->getRolesByModule( $_SESSION['session']['id'], 'class' );
+			$userRoles = $this->roles->getRolesByModule( $_SESSION['session']['id'], $this->moduleName );
 			//if user has class view role then do it
-			if ( array_search( 'gClassView', $userRoles ) !== false || array_search( 'dClassView', $userRoles ) !== false) {
+			if ( Core::inArray( 'gClassView', $userRoles ) ) {
 				$limit = 25;
 				$page--;//to make good looking page numbers for users
 				$offset = $page * $limit;
@@ -177,10 +179,11 @@ EOD;
 		 * only allowed if the user is admin
 		 */
 		public function save( $create = false ) {
+			//todo get rid of the id in class table and make it auto increment
 			$this->loadModule( 'users' );
 			$this->loadModule( 'audit' );
 			$this->loadModule( 'roles' );
-			$ROLES = $this->roles->getRolesByModule( $_SESSION['session']['id'], 'class' );
+			$ROLES = $this->roles->getRolesByModule( $_SESSION['session']['id'], $this->moduleName );
 			$lang = new Lang( Lang::getCode() );
 			$obj = array();
 			$_POST = Core::sanitize( $_POST, true );
@@ -209,11 +212,14 @@ EOD;
 
 					if ( $setClass && $setClassData ) {
 						$obj['msg'] = 'Saved successfully.';
-						$this->audit->newEvent( "Updated class: " . $_POST['title'] );
+						if( !create ) {
+							$this->audit->newEvent( "Updated class: " . $_POST['title'] );
+						} else {
+							$this->audit->newEvent( "Create class: " . $_POST['title'] );
+						}
 						echo Core::ajaxResponse( $obj );
 					} else {
 						$obj['error'] = "An error occurred please contact administrator";
-						$obj['why'] = $ROLES;
 						echo Core::ajaxResponse( $obj, false );
 					}
 				} else {
@@ -231,23 +237,21 @@ EOD;
 		 * only allowed if the user is admin
 		 */
 		public function delete() {
-			$this->loadModule( 'users' );
+			$this->loadModule( 'roles' );
 			$this->loadModule( 'audit' );
 			$lang = new Lang( Lang::getCode() );
+			$ROLES = $this->roles->getRolesByModule( $_SESSION['session']['id'], $this->moduleName );
 			$obj = array();
 			$_POST = Core::sanitize( $_POST, true );
-			if ( $this->users->isLoggedIn() ) {
-				$query = "SELECT title FROM classes WHERE id = '${_POST['id']}'";
-				$event = '';
-				if ( !$result = $this->db->query( $query ) ) {
-					$event = $_POST['id'];
-				}
-				$row = $result->fetch_assoc();
-				$event = $row['title'];
+			if ( Core::inArray( 'gClassDelete', $ROLES ) ) {
+				$class = $this->get( $_POST['id'], 'en', true );
+				$event = isset( $class['title'] ) ? $class['title'] : $_POST['id'];
 
 				$statement = $this->db->prepare( "DELETE FROM classes WHERE id=?" );
+				$statementData = $this->db->prepare( "DELETE FROM classData WHERE class=?" );
+				$statementData->bind_param( "s", $_POST['id'] );
 				$statement->bind_param( "s", $_POST['id'] );
-				if ( $statement->execute() ) {
+				if ( $statement->execute() && $statementData->execute() ) {
 					$obj['msg'] = $lang->o( 'ajaxDelete' );
 					$this->audit->newEvent( "Deleted class: " . $event );
 					echo Core::ajaxResponse( $obj );
@@ -256,7 +260,7 @@ EOD;
 					echo Core::ajaxResponse( $obj, false );
 				}
 			} else {
-				$obj['error'] = $lang->o( 'ajaxSessionExpire' );
+				$obj['error'] = "Session expired. Please log in again.";
 				echo Core::ajaxResponse( $obj, false );
 			}
 		}
@@ -267,36 +271,6 @@ EOD;
 		 */
 		public function create() {
 			$this->save( true );
-			/*
-			$this->loadModule( 'users' );
-			$this->loadModule( 'audit' );
-			$lang = new Lang( Lang::getCode() );
-			$obj = array();
-			$_POST = Core::sanitize( $_POST );
-			if ( $this->users->isLoggedIn() ) {
-
-				$statement = $this->db->prepare( "INSERT INTO classes(id, title, units, transfer, prereq, advisory, coreq, description) VALUES (?,?,?,?,?,?,?,?)" );
-				$statement->bind_param( "ssdsssss", $_POST['id'], $_POST['title'], $_POST['units'], $_POST['transfer'], $_POST['prereq'], $_POST['advisory'], $_POST['coreq'], $_POST['description'] );
-				if ( $statement->execute() ) {
-					$obj['msg'] = $lang->o( 'ajaxCreate' );
-					echo Core::ajaxResponse( $obj );
-					$this->audit->newEvent( "Created class: " . $_POST['title'] );
-				} else {
-					$error = $statement->error;
-					if ( preg_match( "/Duplicate entry '(.+?)' for key 'id'/", $error ) ) {
-						$value = preg_replace( "/Duplicate entry '(.+?)' for key 'id'/", '$1', $error );
-						$obj['error'] = "That id of \"$value\" already exists";
-						$obj['errorCode'] = 1;
-					} else {
-						$obj['error'] = $statement->error;
-					}
-					echo Core::ajaxResponse( $obj, false );
-				}
-			} else {
-				$obj['error'] = $lang->o( 'ajaxSessionExpire' );
-				echo Core::ajaxResponse( $obj, false );
-			}
-			*/
 		}
 
 		/**

@@ -196,10 +196,7 @@ $( document ).ready( function(){
 					var successful = false;
 					$.ajax( {
 						type: 'POST',
-						url: CORE_URL + 'rest/certs/delete/',
-						data: {
-							id: id
-						},
+						url: CORE_URL + 'rest/certs/delete/' + id,
 						dataType: 'json',
 						async: false,
 						success: function ( data ) {
@@ -216,6 +213,12 @@ $( document ).ready( function(){
 									that.remove();
 								} );
 							} else {
+								var modal = createModal( {
+									title: "Error",
+									buttons: [{ value: 'Ok' }]
+								} );
+								setModalContent( modal, data.data.error );
+								displayModal( modal );
 								successful = false;
 							}
 						}
