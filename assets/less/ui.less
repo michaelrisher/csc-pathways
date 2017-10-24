@@ -560,21 +560,27 @@ input[type="submit"],  input[type="button"]{
 				margin: 10px auto;
 				width: 500px;
 				.tab {
-					margin-right: -2px;
+					margin-right: -4px;
 					display: inline-block;
-					border: 1px solid #4e4e4e;
-					padding: 5px;
-					border-top-left-radius: 5px;
-					border-top-right-radius: 5px;
+					//border: 1px solid #4e4e4e;
+					padding: 10px 15px;
+					//border-top-left-radius: 5px;
+					//border-top-right-radius: 5px;
 					cursor: pointer;
+					background: #d1d1d1;
 					&.active {
-						background-color: #d5d5d5;
+						background-color: #4e4e4e !important;
+						color: #fff !important;
+					}
+
+					&:hover{
+						background: #b3b3b3;
 					}
 				}
 			}
 		}
 
-		.userRoles {
+		.userRoles, .userDept {
 			.listing {
 				max-height: 320px;
 				overflow-y: scroll;

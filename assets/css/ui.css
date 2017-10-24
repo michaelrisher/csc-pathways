@@ -922,39 +922,47 @@ input[type="button"].processing {
   width: 500px;
 }
 .modal .modalWrapper .tabWrapper .tabs .tab {
-  margin-right: -2px;
+  margin-right: -4px;
   display: inline-block;
-  border: 1px solid #4e4e4e;
-  padding: 5px;
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
+  padding: 10px 15px;
   cursor: pointer;
+  background: #d1d1d1;
 }
 .modal .modalWrapper .tabWrapper .tabs .tab.active {
-  background-color: #d5d5d5;
+  background-color: #4e4e4e !important;
+  color: #fff !important;
 }
-.modal .modalWrapper .userRoles .listing {
+.modal .modalWrapper .tabWrapper .tabs .tab:hover {
+  background: #b3b3b3;
+}
+.modal .modalWrapper .userRoles .listing,
+.modal .modalWrapper .userDept .listing {
   max-height: 320px;
   overflow-y: scroll;
 }
-.modal .modalWrapper .userRoles .listing li {
+.modal .modalWrapper .userRoles .listing li,
+.modal .modalWrapper .userDept .listing li {
   padding: 10px;
   list-style: none;
   border: 1px solid black;
   border-bottom: none;
 }
-.modal .modalWrapper .userRoles .listing li:nth-child(even) {
+.modal .modalWrapper .userRoles .listing li:nth-child(even),
+.modal .modalWrapper .userDept .listing li:nth-child(even) {
   background: #b1bcc7;
 }
-.modal .modalWrapper .userRoles .listing li:last-child {
+.modal .modalWrapper .userRoles .listing li:last-child,
+.modal .modalWrapper .userDept .listing li:last-child {
   border-bottom: 1px solid black;
 }
-.modal .modalWrapper .userRoles .listing li img {
+.modal .modalWrapper .userRoles .listing li img,
+.modal .modalWrapper .userDept .listing li img {
   float: right;
   padding: 0 5px 0 5px;
   vertical-align: text-top;
 }
-.modal .modalWrapper .userRoles .add {
+.modal .modalWrapper .userRoles .add,
+.modal .modalWrapper .userDept .add {
   padding-top: 10px;
 }
 #loadOff {
