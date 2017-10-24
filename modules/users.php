@@ -75,86 +75,125 @@
 		 */
 		public function edit( $id ){
 			$this->loadModule( "roles" );
+			$this->loadModule( "users" );
 			$ROLES = $this->roles->getRolesByModule( $_SESSION['session']['id'], 'user' );
 			//check if user can edit
-			if( Core::inArray( 'gUserEdit', $ROLES) && IS_AJAX ){
-				//get user and force return
-				if( $id != -1 ) {
-					$user = $this->get( $id, true );
-				} else {
-					$user = array(
-						'id' => -1,
-						'username' => '',
-						'isAdmin' => 0,
-						'active' => 0
-					);
-				}
+			if( $this->users->isLoggedIn() ) {
+				if ( Core::inArray( 'gUserEdit', $ROLES ) && IS_AJAX ) {
+					//get user and force return
+					if ( $id != -1 ) {
+						$user = $this->get( $id, true );
+					} else {
+						$user = array(
+							'id' => -1,
+							'username' => '',
+							'isAdmin' => 0,
+							'active' => 0
+						);
+					}
 //				Core::debug( $user );
-				?>
-				<div class='tabWrapper users'>
-					<div class="tabs">
-						<div class='tab' data-tab='edit' >Edit</div>
-						<div class='tab active' data-tab='roles' >Roles</div>
-						<div class='tab' data-tab='dept' >Discipline</div>
-					</div>
+					?>
+					<div class='tabWrapper users'>
+						<div class="tabs">
+							<div class='tab' data-tab='edit'>Edit</div>
+							<div class='tab active' data-tab='roles'>Roles</div>
+							<div class='tab' data-tab='dept'>Discipline</div>
+						</div>
 
-					<div class="tabContent none" data-tab="edit">
-						<form>
-							<ul>
-								<input type="hidden" name="id" value="<?= $user['id']?>">
-								<li>
-									<label for="username">User name</label>
-									<input name="username" type="text" value="<?= $user['username'] ?>">
-									<span>Enter the username</span>
-								</li>
-								<li>
-									<label for="isAdmin">Admin</label>
-									<input name="isAdmin" type="checkbox" value="1" <?= $user['isAdmin'] ? 'checked' : '' ?>>Check if the user should be able to edit users
-									<span>Check if the user should be able to edit users</span>
-								</li>
-								<li>
-									<label for="active">Active User</label>
-									<input name="active" type="checkbox" value="1" <?= $user['active'] ? 'checked' : '' ?>>Check if the user should be allowed to login
-									<span>Check if the user should be allowed to login</span>
-								</li>
-							</ul>
-						</form>
-					</div>
-					<div class="tabContent" data-tab="roles">
-						<div class="userRoles">
-							<?php
-								$roles = $this->roles->getAllForUser( $user['id'] );
-								$list = array();
-								foreach( $roles as $role ){
-									array_push( $list, $role['id'] );
-								}
-								echo "<form class='none'>".
-										"<input type='hidden' value='" . json_encode( $list ) . "' name='roles'/>".
-									"</form>"
-							?>
-							<ul class="listing">
+						<div class="tabContent none" data-tab="edit">
+							<form>
+								<ul>
+									<input type="hidden" name="id" value="<?= $user['id'] ?>">
+									<input name="isAdmin" type="hidden" value="1" <?= $user['isAdmin'] ? 'checked' : '' ?>>
+									<li>
+										<label for="username">User name</label>
+										<input name="username" type="text" value="<?= $user['username'] ?>">
+										<span>Enter the username</span>
+									</li>
+									<li>
+										<label for="active">Active User</label>
+										<input name="active" type="checkbox"
+											   value="1" <?= $user['active'] ? 'checked' : '' ?>>Check if the user
+										should be allowed to login
+										<span>Check if the user should be allowed to login</span>
+									</li>
+								</ul>
+							</form>
+						</div>
+						<div class="tabContent" data-tab="roles">
+							<div class="userRoles">
 								<?php
-									foreach( $roles as $role ){
-										echo "<li data-id='${role['id']}'>";
-										echo $role['description'];
-										echo '<img class="delete tooltip" src="http://localhost/lab/assets/img/delete.png" title="Delete Role">';
-										echo "</li>";
+									$canAssign = false;
+//									Core::debug( $ROLES );
+									if( $user['id'] == $_SESSION['session']['id'] && Core::inArray( 'gUserRoles', $ROLES ) ){
+										$canAssign = true;
 									}
+									if( Core::inArray( 'gUserRoles', $ROLES ) ){
+										$canAssign = true;
+									}
+									$roles = $this->roles->getAllForUser( $user['id'] );
+									$list = array();
+									foreach ( $roles as $role ) {
+										array_push( $list, $role['id'] );
+									}
+									echo "<form class='none'>" .
+										"<input type='hidden' value='" . json_encode( $list ) . "' name='roles'/>" .
+										"</form>"
 								?>
-							</ul>
-							<div class="add">
-								<input type="button" value="Add Role" name="addRole">
+								<ul class="listing">
+									<?php
+										foreach ( $roles as $role ) {
+											echo "<li data-id='${role['id']}'>";
+											echo $role['description'];
+											if( $canAssign )
+												echo '<img class="delete tooltip" src="' . CORE_URL . 'assets/img/delete.png" title="Delete Role">';
+											echo "</li>";
+										}
+									?>
+								</ul>
+								<?php if( $canAssign ){?>
+								<div class="add">
+									<input type="button" value="Add Role" name="addRole">
+								</div>
+								<?php } ?>
+							</div>
+						</div>
+						<div class="tabContent none" data-tab="dept">
+							<div class="userDept">
+								<?php
+									$canAssign = false;
+
+
+									echo "<form class='none'>" .
+										"<input type='hidden' value='" . json_encode( $list ) . "' name='depts'/>" .
+										"</form>"
+								?>
+								<ul class="listing">
+									<?php
+//										foreach ( $roles as $role ) {
+//											echo "<li data-id='${role['id']}'>";
+//											echo $role['description'];
+//											if( $canAssign )
+//												echo '<img class="delete tooltip" src="' . CORE_URL . 'assets/img/delete.png" title="Delete Role">';
+//											echo "</li>";
+//										}
+									?>
+								</ul>
+								<?php if( $canAssign ){?>
+									<div class="add">
+										<input type="button" value="Add Role" name="addRole">
+									</div>
+								<?php } ?>
 							</div>
 						</div>
 					</div>
-					<div class="tabContent none" data-tab="dept">
-						d
-					</div>
-				</div>
 
-				<?php
+					<?php
+				} else {
+					echo "<p>You do not have access to edit users</p>";
+				}
 			} else {
-				echo "<p>You do not have access to edit users</p>";
+				echo "<p>Session expired. Please log in again.</p>";
 			}
 		}
 
@@ -228,7 +267,7 @@
 
 						//add roles
 						foreach ( $addedRoles as $item ) {
-							$this->roles->add( $_POST['id'], $item );
+							$temp = $this->roles->add( $_POST['id'], $item );
 							if ( $temp == false )
 								$roleError = true;
 						}
@@ -241,7 +280,7 @@
 					}
 
 					//TODO save the disciplines
-					if ( error ) {
+					if ( $error ) {
 						echo Core::ajaxResponse( $obj, false );
 					} else {
 						echo Core::ajaxResponse( $obj );
