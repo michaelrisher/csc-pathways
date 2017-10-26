@@ -40,7 +40,7 @@
 		define( 'DB_PASS', 'S0larF0r3st!' );
 		define( 'DB_DB', 'staging_pathways' );
 	}
-	
+
 	
 	if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
 		define( 'IS_AJAX', true );

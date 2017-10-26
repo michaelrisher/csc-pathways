@@ -760,7 +760,7 @@ form ul li > label {
   overflow: hidden;
   font-family: Arial, Helvetica, sans-serif;
 }
-form ul li > span {
+form ul li > span:last-child {
   background: #4e4e4e;
   display: block;
   padding: 3px;

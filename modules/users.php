@@ -96,8 +96,8 @@
 					<div class='tabWrapper users'>
 						<div class="tabs">
 							<div class='tab' data-tab='edit'>Edit</div>
-							<div class='tab active' data-tab='roles'>Roles</div>
-							<div class='tab' data-tab='dept'>Discipline</div>
+							<div class='tab' data-tab='roles'>Roles</div>
+							<div class='tab active' data-tab='dept'>Discipline</div>
 						</div>
 
 						<div class="tabContent none" data-tab="edit">
@@ -120,7 +120,7 @@
 								</ul>
 							</form>
 						</div>
-						<div class="tabContent" data-tab="roles">
+						<div class="tabContent none" data-tab="roles">
 							<div class="userRoles">
 								<?php
 									$canAssign = false;
@@ -158,11 +158,23 @@
 								<?php } ?>
 							</div>
 						</div>
-						<div class="tabContent none" data-tab="dept">
+						<div class="tabContent" data-tab="dept">
 							<div class="userDept">
 								<?php
+									$canAssign = true;
+									$list = array();
 									$canAssign = false;
-
+									if( $user['id'] == $_SESSION['session']['id'] && Core::inArray( 'gUserRoles', $ROLES ) ){
+										$canAssign = true;
+									}
+									if( Core::inArray( 'gUserEdit', $ROLES ) ){
+										$canAssign = true;
+									}
+									$disciplines = $this->getDisciplinesForUser( $user['id'] );
+									$list = array();
+									foreach ( $disciplines as $discipline ) {
+										array_push( $list, $discipline['id'] );
+									}
 
 									echo "<form class='none'>" .
 										"<input type='hidden' value='" . json_encode( $list ) . "' name='depts'/>" .
@@ -170,18 +182,18 @@
 								?>
 								<ul class="listing">
 									<?php
-//										foreach ( $roles as $role ) {
-//											echo "<li data-id='${role['id']}'>";
-//											echo $role['description'];
-//											if( $canAssign )
-//												echo '<img class="delete tooltip" src="' . CORE_URL . 'assets/img/delete.png" title="Delete Role">';
-//											echo "</li>";
-//										}
+										foreach ( $disciplines as $d ) {
+											echo "<li data-id='${d['id']}'>";
+											echo $d['description'];
+											if( $canAssign )
+												echo '<img class="delete tooltip" src="' . CORE_URL . 'assets/img/delete.png" title="Delete Role">';
+											echo "</li>";
+										}
 									?>
 								</ul>
 								<?php if( $canAssign ){?>
 									<div class="add">
-										<input type="button" value="Add Role" name="addRole">
+										<input type="button" value="Add Discipline" name="addDiscipline">
 									</div>
 								<?php } ?>
 							</div>
@@ -224,6 +236,7 @@
 			$_POST['username'] = Core::sanitize( $_POST['username'] );
 			$_POST['active'] = Core::sanitize( $_POST['active'] );
 			$_POST['isAdmin'] = Core::sanitize( $_POST['isAdmin'] );
+			$obj['error'] = ''; //initialize for later use
 
 			if( $this->isLoggedIn() ) {
 				if ( isset( $_POST['create'] ) && $_POST['create'] == 'create' ) {
@@ -239,8 +252,41 @@
 							$this->audit->newEvent( "Updated user: " . $_POST['username'] );
 						} else {
 							$error = true;
-							$obj['error'] = "An error occurred saving a user.<br>";
+							$obj['error'] .= "An error occurred saving a user.<br>";
 						}
+
+						//deal with discipline
+						$disciplines = $this->getDisciplinesForUser( $_POST['id'] );
+						$flatDisciplines = array();
+						foreach ( $disciplines as $val ) {
+							array_push( $flatDisciplines, $val['id'] );
+						}
+						//disciplines that were posted
+						$postedDisciplines = json_decode( $_POST['disciplines'] );
+						//get any changes in the roles
+						$addedDisciplines = Core::assocToFlat( array_diff( $postedDisciplines, $flatDisciplines ) );
+						$removedDisciplines = Core::assocToFlat( array_diff( $flatDisciplines, $postedDisciplines ) );
+
+						$disciplineError = false;
+						//remove roles
+						foreach ( $removedDisciplines as $item ) {
+							$temp = $this->deleteDiscipline( $_POST['id'], $item );
+							if ( $temp == false )
+								$disciplineError = true;
+						}
+
+						//add roles
+						foreach ( $addedDisciplines as $item ) {
+							$temp = $this->addDiscipline( $_POST['id'], $item );
+							if ( $temp == false )
+								$disciplineError = true;
+						}
+
+						if ( $disciplineError ) {
+							$obj['error'] .= "An error occurred saving the disciplines<br>";
+							$error = true;
+						}
+
 					}
 					//if editing roles
 					if ( Core::inArray( 'gUserRoles', $USER_ROLES ) ) {
@@ -273,7 +319,7 @@
 						}
 
 						if ( $roleError ) {
-							$obj['error'] = "An error occurred saving the roles<br>";
+							$obj['error'] .= "An error occurred saving the roles<br>";
 							$error = true;
 						}
 
@@ -287,7 +333,7 @@
 					}
 				}
 			} else {
-				$obj['error'] = "Session expired.<br>Please log in again";
+				$obj['error'] .= "Session expired.<br>Please log in again";
 				echo Core::ajaxResponse( $obj, false );
 			}
 		}
@@ -665,10 +711,174 @@
 			return false;
 		}
 
+		/**
+		 * get the listing of disciplines. didnt see fit to make this its own module
+		 * @param bool|false $forceReturn
+		 * @return array
+		 */
+		public function disciplineListing($forceReturn = false ) {
+			//to kinda standardize it for later needs
+			$query = "SELECT * FROM disciplines";
+
+			if ( !$result = $this->db->query( $query ) ) {
+				echo( 'There was an error running the query [' . $this->db->error . ']' );
+			}
+
+			$return = array();
+			while ( $row = $result->fetch_assoc() ) {
+				$a = array(
+					'id' => $row['id'],
+					'name' => $row['name'],
+					'description' => $row['description']
+				);
+				array_push( $return, $a );
+			}
+
+
+			if ( IS_AJAX && !$forceReturn ) {
+				echo Core::ajaxResponse( $return );
+			}
+			return $return;
+		}
+
+		/**
+		 * Gets a single discipline
+		 * @param int $did
+		 * @param bool|false $forceReturn
+		 * @return array|void
+		 */
+		public function getDiscipline( $did, $forceReturn = false ){
+			$query = "SELECT * FROM disciplines WHERE id = '$did'";
+
+			if ( !$result = $this->db->query( $query ) ) {
+				echo Core::ajaxResponse( array( 'error' => "An error occurred please try again" ), false );
+				return;
+			}
+			$row = $result->fetch_assoc();
+			$return = array(
+				'id' => $row['id'],
+				'name' => $row['name'],
+				'description' => $row['description']
+			);
+
+			if ( IS_AJAX  && !$forceReturn) {
+				echo Core::ajaxResponse( $return );
+			} else {
+				return $return;
+			}
+		}
+
+		/**
+		 * gets all the discipline for a user
+		 * @param int $uid user id
+		 * @return array|void
+		 */
+		public function getDisciplinesForUser( $uid ){
+			$query = <<<EOD
+SELECT
+    users.id as userId,
+    disciplines.id as disciplineId,
+    disciplines.name,
+    disciplines.description
+FROM
+    userXdiscipline,
+    users,
+    disciplines
+WHERE
+    userXdiscipline.userId = users.id AND disciplines.id = userXdiscipline.disciplineId AND users.id = $uid
+EOD;
+
+			if( !$result = $this->db->query( $query ) ){
+				echo Core::ajaxResponse( array( 'error' => "An error occurred please try again" ), false );
+				return;
+			}
+
+			$return = array();
+			while ( $row = $result->fetch_assoc() ) {
+				array_push( $return, array(
+					'id' => $row['disciplineId'],
+					'name' => $row['name'],
+					'description' => $row['description']
+				) );
+			}
+			return $return;
+		}
+
+		/**
+		 * Displays modal for the add discipline in the edit user modal
+		 */
+		public function modalAddDiscipline(){
+			//get disciplines
+			$disciplines = $this->disciplineListing( true );
+			?>
+			<form>
+				<ul>
+					<li>
+						<label for="roles">Roles</label>
+						<select name="class">
+							<?php
+								foreach( $disciplines as $discipline ){
+									echo '<option value="' . $discipline['id'] . '">' . $discipline['description'] . '</option>';
+								}
+							?>
+						</select>
+						<span>Pick a discipline to add</span>
+					</li>
+				</ul>
+			</form>
+			<?php
+
+		}
+
+		/**
+		 * Add a discipline to a user
+		 * @param int $uid user id
+		 * @param int $did discipline id
+		 * @return bool
+		 */
+		public function addDiscipline( $uid, $did ){
+			$this->loadModule( 'audit' );
+			$user = $this->get( $uid, true );
+			$discipline = $this->getDiscipline( $did, true );
+			$statement = $this->db->prepare( "INSERT INTO userXdiscipline( userId, disciplineId ) VALUES(?,?)" );
+			$statement->bind_param( "ii", $uid, $did );
+			if( $statement->execute() ){
+				$this->audit->newEvent( "Deleted " . $discipline['description'] . " role from " . $user['username'] );
+				return true;
+			}
+			return false;
+		}
+
+		/**
+		 * Deleting a discipline from a user
+		 * @param int $uid
+		 * @param int $did
+		 * @return bool
+		 */
+		public function deleteDiscipline( $uid, $did ){
+			$this->loadModule( 'audit' );
+			$user = $this->get( $uid, true );
+			$discipline = $this->get( $did, true );
+			$statement = $this->db->prepare( "DELETE FROM userXdiscipline where userId = ? AND disciplineId = ?" );
+			$statement->bind_param( "ii", $uid, $did );
+			if( $statement->execute() ){
+				$this->audit->newEvent( $_SESSION['session']['username'] . " deleted " . $discipline['description'] . " from " . $user['username'] );
+				return true;
+			}
+			return false;
+		}
+
+		/**
+		 * creates the complex hash for user passwords
+		 * @param string $inPass string of password
+		 * @param string $inUser string of username
+		 * @return string
+		 */
 		private function hashPassword( $inPass, $inUser ){
 			$password[0] = hash( 'sha512', substr( $inPass, 0, 64 ) );
 			$password[1] = hash( 'sha512', substr( $inPass, 64 ) );
 			$passwordHash = hash( 'sha512', $password[0] . $password[1] . $inUser );
 			return $passwordHash;
 		}
+
 	}

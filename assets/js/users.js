@@ -108,7 +108,8 @@ $( document ).ready( function(){
 					username: map.username,
 					isAdmin: ( map.isAdmin ) ? map.isAdmin : 0,
 					active: ( map.active ) ? map.active : 0,
-					roles: map.roles
+					roles: map.roles,
+					disciplines : map.depts
 				},
 				async: false,
 				success: function ( data ) {
@@ -249,7 +250,7 @@ $( document ).ready( function(){
 									}
 								}
 								idsSet.push( value );
-								var html = "<li>";
+								var html = "<li data-id='" + value + "'>";
 								html += $( '.modal[data-id=' + id + '] select option:selected' ).text();
 								html += '<img class="delete tooltip" src="' + CORE_URL + 'assets/img/delete.png" title="Delete Role">'
 								html += '</li>';
@@ -288,6 +289,80 @@ $( document ).ready( function(){
 		var index = idsSet.indexOf( id );
 		idsSet.splice( index, 1 );
 		$( '.userRoles input[name=roles]' ).val( JSON.stringify( idsSet ) );
+
+		$( li ).slideUp( 400 );
+
+	} );
+
+	/******************************************************************************/
+	/*******************************Add user discipline**********************************/
+	/******************************************************************************/
+	$( document ).on( 'click', '.modal .userDept .add input[type=button]', function(){
+		$.ajax( {
+			type: 'POST',
+			url: CORE_URL + 'rest/users/modalAddDiscipline',
+			success: function ( data ) {
+				//alert( JSON.stringify( data ) );
+				if ( data ) {
+					var modal = createModal( {
+						title: "Add Discipline",
+						buttons: [{
+							value: 'Add',
+							onclick : function( id ){
+								//get value
+								var value = $( '.modal[data-id=' + id + '] select' ).val();
+								//get ids already displayed in the listing
+								var idsSet = JSON.parse( $( '.userDept input[name=depts]' ).val() );
+								//check id isnt already there
+								for( var i = 0; i < idsSet.length; i++ ){
+									if( idsSet[i] == value ){
+										var modal = createModal( { title: "Error", buttons: [{ value: 'Ok', focus:true }] } );
+										setModalContent( modal, "You cannot add the same discipline twice." );
+										displayModal( modal );
+										return false;
+									}
+								}
+								idsSet.push( value );
+								var html = "<li data-id='" + value + "'>";
+								html += $( '.modal[data-id=' + id + '] select option:selected' ).text();
+								html += '<img class="delete tooltip" src="' + CORE_URL + 'assets/img/delete.png" title="Delete Discipline">'
+								html += '</li>';
+								//add to listing
+								$( '.userDept .listing' ).append( html );
+								//add to input
+								$( '.userDept input[name=depts]' ).val( JSON.stringify( idsSet ) );
+								return true;
+							}
+						},{
+							value: 'Cancel',
+							class: 'low'
+						}]
+					} );
+					setModalContent( modal, data );
+					displayModal( modal );
+					//$( 'select', modal ).select2( {} );
+				} else {
+					var modal = createModal( { title: "Error Saving User", buttons: [{ value: 'Ok' }] } );
+					setModalContent( modal, data.data.error );
+					displayModal( modal );
+				}
+			}
+		} );
+	} );
+
+
+	/******************************************************************************/
+	/******************************delete user role********************************/
+	/******************************************************************************/
+	$( document ).on( 'click', '.modal .userDept img.delete', function(){
+		var li = $( this ).closest( 'li' );
+		var id = $( li ).attr( 'data-id' );
+		//get ids already displayed in the listing
+		var idsSet = JSON.parse( $( '.userDept input[name=depts]' ).val() );
+
+		var index = idsSet.indexOf( id );
+		idsSet.splice( index, 1 );
+		$( '.userDept input[name=depts]' ).val( JSON.stringify( idsSet ) );
 
 		$( li ).slideUp( 400 );
 

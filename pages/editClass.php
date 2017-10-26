@@ -15,7 +15,7 @@
 <head>
 	<?php
 		include_once CORE_PATH . 'assets/inc/header.php';
-		Core::queueStyle( 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css' );
+		Core::queueStyle( 'assets/css/select2.css' );
 		Core::includeStyles();
 	?>
 </head>
@@ -102,8 +102,8 @@
 </div>
 <?php
 	include_once CORE_PATH . 'assets/inc/footer.php';
+	Core::queueScript( 'assets/js/select2.js' );
 	Core::queueScript( 'assets/js/class.js' );
-	Core::queueScript( 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js' );
 	Core::includeScripts();
 ?>
 

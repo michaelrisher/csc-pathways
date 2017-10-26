@@ -17,7 +17,7 @@
 		public function listing( $order = 'id' ) {
 			//to kinda standardize it for later needs
 			$this->loadModule( 'roles' );
-			$ROLES = $this->roles->getRolesByModule( $_SESSION['session']['id'], $this->moduleName );
+			$ROLES = $this->roles->getRolesByModule( Core::getSessionId(), $this->moduleName );
 			if( Core::inArray( 'gCertView', $ROLES ) ) {
 				$page = 1;
 				$limit = 50;

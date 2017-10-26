@@ -268,4 +268,11 @@
 				return false;
 			}
 		}
+
+		public static function getSessionId(){
+			if( isset( $_SESSION['session'] ) ){
+				return $_SESSION['session']['id'];
+			}
+			return -1;
+		}
 	}

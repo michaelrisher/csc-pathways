@@ -132,7 +132,7 @@ ORDER BY
     roles.module ASC, roles.id DESC
 EOD;
 			if ( !$result = $this->db->query( $query ) ) {
-				return null;
+				return array();
 			}
 
 			$return = array();
@@ -244,7 +244,7 @@ EOD;
 								}
 							?>
 						</select>
-						<span>Pick a class to add</span>
+						<span>Pick a role to add</span>
 					</li>
 				</ul>
 			</form>
