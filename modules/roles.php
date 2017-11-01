@@ -182,6 +182,7 @@ EOD;
 			}
 			return false;
 		}
+
 		/**
 		 * check if user has a role
 		 * @param $userId int id for the user

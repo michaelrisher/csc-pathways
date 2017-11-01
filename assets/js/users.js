@@ -340,7 +340,7 @@ $( document ).ready( function(){
 					} );
 					setModalContent( modal, data );
 					displayModal( modal );
-					//$( 'select', modal ).select2( {} );
+					$( 'select', modal ).select2();
 				} else {
 					var modal = createModal( { title: "Error Saving User", buttons: [{ value: 'Ok' }] } );
 					setModalContent( modal, data.data.error );

@@ -131,7 +131,7 @@ SELECT
 FROM
     classes
 INNER JOIN classData on classes.id = classData.class
-WHERE classes.id = '$id'
+WHERE classes.id = $id
 ORDER BY classData.language ASC
 EOD;
 
@@ -178,7 +178,7 @@ EOD;
 		 * save a class from the admin page
 		 * only allowed if the user is admin
 		 */
-		public function save( $create = false ) {
+		public function save( $id, $create = false ) {
 			//todo get rid of the id in class table and make it auto increment
 			$this->loadModule( 'users' );
 			$this->loadModule( 'audit' );
@@ -193,16 +193,16 @@ EOD;
 					$sort = explode( ' - ', $_POST['title'] )[0];
 					$sort = preg_replace( '/\D/', '', $sort );
 
-					$setClass = $this->upsertRecord( 'classes', "id='${_POST['id']}'", array(
-						'id' => $_POST['id'],
+					$setClass = $this->upsertRecord( 'classes', "id=${id}", array(
+						'id' => $id,
 						'title' => $_POST['title'],
 						'units' => intval( $_POST['units'] ),
 						'transfer' => $_POST['transfer'],
 						'sort' => intval( $sort )
 					) );
 
-					$setClassData = $this->upsertRecord( 'classData', "class='${_POST['id']}' AND language=${_POST['language']}", array(
-						'class' => $_POST['id'],
+					$setClassData = $this->upsertRecord( 'classData', "class=${id} AND language=${_POST['language']}", array(
+						'class' => $id,
 						'language' => $_POST['language'],
 						'prereq' => $_POST['prereq'],
 						'advisory' => $_POST['advisory'],
@@ -212,7 +212,7 @@ EOD;
 
 					if ( $setClass && $setClassData ) {
 						$obj['msg'] = 'Saved successfully.';
-						if( !create ) {
+						if( !$create ) {
 							$this->audit->newEvent( "Updated class: " . $_POST['title'] );
 						} else {
 							$this->audit->newEvent( "Create class: " . $_POST['title'] );
@@ -249,8 +249,8 @@ EOD;
 
 				$statement = $this->db->prepare( "DELETE FROM classes WHERE id=?" );
 				$statementData = $this->db->prepare( "DELETE FROM classData WHERE class=?" );
-				$statementData->bind_param( "s", $_POST['id'] );
-				$statement->bind_param( "s", $_POST['id'] );
+				$statementData->bind_param( "i", $_POST['id'] );
+				$statement->bind_param( "i", $_POST['id'] );
 				if ( $statement->execute() && $statementData->execute() ) {
 					$obj['msg'] = $lang->o( 'ajaxDelete' );
 					$this->audit->newEvent( "Deleted class: " . $event );
@@ -270,7 +270,18 @@ EOD;
 		 * only allowed if the user is admin
 		 */
 		public function create() {
-			$this->save( true );
+			//todo make this standard where the module makes the modal
+			$query = "SHOW TABLE STATUS LIKE 'classes'";
+			if ( !$result = $this->db->query( $query ) ) {
+				die( 'There was an error running the query [' . $this->db->error . ']' );
+			}
+			$row = null;
+			$id = -1;
+			if ( $result->num_rows ) {
+				$row = $result->fetch_assoc();
+				$id = $row['Auto_increment'];
+			}
+			$this->save( $id, true );
 		}
 
 		/**
@@ -358,6 +369,10 @@ EOD;
 			}
 		}
 
+		/**
+		 * shows a classes when as html
+		 * @param $id
+		 */
 		public function show( $id ) {
 			$data['params'] = $id;
 			include CORE_PATH . 'pages/class.php';

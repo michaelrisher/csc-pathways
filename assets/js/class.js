@@ -134,10 +134,6 @@ $( document ).ready( function(){
 		} );
 		var hasError = false;
 		//verify data
-		if ( map['id'].length == 0 ) {
-			$( form ).find( 'input[name=id]' ).closest( 'li' ).addClass( 'error' );
-			hasError = true;
-		}
 		if ( map['title'].length == 0 ) {
 			$( form ).find( 'input[name=title]' ).closest( 'li' ).addClass( 'error' );
 			hasError = true;
@@ -167,7 +163,7 @@ $( document ).ready( function(){
 			if ( map['create'] ) {
 				url = 'create';
 			} else {
-				url = 'save';
+				url = 'save/' + map.id;
 			}
 			$.ajax( {
 				type: 'POST',
@@ -294,6 +290,7 @@ $( document ).ready( function(){
 		adjustTextarea( $( modal ).find( 'textarea' )[0] );
 	} );
 
+	//add class
 	$( document ).on( 'click', '.modal span a.addClass', function () {
 		var input = $( this ).closest( 'li' ).find( 'input' );
 		var prevModal = $( this ).closest( '.modal' );

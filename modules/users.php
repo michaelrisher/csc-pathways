@@ -11,8 +11,7 @@
 			$this->loadModule( 'roles' );
 			$ROLES = $this->roles->getRolesByModule( $_SESSION['session']['id'], 'user' );
 			if( Core::inArray( 'gUserView', $ROLES ) ){
-				$query = "SELECT * FROM users ORDER BY " . $order;//remove limit for a time LIMIT $page,50
-
+				$query = "SELECT * FROM users WHERE id != -1 ORDER BY " . $order;//remove limit for a time LIMIT $page,50
 				if ( !$result = $this->db->query( $query ) ) {
 					echo( 'There was an error running the query [' . $this->db->error . ']' );
 				}
@@ -95,12 +94,12 @@
 					?>
 					<div class='tabWrapper users'>
 						<div class="tabs">
-							<div class='tab' data-tab='edit'>Edit</div>
+							<div class='tab active' data-tab='edit'>Edit</div>
 							<div class='tab' data-tab='roles'>Roles</div>
-							<div class='tab active' data-tab='dept'>Discipline</div>
+							<div class='tab' data-tab='dept'>Discipline</div>
 						</div>
 
-						<div class="tabContent none" data-tab="edit">
+						<div class="tabContent" data-tab="edit">
 							<form>
 								<ul>
 									<input type="hidden" name="id" value="<?= $user['id'] ?>">
@@ -158,7 +157,7 @@
 								<?php } ?>
 							</div>
 						</div>
-						<div class="tabContent" data-tab="dept">
+						<div class="tabContent none" data-tab="dept">
 							<div class="userDept">
 								<?php
 									$canAssign = true;

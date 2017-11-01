@@ -275,4 +275,9 @@
 			}
 			return -1;
 		}
+
+		public static function htmlEcho( $s ){
+			echo $s;
+			echo '<br>';
+		}
 	}
