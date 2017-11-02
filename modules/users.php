@@ -324,7 +324,6 @@
 
 					}
 
-					//TODO save the disciplines
 					if ( $error ) {
 						echo Core::ajaxResponse( $obj, false );
 					} else {

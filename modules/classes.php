@@ -181,7 +181,6 @@ EOD;
 		 * only allowed if the user is admin
 		 */
 		public function save( $id, $create = false ) {
-			//todo get rid of the id in class table and make it auto increment
 			$this->loadModules( 'users audit roles' );
 			$ROLES = $this->roles->getRolesByModule( $_SESSION['session']['id'], $this->moduleName );
 			$lang = new Lang( Lang::getCode() );
