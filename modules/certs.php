@@ -7,8 +7,8 @@
 	 * Time: 12:22
 	 */
 	class certs extends Main {
-
 		private $moduleName = 'certs';
+
 		/**
 		 * get a simple-ish listing of the certificate
 		 * @param string $order any custom sort you want to run with the query

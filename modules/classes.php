@@ -7,8 +7,8 @@
 	 * Time: 10:15
 	 */
 	class classes extends Main {
-
 		private $moduleName = 'classes';
+
 		/**
 		 * get a simple listing of classes only id and title are returned
 		 * only allowed if the user is admin
@@ -123,6 +123,7 @@ SELECT
     classes.sort,
     classes.title,
     classes.units,
+    classes.discipline,
     classes.transfer,
     classData.prereq,
     classData.coreq,
@@ -164,7 +165,8 @@ EOD;
 				'prereq' => $row['prereq'],
 				'coreq' => $row['coreq'],
 				'description' => $row['description'],
-				'language' => $langCode
+				'language' => $langCode,
+				'discipline' => $row['discipline']
 			);
 
 			if ( IS_AJAX && !$forceReturn ) {
@@ -180,9 +182,7 @@ EOD;
 		 */
 		public function save( $id, $create = false ) {
 			//todo get rid of the id in class table and make it auto increment
-			$this->loadModule( 'users' );
-			$this->loadModule( 'audit' );
-			$this->loadModule( 'roles' );
+			$this->loadModules( 'users audit roles' );
 			$ROLES = $this->roles->getRolesByModule( $_SESSION['session']['id'], $this->moduleName );
 			$lang = new Lang( Lang::getCode() );
 			$obj = array();
@@ -198,6 +198,7 @@ EOD;
 						'title' => $_POST['title'],
 						'units' => intval( $_POST['units'] ),
 						'transfer' => $_POST['transfer'],
+						'discipline' => $_POST['discipline'],
 						'sort' => intval( $sort )
 					) );
 
@@ -282,6 +283,113 @@ EOD;
 				$id = $row['Auto_increment'];
 			}
 			$this->save( $id, true );
+		}
+
+		public function edit( $id =-1 ){
+			$this->loadModules( "roles users discipline" );
+			$ROLES = $this->roles->getRolesByModule( Core::getSessionId(), 'class' );
+			//check if user can edit
+			if( $this->users->isLoggedIn() ) {
+				if( Core::inArray( 'gClassEdit', $ROLES ) && IS_AJAX ){
+					if( $id != -1 ){
+						$langCode = 0;
+						if ( isset( $_POST ) && isset( $_POST['language'] ) ) {
+							Core::sanitize( $_POST['language'] );
+							$langCode = $_POST['language'];
+						}
+						$class = $this->get( $id, $langCode, true );
+						$class['create'] = 0;
+					} else{ //we are creating a class
+						$query = "SHOW TABLE STATUS LIKE 'classes'";
+						if ( !$result = $this->db->query( $query ) ) {
+							die( 'There was an error running the query [' . $this->db->error . ']' );
+						}
+						$row = null;
+						$id = -1;
+						if ( $result->num_rows ) {
+							$row = $result->fetch_assoc();
+							$id = $row['Auto_increment'];
+						}
+						$class = array(
+							'id' => $id,
+							'title' => '',
+							'units' => 0,
+							'transfer' => '',
+							'advisory' => '',
+							'prereq' => '',
+							'coreq' => '',
+							'description' => '',
+							'language' => 0,
+							'create' => 1,
+							'discipline' => -1
+						);
+					}
+					//get disciplines
+					$disciplines = $this->discipline->listing( true );
+					?>
+					<p>* fields are required</p>
+					<form>
+						<?php if( $class['create'] ){?>
+						<input type="hidden" name="create" value="<?=$class['create']?>">
+						<?php } ?>
+						<input type="hidden" name="id" value="<?=$class['id']?>">
+						<input type="hidden" name="language" value="<?=$class['language']?>">
+						<ul>
+							<li>
+								<label for="discipline">Discipline*</label>
+								<select name="discipline">
+									<option disabled selected> -- Select A Discipline -- </option>
+									<?php
+									foreach( $disciplines as $discipline ){
+										echo "<option " . ( ( $discipline['id'] == $class['discipline'] ) ? ( 'selected' ) : ( '' ) ) . " value='${discipline['id']}'>${discipline['description']}</option>";
+									}
+									?>
+								</select>
+								<span>Enter the class ID</span>
+							</li>
+							<li>
+								<label for="title">Title*</label>
+								<input name="title" type="text" value="<?=$class['title']?>" class="tooltip" title="Class title should look like: CIS-1 - Title">
+								<span>Enter the class title</span>
+							</li>
+							<li>
+								<label for="units">Units*</label>
+								<input name="units" type="number" value="<?=$class['units']?>">
+								<span>Enter the class units</span>
+							</li>
+							<li>
+								<label for="transfer">Transfer</label>
+								<input name="transfer" type="text" value="<?=$class['transfer']?>">
+								<span>Enter the class transfer</span>
+							</li>
+							<li>
+								<label for="advisory">Advisory</label>
+								<input name="advisory" type="text" value="<?=$class['advisory']?>">
+								<span>Enter the class advisory<a class="addClass floatright">+ Add Class</a></span>
+							</li>
+							<li>
+								<label for="prereq">Prerequisite</label>
+								<input name="prereq" type="text" value="<?=$class['prereq']?>">
+								<span>Enter the class prerequisite<a class="addClass floatright">+ Add Class</a></span>
+							</li>
+							<li>
+								<label for="coreq">Corequisite</label>
+								<input name="coreq" type="text" value="<?=$class['coreq']?>">
+								<span>Enter the class corequisite<a class="addClass floatright">+ Add Class</a></span>
+							</li>
+							<li>
+								<label for="description">Description*</label>
+								<textarea onkeyup="adjustTextarea(this)" name="description" type="textarea"><?=$class['description']?></textarea>
+								<span>Enter the class Description</span>
+							</li>
+						</ul>
+					</form><?php
+				} else {
+					echo "<p>You do not have access to edit classes</p>";
+				}
+			} else {
+				echo "<p>Session expired. Please log in again.</p>";
+			}
 		}
 
 		/**
@@ -376,27 +484,5 @@ EOD;
 		public function show( $id ) {
 			$data['params'] = $id;
 			include CORE_PATH . 'pages/class.php';
-		}
-
-		/**
-		 * removes the old prereq, coreq, advisory, and description from the classes table
-		 * @deprecated
-		 */
-		public function removeOldData(){
-			$this->loadModule( 'roles' );
-			if( $this->roles->doesUserHaveRole( $_SESSION['session']['id'], 'dataManage' ) ) {
-				$query = <<<EOD
-ALTER TABLE `classes`
-  DROP `prereq`,
-  DROP `coreq`,
-  DROP `advisory`,
-  DROP `description`;
-EOD;
-				if ( $this->db->query( $query ) ) {
-					echo "ran successfully";
-				} else {
-					echo "failed update";
-				}
-			}
 		}
 	}

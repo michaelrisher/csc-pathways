@@ -7,7 +7,33 @@
 	 * Time: 12:00
 	 */
 	class update extends Main{
+
+
 		/**
+		 * TODO run on live
+		 * remove old data from classes
+		 */
+		public function removeOldData(){
+			$this->loadModule( 'roles' );
+			if( $this->roles->doesUserHaveRole( Core::getSessionId(), 'dataManage' ) ) {
+				$query = <<<EOD
+ALTER TABLE `classes`
+  DROP `prereq`,
+  DROP `coreq`,
+  DROP `advisory`,
+  DROP `description`;
+EOD;
+				if ( $this->db->query( $query ) ) {
+					echo "ran successfully";
+				} else {
+					echo "failed update";
+				}
+			}
+		}
+
+
+		/**
+		 * TODO run on live
 		 * updates the class table to change the id to an auto increment number.
 		 * have to search for usage
 		 * 1. in class data table

@@ -732,7 +732,7 @@ form ul {
 }
 form ul li {
   display: block;
-  padding: 9px;
+  padding: 8px;
   border: 1px solid #a2aab2;
   margin-bottom: 30px;
   border-radius: 3px;
@@ -797,6 +797,9 @@ select {
   font-size: 16px;
   padding: 0;
   font-family: Georgia, "Times New Roman", Times, serif;
+}
+.select2-container {
+  height: 35px;
 }
 input[type="submit"],
 input[type="button"] {

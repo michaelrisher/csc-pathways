@@ -9,13 +9,39 @@ $( document ).ready( function(){
 		var id = $( this ).closest( 'li' ).attr( 'data-id' );
 		$.ajax( {
 			type: 'POST',
-			url: CORE_URL + 'rest/classes/get/' + id,
-			dataType: 'json',
+			url: CORE_URL + 'rest/classes/edit/' + id,
 			success: function ( data ) {
-				editClassModal( data );
+				if ( data ) {
+					createClassModal( data, false );
+				} else {
+					var modal = createModal( { title: 'Failed to load user', buttons: [{ value: 'Ok', focus : true }] } );
+					setModalContent( modal, "An error occurred." );
+					displayModal( modal, true )
+				}
 			}
 		} );
 	} );
+
+	function createClassModal( data, create ){
+		var modal = createModal( {
+			title: ( ( create ) ? ( 'Create Class' ) : ( 'Edit Class' ) ),
+			buttons: [
+				{
+					value: 'Save',
+					name: 'save',
+					onclick: saveClass
+				},
+				{
+					value: 'Cancel',
+					class: 'low'
+				}
+			]
+		} );
+		setModalContent( modal, data );
+		displayModal( modal );
+		adjustTextarea( $( modal ).find( 'textarea' )[0] );
+		$( 'select', modal ).select2();
+	}
 
 	//language edit
 	$( document ).on( 'click', '#main .classes li img.languageEdit', function () {
@@ -65,58 +91,17 @@ $( document ).ready( function(){
 			var classId = $( 'input[name="class"]' ).val();
 			$.ajax({
 				type: 'POST',
-				url: CORE_URL + 'rest/classes/get/' + classId,
+				url: CORE_URL + 'rest/classes/edit/' + classId,
 				data : {
 					language : lang
 				},
-				dataType: 'json',
 				success: function ( data ) {
-					editClassModal( data );
+					createClassModal( data );
 				}
 			});
 			return true;
 		}
 	} );
-
-	function editClassModal( data ){
-		if ( data.success ) {
-			//alert( JSON.stringify( data ) );
-			var modal = createModal( {
-				title: 'Edit Class',
-				buttons: [
-					{
-						value: 'Save',
-						name: 'save',
-						onclick: saveClass
-					},
-					{
-						value: 'Cancel',
-						class: 'low'
-					}
-				]
-			} );
-			var html = "<p>* fields are required</p>";
-			html += "<form><ul>";
-			//type, name, label, data, text
-			html += "<input type='hidden' name='language' value='" + data.data.language + "'/>";
-			html += modalLi( 'text', 'id', 'ID*', data.data.id, "Enter the class ID", true );
-			html += modalLi( 'text', 'title', 'Title*', data.data.title, "Enter the class title", false, false, 'Class title should look like: CIS-1 - Title' );
-			html += modalLi( 'number', 'units', 'Units*', data.data.units, "Enter the class units", false );
-			html += modalLi( 'text', 'transfer', 'Transfer', data.data.transfer ? data.data.transfer : '', "Enter the class transfer", false );
-			html += modalLi( 'text', 'advisory', 'Advisory', data.data.advisory ? data.data.advisory : '', "Enter the class advisory", false, true );
-			html += modalLi( 'text', 'prereq', 'Prerequisite', data.data.prereq ? data.data.prereq : '', "Enter the class prerequisite", false, true );
-			html += modalLi( 'text', 'coreq', 'Corequisite', data.data.coreq ? data.data.coreq : '', "Enter the class corequisite", false, true );
-			html += modalLi( 'textarea', 'description', 'Description*', data.data.description, "Enter the class Description", false );
-			html += "</ul></form>";
-			setModalContent( modal, html );
-			displayModal( modal );
-			adjustTextarea( $( modal ).find( 'textarea' )[0] );
-		} else {
-			var modal = createModal( { title: 'Failed to load class', buttons: [{ value: 'Ok' }] } );
-			setModalContent( modal, data.data.error );
-			displayModal( modal, true )
-		}
-	}
 
 	function saveClass( id ) {
 		//assume the only modal open is the one we are saving
@@ -159,12 +144,7 @@ $( document ).ready( function(){
 			var successful = false;
 			window.processing = true;
 			saveBtn.addClass( 'processing' );
-			var url;
-			if ( map['create'] ) {
-				url = 'create';
-			} else {
-				url = 'save/' + map.id;
-			}
+			var url = 'save/' + map.id;
 			$.ajax( {
 				type: 'POST',
 				url: CORE_URL + 'rest/classes/' + url,
@@ -178,7 +158,7 @@ $( document ).ready( function(){
 						setModalContent( modal, data.data.msg );
 						displayModal( modal );
 						successful = true;
-						if ( url == 'create' ) {
+						if ( map['create'] ) {
 							$( '.classes .listing ul' ).append( '<li data-id="' + map['id'] + '">' +
 								map['title'] + '<img class="delete" src="' + CORE_URL + 'assets/img/delete.png">'+
 								'<img class="languageEdit tooltip" src="' + CORE_URL + 'assets/img/region.png" title="Edit in Different Language">'+
@@ -257,37 +237,19 @@ $( document ).ready( function(){
 
 	//create class
 	$( '.classes input[name=createClass]' ).on( 'click', function () {
-		var modal = createModal( {
-			title: 'Create Class',
-			buttons: [
-				{
-					value: 'Save',
-					name: 'save',
-					onclick: saveClass
-				},
-				{
-					value: 'Cancel',
-					class: 'low'
+		$.ajax( {
+			type: 'POST',
+			url: CORE_URL + 'rest/classes/edit',
+			success: function ( data ) {
+				if ( data ) {
+					createClassModal( data, true );
+				} else {
+					var modal = createModal( { title: 'Error', buttons: [{ value: 'Ok', focus : true }] } );
+					setModalContent( modal, "Failed to contact database. Please try again." );
+					displayModal( modal, true )
 				}
-			]
+			}
 		} );
-		var html = "<p>* fields are required</p>";
-		html+="<form><ul>";
-		//type, name, label, data, text
-		html += "<input type='hidden' name='create' value='create' />";
-		html += "<input type='hidden' name='language' value='0' />";
-		html += modalLi( 'text', 'id', 'ID*', '', "Enter the class ID", false, false, 'An sample id for CIS-1A would be c1a' );
-		html += modalLi( 'text', 'title', 'Title*', '', "Enter the class title", false, false, 'Class title should look like: CIS-1 - Title' );
-		html += modalLi( 'number', 'units', 'Units*', 0, "Enter the class units", false );
-		html += modalLi( 'text', 'transfer', 'Transfer', '', "Enter the class transfer", false );
-		html += modalLi( 'text', 'advisory', 'Advisory', '', "Enter the class advisory", false, true );
-		html += modalLi( 'text', 'prereq', 'Prerequisite', '', "Enter the class prerequisite", false, true );
-		html += modalLi( 'text', 'coreq', 'Corequisite', '', "Enter the class corequisite", false, true );
-		html += modalLi( 'textarea', 'description', 'Description*', '', "Enter the class Description", false );
-		html += "</ul></form>";
-		setModalContent( modal, html );
-		displayModal( modal );
-		adjustTextarea( $( modal ).find( 'textarea' )[0] );
 	} );
 
 	//add class
@@ -303,7 +265,7 @@ $( document ).ready( function(){
 			}
 		}
 		if ( ( data = getStorageJSON( 'classes' ) ) != null ) {
-			createClassModal( data );
+			createClassListModal( data );
 		} else {
 			$.ajax( {
 				type: 'POST',
@@ -316,13 +278,13 @@ $( document ).ready( function(){
 						setStorageJSON( 'classes', data.data.listing );
 						var t = +new Date(); //gives unix time
 						setStorage( 'invalidateCache', ( t + ( 5 * 60 * 1000 ) ) );
-						createClassModal( data.data );
+						createClassListModal( data.data );
 					}
 				}
 			} );
 		}
 
-		function createClassModal( data ){
+		function createClassListModal( data ){
 			var modal = createModal( {
 				title: "Choose Class",
 				buttons: [{

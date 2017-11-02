@@ -63,12 +63,19 @@
 			}
 		}
 
+		/**
+		 * @deprecated
+		 */
 		public static function initShortClassBlock(){
 			$str = '';
 			$str .= '<div class="8week aligncenter">'.
 				'<span>8 Week Classes</span>';
 			echo $str;
 		}
+
+		/**
+		 * @deprecated
+		 */
 		public static function shortClassBlock( $leftCode, $leftTitle, $rightCode = null, $rightTitle = null ){
 			$str = '';
 			$str .= '<div class="clearfix">';
@@ -82,6 +89,9 @@
 			echo $str;
 		}
 
+		/**
+		 * @deprecated
+		 */
 		public static function endShortClassBlock(){
 			echo '</div>';
 		}

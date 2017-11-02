@@ -21,15 +21,36 @@
 			$this->db = $connection;
 		}
 
+		/**
+		 * destructor
+		 */
 		public function __destruct(){
 			$this->db->close();
 		}
 
+		/**
+		 * returns the uri (ie the module, function, params )
+		 * @param string $url
+		 */
 		public function uri( $url ){
 			$this->url = $url;
 		}
 
-		//load a module
+		/**
+		 * load modules in a space delimited list
+		 * @param string $modules names of the modules to load in a space delimited list
+		 */
+		public function loadModules( $modules ){
+			$array = explode( ' ', $modules );
+			for( $i = 0; $i < count( $array ); $i++ ){
+				$this->loadModule( $array[$i] );
+			}
+		}
+
+		/**
+		 * load a single module
+		 * @param string $module name of the module to load
+		 */
 		public function loadModule( $module ){
 			if( isset( $this->$module ) ) { //if already defined
 				return;

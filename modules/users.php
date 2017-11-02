@@ -6,6 +6,7 @@
 	 * Time: 11:05
 	 */
 	class users extends Main{
+		private $moduleName = 'users';
 
 		public function listing( $order = 'username' ){
 			$this->loadModule( 'roles' );
@@ -73,11 +74,10 @@
 		 * @param $id
 		 */
 		public function edit( $id ){
-			$this->loadModule( "roles" );
-			$this->loadModule( "users" );
+			$this->loadModules( "roles discipline" );
 			$ROLES = $this->roles->getRolesByModule( $_SESSION['session']['id'], 'user' );
 			//check if user can edit
-			if( $this->users->isLoggedIn() ) {
+			if( $this->isLoggedIn() ) {
 				if ( Core::inArray( 'gUserEdit', $ROLES ) && IS_AJAX ) {
 					//get user and force return
 					if ( $id != -1 ) {
@@ -169,7 +169,7 @@
 									if( Core::inArray( 'gUserEdit', $ROLES ) ){
 										$canAssign = true;
 									}
-									$disciplines = $this->getDisciplinesForUser( $user['id'] );
+									$disciplines = $this->discipline->getForUser( $user['id'] );
 									$list = array();
 									foreach ( $disciplines as $discipline ) {
 										array_push( $list, $discipline['id'] );
@@ -419,7 +419,8 @@
 		/**
 		 * create a reset password token
 		 * @param $id
-		 * @param $forceReturn
+		 * @param bool $forceReturn
+		 * @param bool $noLog
 		 * @return string
 		 */
 		public function createResetPassword( $id, $forceReturn = false, $noLog = false ){
@@ -448,7 +449,10 @@
 						$obj['msg'] = "Give the user this link so they can set their password<br>";
 						$obj['msg'] .= '<a href="' . CORE_URL . 'users/resetPassword&token=' . $token . '">';
 						$obj['msg'] .= CORE_URL . 'users/resetPassword&token=' . $token . "</a>";
-						if( !$noLog ) $this->audit->newEvent( "Reset password for user: " . $_POST['username'] );
+						if( !$noLog ){
+							$user = $this->get( $id, true );
+							$this->audit->newEvent( "Reset password for user: " . $user['username'] );
+						}
 						if( !$forceReturn ){
 							echo Core::ajaxResponse( $obj );
 						} else {
@@ -711,104 +715,12 @@
 		}
 
 		/**
-		 * get the listing of disciplines. didnt see fit to make this its own module
-		 * @param bool|false $forceReturn
-		 * @return array
-		 */
-		public function disciplineListing($forceReturn = false ) {
-			//to kinda standardize it for later needs
-			$query = "SELECT * FROM disciplines";
-
-			if ( !$result = $this->db->query( $query ) ) {
-				echo( 'There was an error running the query [' . $this->db->error . ']' );
-			}
-
-			$return = array();
-			while ( $row = $result->fetch_assoc() ) {
-				$a = array(
-					'id' => $row['id'],
-					'name' => $row['name'],
-					'description' => $row['description']
-				);
-				array_push( $return, $a );
-			}
-
-
-			if ( IS_AJAX && !$forceReturn ) {
-				echo Core::ajaxResponse( $return );
-			}
-			return $return;
-		}
-
-		/**
-		 * Gets a single discipline
-		 * @param int $did
-		 * @param bool|false $forceReturn
-		 * @return array|void
-		 */
-		public function getDiscipline( $did, $forceReturn = false ){
-			$query = "SELECT * FROM disciplines WHERE id = '$did'";
-
-			if ( !$result = $this->db->query( $query ) ) {
-				echo Core::ajaxResponse( array( 'error' => "An error occurred please try again" ), false );
-				return;
-			}
-			$row = $result->fetch_assoc();
-			$return = array(
-				'id' => $row['id'],
-				'name' => $row['name'],
-				'description' => $row['description']
-			);
-
-			if ( IS_AJAX  && !$forceReturn) {
-				echo Core::ajaxResponse( $return );
-			} else {
-				return $return;
-			}
-		}
-
-		/**
-		 * gets all the discipline for a user
-		 * @param int $uid user id
-		 * @return array|void
-		 */
-		public function getDisciplinesForUser( $uid ){
-			$query = <<<EOD
-SELECT
-    users.id as userId,
-    disciplines.id as disciplineId,
-    disciplines.name,
-    disciplines.description
-FROM
-    userXdiscipline,
-    users,
-    disciplines
-WHERE
-    userXdiscipline.userId = users.id AND disciplines.id = userXdiscipline.disciplineId AND users.id = $uid
-EOD;
-
-			if( !$result = $this->db->query( $query ) ){
-				echo Core::ajaxResponse( array( 'error' => "An error occurred please try again" ), false );
-				return;
-			}
-
-			$return = array();
-			while ( $row = $result->fetch_assoc() ) {
-				array_push( $return, array(
-					'id' => $row['disciplineId'],
-					'name' => $row['name'],
-					'description' => $row['description']
-				) );
-			}
-			return $return;
-		}
-
-		/**
 		 * Displays modal for the add discipline in the edit user modal
 		 */
 		public function modalAddDiscipline(){
+			$this->loadModule( 'discipline' );
 			//get disciplines
-			$disciplines = $this->disciplineListing( true );
+			$disciplines = $this->discipline->listing( true );
 			?>
 			<form>
 				<ul>
@@ -836,9 +748,9 @@ EOD;
 		 * @return bool
 		 */
 		public function addDiscipline( $uid, $did ){
-			$this->loadModule( 'audit' );
+			$this->loadModules( 'audit discipline' );
 			$user = $this->get( $uid, true );
-			$discipline = $this->getDiscipline( $did, true );
+			$discipline = $this->discipline->get( $did, true );
 			$statement = $this->db->prepare( "INSERT INTO userXdiscipline( userId, disciplineId ) VALUES(?,?)" );
 			$statement->bind_param( "ii", $uid, $did );
 			if( $statement->execute() ){
