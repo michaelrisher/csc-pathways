@@ -257,7 +257,7 @@ $( document ).ready( function(){
 		var input = $( this ).closest( 'li' ).find( 'input' );
 		var prevModal = $( this ).closest( '.modal' );
 		var id = $( prevModal ).attr( 'data-id' );
-		if ( false && getStorage( "invalidateCache" ) && getStorage( 'classes' ) ) {
+		if ( getStorage( "invalidateCache" ) && getStorage( 'classes' ) ) {
 			var time = parseInt( getStorage( "invalidateCache" ) );
 			var curr = +new Date(); //gives unix time
 			if ( curr >= time ) {
@@ -278,7 +278,7 @@ $( document ).ready( function(){
 						setStorageJSON( 'classes', data.data.listing );
 						var t = +new Date(); //gives unix time
 						setStorage( 'invalidateCache', ( t + ( 5 * 60 * 1000 ) ) );
-						createClassListModal( data.data );
+						createClassListModal( data.data.listing );
 					}
 				}
 			} );
