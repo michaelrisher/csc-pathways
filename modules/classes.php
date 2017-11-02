@@ -336,6 +336,11 @@ EOD;
 						<input type="hidden" name="language" value="<?=$class['language']?>">
 						<ul>
 							<li>
+								<label for="title">Title*</label>
+								<input name="title" type="text" value="<?=$class['title']?>" class="tooltip" title="Class title should look like: CIS-1 - Title">
+								<span>Enter the class title</span>
+							</li>
+							<li>
 								<label for="discipline">Discipline*</label>
 								<select name="discipline">
 									<option disabled selected> -- Select A Discipline -- </option>
@@ -346,11 +351,6 @@ EOD;
 									?>
 								</select>
 								<span>Enter the class ID</span>
-							</li>
-							<li>
-								<label for="title">Title*</label>
-								<input name="title" type="text" value="<?=$class['title']?>" class="tooltip" title="Class title should look like: CIS-1 - Title">
-								<span>Enter the class title</span>
 							</li>
 							<li>
 								<label for="units">Units*</label>

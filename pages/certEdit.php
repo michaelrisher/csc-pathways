@@ -49,6 +49,18 @@
 							<input type="text" name="code" value="<?=isset( $data['code'] ) ? $data['code'] : ''?>"/>
 							<span>Enter the certificate code number</span>
 						</li>
+						<li class="alignleft">
+							<label for="discipline">Discipline*</label>
+							<select name="discipline">
+								<option disabled selected> -- Select A Discipline -- </option>
+								<?php
+									foreach( $data['disciplines'] as $discipline ){
+										echo "<option " . ( ( $discipline['id'] == $data['discipline'] ) ? ( 'selected' ) : ( '' ) ) . " value='${discipline['id']}'>${discipline['description']}</option>";
+									}
+								?>
+							</select>
+							<span>Enter the class ID</span>
+						</li>
 						<li>
 							<label for="units">Units*</label>
 							<input type="number" name="units" value="<?=isset( $data['units'] ) ? $data['units'] : 0?>"/>
@@ -103,10 +115,8 @@
 						</li>
 						<li>
 							<input type="submit" value="Save" />
-<!--							TODO activate this button-->
-<!--							<input type="button" class="margin15Left low" value="Cancel" />-->
+							<input type="button" class="margin15Left low cancel" value="Cancel" />
 						</li>
-
 					</ul>
 				</form>
 			</div>
@@ -122,7 +132,7 @@
 	Core::includeScripts();
 
 ?>
-
+<script>$('[name=discipline]').select2();</script>
 </body>
 </html>
 

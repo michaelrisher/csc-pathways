@@ -42,6 +42,7 @@
 						'units' => $row['units'],
 						'sort' => $row['sort'],
 						'active' => $row['active'],
+						'discipline' => $row['discipline'],
 						'edit' => $canEdit,
 						'delete' => $canDelete
 					);
@@ -80,8 +81,7 @@
 		 * @param $params
 		 */
 		public function edit( $params ) {
-			$this->loadModule( 'roles' );
-			$this->loadModule( 'users' );
+			$this->loadModules( 'roles users discipline' );
 			$ROLES = $this->roles->getRolesByModule( $_SESSION['session']['id'], $this->moduleName );
 			if ( $this->users->isLoggedIn() && Core::inArray( 'gCertEdit', $ROLES ) ) {
 				Core::queueStyle( 'assets/css/reset.css' );
@@ -96,13 +96,13 @@
 				}
 				$data = $this->get( $id, $lang );
 				$data['categories'] = $this->listCategories();
+				$data['disciplines'] = $this->discipline->listing( true );
 				$data['language'] = $lang; //bug fix when there is not a lang cert yet
 				include( CORE_PATH . 'pages/certEdit.php' );
 			} else {
 				Core::errorPage( 404 );
 			}
 		}
-
 
 		/**
 		 * get a specific cert from an id
@@ -131,6 +131,7 @@
 SELECT
 certificateList.id,
 certificateList.code,
+certificateList.discipline,
 certificateData.language,
 certificateList.hasAs,
 certificateList.hasCe,
@@ -224,6 +225,7 @@ EOD;
 					$_POST['title'] = core::sanitize( $_POST['title'] ); //certlist description
 					$_POST['code'] = core::sanitize( $_POST['code'] );
 					$_POST['units'] = core::sanitize( $_POST['units'] );
+					$_POST['discipline'] = core::sanitize( $_POST['discipline'] );
 					$_POST['category'] = core::sanitize( $_POST['category'] );
 					$_POST['description'] = core::sanitize( $_POST['description'], true );
 					$_POST['elo'] = core::sanitize( $_POST['elo'], true );
@@ -244,7 +246,8 @@ EOD;
 						'units' => (int)$_POST['units'],
 						'description' => $_POST['title'],
 						'sort' => (int)$_POST['sort'],
-						'active' => $active
+						'active' => $active,
+						'discipline' => $_POST['discipline']
 					) );
 
 					$error = '';
@@ -287,8 +290,7 @@ EOD;
 		 * only allowed if the user is admin
 		 */
 		public function create(){
-			$this->loadModule('users');
-			$this->loadModule('roles');
+			$this->loadModules('users roles discipline');
 			$ROLES = $this->roles->getRolesByModule( $_SESSION['session']['id'], $this->moduleName );
 			if( $this->users->isLoggedIn() &&  Core::inArray( 'gCertEdit', $ROLES ) ) {
 				Core::queueStyle( 'assets/css/reset.css' );
@@ -314,6 +316,7 @@ EOD;
 						'schedule' => '',
 						'sort' => 0,
 						'categories' => $this->listCategories(),
+						'disciplines' => $this->discipline->listing( true ),
 						'language' => 0,
 						'active' => 0
 					);

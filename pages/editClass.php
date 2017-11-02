@@ -103,7 +103,7 @@
 <?php
 	include_once CORE_PATH . 'assets/inc/footer.php';
 	Core::queueScript( 'assets/js/select2.js' );
-	Core::queueScript( 'assets/js/class.js' );
+	Core::queueScript( 'assets/js/classes.js' );
 	Core::includeScripts();
 ?>
 
