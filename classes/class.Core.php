@@ -96,7 +96,6 @@
 			echo '</div>';
 		}
 
-
 		/**
 		 * clean strings of bad stuffs
 		 * @param $string

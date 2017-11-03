@@ -101,4 +101,29 @@ EOD;
 			}
 			return $return;
 		}
+
+		public function getIdsForUser( $uid ){
+			$query = <<<EOD
+SELECT
+    users.id as userId,
+    disciplines.id as disciplineId
+FROM
+    userXdiscipline,
+    users,
+    disciplines
+WHERE
+    userXdiscipline.userId = users.id AND disciplines.id = userXdiscipline.disciplineId AND users.id = $uid
+EOD;
+
+			if( !$result = $this->db->query( $query ) ){
+				echo Core::ajaxResponse( array( 'error' => "An error occurred please try again" ), false );
+				return;
+			}
+
+			$return = array();
+			while ( $row = $result->fetch_assoc() ) {
+				array_push( $return, $row['disciplineId'] );
+			}
+			return $return;
+		}
 	}

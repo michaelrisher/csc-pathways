@@ -105,7 +105,6 @@ EOD;
 			return $return;
 		}
 
-
 		/**
 		 * gets all the roles for a user based on module in a flat array of the role name
 		 * eg ['gClassView', 'gClassEdit' ]
@@ -250,5 +249,35 @@ EOD;
 				</ul>
 			</form>
 			<?php
+		}
+
+		/**
+		 * @param string $perm string of the permission attempting to run
+		 * @param int $userId users id
+		 * @param int $disciplineId discipline of the object in question
+		 * @return bool
+		 */
+		public function haveAccess( $perm, $userId, $disciplineId ){
+			$this->loadModule( 'discipline' );
+			$fullRoles = $this->getAllForUser( $userId );
+			$roles = array();
+			foreach ( $fullRoles as $role ) {
+				array_push( $roles, $role['name'] );
+			}
+
+			$disciplines = $this->discipline->getIdsForUser( $userId );
+
+			if( Core::inArray( 'g' . $perm, $roles ) ){
+				return true;
+			} else {
+				if( Core::inArray( 'd' . $perm, $roles ) ){
+					if ( $disciplineId == -1 ) {
+						return true;
+					} else if( Core::inArray( $disciplineId, $disciplines ) ){
+						return true;
+					}
+				}
+			}
+			return false;
 		}
 	}

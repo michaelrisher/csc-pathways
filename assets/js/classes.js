@@ -219,6 +219,12 @@ $( document ).ready( function(){
 									that.remove();
 								} );
 							} else {
+								var modal = createModal( {
+									title: "Error",
+									buttons: [{ value: 'Ok' }]
+								} );
+								setModalContent( modal, data.data.error );
+								displayModal( modal );
 								successful = false;
 							}
 						}

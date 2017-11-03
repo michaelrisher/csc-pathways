@@ -16,8 +16,9 @@
 		 * @return array
 		 */
 		public function listing( $page = 1 ) {
-			$this->loadModule( 'roles' );
-			$userRoles = $this->roles->getRolesByModule( $_SESSION['session']['id'], $this->moduleName );
+			$this->loadModules( 'roles discipline' );
+			$userRoles = $this->roles->getRolesByModule( Core::getSessionId(), $this->moduleName );
+			$userDisciplines = $this->discipline->getIdsForUser( Core::getSessionId() );
 			//if user has class view role then do it
 			if ( Core::inArray( 'gClassView', $userRoles ) ) {
 				$limit = 25;
@@ -49,9 +50,23 @@
 				}
 
 				$return = array();
-				$canEdit = Core::inArray( 'gClassEdit', $userRoles );
-				$canDelete = Core::inArray( 'gClassDelete', $userRoles );
+				$gEdit = Core::inArray( 'gClassEdit', $userRoles );
+				$gDelete = Core::inArray( 'gClassDelete', $userRoles );
+				$dEdit = Core::inArray( 'dClassEdit', $userRoles );
+				$dDelete = Core::inArray( 'dClassDelete', $userRoles );
+				$canEdit = $gEdit;
+				$canDelete = $gDelete;
 				while ( $row = $result->fetch_assoc() ) {
+					if( !$gEdit && $dEdit ){ //if doesn't have global edit
+						if( Core::inArray( $row['discipline'], $userDisciplines ) ){
+							$canEdit = true;
+						}
+					}
+					if( !$gDelete && $dDelete){ //if doesn't have global edit
+						if( Core::inArray( $row['discipline'], $userDisciplines ) ){
+							$canDelete = true;
+						}
+					}
 					$a = array(
 						'id' => $row['id'],
 						'title' => $row['title'],
@@ -59,6 +74,8 @@
 						'delete' => $canDelete
 					);
 					array_push( $return, $a );
+					if( !$gEdit ) $canEdit = false;
+					if( !$gDelete ) $canDelete = false;
 				}
 
 				//get count of data
@@ -181,13 +198,14 @@ EOD;
 		 * only allowed if the user is admin
 		 */
 		public function save( $id, $create = false ) {
+			//what if a user from outside discipline wants to create a class for there cert (ie math for a compsci cert)
 			$this->loadModules( 'users audit roles' );
 			$ROLES = $this->roles->getRolesByModule( $_SESSION['session']['id'], $this->moduleName );
 			$lang = new Lang( Lang::getCode() );
 			$obj = array();
 			$_POST = Core::sanitize( $_POST, true );
 			if ( $this->users->isLoggedIn() ) {
-				if( Core::inArray( 'gClassEdit', $ROLES ) ) {
+				if( $this->roles->haveAccess( 'ClassEdit', Core::getSessionId(), -1 ) ) {
 					//get the sort from the title
 					$sort = explode( ' - ', $_POST['title'] )[0];
 					$sort = preg_replace( '/\D/', '', $sort );
@@ -237,26 +255,29 @@ EOD;
 		 * only allowed if the user is admin
 		 */
 		public function delete() {
-			$this->loadModule( 'roles' );
-			$this->loadModule( 'audit' );
+			$this->loadModules( 'roles audit users' );
 			$lang = new Lang( Lang::getCode() );
-			$ROLES = $this->roles->getRolesByModule( $_SESSION['session']['id'], $this->moduleName );
 			$obj = array();
 			$_POST = Core::sanitize( $_POST, true );
-			if ( Core::inArray( 'gClassDelete', $ROLES ) ) {
+			if( $this->users->isLoggedIn() ) {
 				$class = $this->get( $_POST['id'], 'en', true );
-				$event = isset( $class['title'] ) ? $class['title'] : $_POST['id'];
-
-				$statement = $this->db->prepare( "DELETE FROM classes WHERE id=?" );
-				$statementData = $this->db->prepare( "DELETE FROM classData WHERE class=?" );
-				$statementData->bind_param( "i", $_POST['id'] );
-				$statement->bind_param( "i", $_POST['id'] );
-				if ( $statement->execute() && $statementData->execute() ) {
-					$obj['msg'] = $lang->o( 'ajaxDelete' );
-					$this->audit->newEvent( "Deleted class: " . $event );
-					echo Core::ajaxResponse( $obj );
-				} else {
-					$obj['error'] = $statement->error;
+				$disciplineId = $class['discipline'];
+				if ( $this->roles->haveAccess( 'ClassDelete', Core::getSessionId(), $disciplineId ) ) {
+					$event = isset( $class['title'] ) ? $class['title'] : $_POST['id'];
+					$statement = $this->db->prepare( "DELETE FROM classes WHERE id=?" );
+					$statementData = $this->db->prepare( "DELETE FROM classData WHERE class=?" );
+					$statementData->bind_param( "i", $_POST['id'] );
+					$statement->bind_param( "i", $_POST['id'] );
+					if ( $statement->execute() && $statementData->execute() ) {
+						$obj['msg'] = $lang->o( 'ajaxDelete' );
+						$this->audit->newEvent( "Deleted class: " . $event );
+						echo Core::ajaxResponse( $obj );
+					} else {
+						$obj['error'] = $statement->error;
+						echo Core::ajaxResponse( $obj, false );
+					}
+				} else{
+					$obj['error'] = "You do not have access to delete classes";
 					echo Core::ajaxResponse( $obj, false );
 				}
 			} else {
@@ -284,45 +305,49 @@ EOD;
 			$this->save( $id, true );
 		}
 
+		/**
+		 * ajax to recieve the html modal with all data included
+		 * @param int $id
+		 */
 		public function edit( $id =-1 ){
 			$this->loadModules( "roles users discipline" );
-			$ROLES = $this->roles->getRolesByModule( Core::getSessionId(), 'class' );
+			//get first
+			if( $id != -1 ){
+				$langCode = 0;
+				if ( isset( $_POST ) && isset( $_POST['language'] ) ) {
+					Core::sanitize( $_POST['language'] );
+					$langCode = $_POST['language'];
+				}
+				$class = $this->get( $id, $langCode, true );
+				$class['create'] = 0;
+			} else{ //we are creating a class
+				$query = "SHOW TABLE STATUS LIKE 'classes'";
+				if ( !$result = $this->db->query( $query ) ) {
+					die( 'There was an error running the query [' . $this->db->error . ']' );
+				}
+				$row = null;
+				$id = -1;
+				if ( $result->num_rows ) {
+					$row = $result->fetch_assoc();
+					$id = $row['Auto_increment'];
+				}
+				$class = array(
+					'id' => $id,
+					'title' => '',
+					'units' => 0,
+					'transfer' => '',
+					'advisory' => '',
+					'prereq' => '',
+					'coreq' => '',
+					'description' => '',
+					'language' => 0,
+					'create' => 1,
+					'discipline' => -1
+				);
+			}
 			//check if user can edit
 			if( $this->users->isLoggedIn() ) {
-				if( Core::inArray( 'gClassEdit', $ROLES ) && IS_AJAX ){
-					if( $id != -1 ){
-						$langCode = 0;
-						if ( isset( $_POST ) && isset( $_POST['language'] ) ) {
-							Core::sanitize( $_POST['language'] );
-							$langCode = $_POST['language'];
-						}
-						$class = $this->get( $id, $langCode, true );
-						$class['create'] = 0;
-					} else{ //we are creating a class
-						$query = "SHOW TABLE STATUS LIKE 'classes'";
-						if ( !$result = $this->db->query( $query ) ) {
-							die( 'There was an error running the query [' . $this->db->error . ']' );
-						}
-						$row = null;
-						$id = -1;
-						if ( $result->num_rows ) {
-							$row = $result->fetch_assoc();
-							$id = $row['Auto_increment'];
-						}
-						$class = array(
-							'id' => $id,
-							'title' => '',
-							'units' => 0,
-							'transfer' => '',
-							'advisory' => '',
-							'prereq' => '',
-							'coreq' => '',
-							'description' => '',
-							'language' => 0,
-							'create' => 1,
-							'discipline' => -1
-						);
-					}
+				if( $this->roles->haveAccess( 'ClassEdit', Core::getSessionId(), $class['discipline'] ) && IS_AJAX ){
 					//get disciplines
 					$disciplines = $this->discipline->listing( true );
 					?>
@@ -388,24 +413,6 @@ EOD;
 				}
 			} else {
 				echo "<p>Session expired. Please log in again.</p>";
-			}
-		}
-
-		/**
-		 * get the number of pages with the limit
-		 * @deprecated
-		 * @param int $limit the number od results to limit
-		 * @return float
-		 */
-		public function getPages( $limit = 25){
-			$this->loadModule( 'users' );
-			if( $this->users->isLoggedIn() ) {
-				$query = "SELECT COUNT(id) as pages FROM classes";
-
-				if ( $result = $this->db->query( $query ) ) {
-					$row = $result->fetch_assoc();
-					return ceil( $row['pages'] / $limit );
-				}
 			}
 		}
 

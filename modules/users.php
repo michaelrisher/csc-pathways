@@ -56,7 +56,10 @@
 					'id' => $row['id'],
 					'username' => $row['username'],
 					'isAdmin' => $row['isAdmin'],
-					'active' => $row['active']
+					'active' => $row['active'],
+					'lastIP' => $row['lastIP'],
+					'creationDate' => $row['creationDate'],
+					'latestDate' => $row['latestDate']
 				);
 
 				if ( IS_AJAX  && !$forceReturn) {
@@ -87,9 +90,15 @@
 							'id' => -1,
 							'username' => '',
 							'isAdmin' => 0,
-							'active' => 0
+							'active' => 0,
+							'lastIP' => '',
+							'creationDate' => '',
+							'latestDate' => ''
 						);
 					}
+					$user['creationDate'] = explode(' ',  $user['creationDate'] )[0];
+					$user['latestDate'] = explode(' ',  $user['latestDate'] )[0];
+
 //				Core::debug( $user );
 					?>
 					<div class='tabWrapper users'>
@@ -115,6 +124,21 @@
 											   value="1" <?= $user['active'] ? 'checked' : '' ?>>Check if the user
 										should be allowed to login
 										<span>Check if the user should be allowed to login</span>
+									</li>
+									<li>
+										<label for="">Last Ip</label>
+										<input disabled type="text" value="<?= $user['lastIP'] ?>">
+										<span>Last used ip</span>
+									</li>
+									<li>
+										<label for="">Latest Login</label>
+										<input disabled type="date" value="<?= $user['latestDate'] ?>">
+										<span>Latest login date</span>
+									</li>
+									<li>
+										<label for="">Creation Date</label>
+										<input disabled type="date" value="<?= $user['creationDate'] ?>">
+										<span>Date of creation</span>
 									</li>
 								</ul>
 							</form>
@@ -227,8 +251,7 @@
 		 */
 		public function save(){
 			//new save method
-			$this->loadModule( 'audit' );
-			$this->loadModule( 'roles' );
+			$this->loadModules( 'audit roles discipline' );
 			$USER_ROLES = $this->roles->getRolesByModule( $_SESSION['session']['id'], 'user' );
 			$obj = array();
 			$_POST['id'] = Core::sanitize( $_POST['id'] );
@@ -255,7 +278,7 @@
 						}
 
 						//deal with discipline
-						$disciplines = $this->getDisciplinesForUser( $_POST['id'] );
+						$disciplines = $this->discipline->getForUser( $_POST['id'] );
 						$flatDisciplines = array();
 						foreach ( $disciplines as $val ) {
 							array_push( $flatDisciplines, $val['id'] );
@@ -766,9 +789,9 @@
 		 * @return bool
 		 */
 		public function deleteDiscipline( $uid, $did ){
-			$this->loadModule( 'audit' );
+			$this->loadModules( 'audit discipline' );
 			$user = $this->get( $uid, true );
-			$discipline = $this->get( $did, true );
+			$discipline = $this->discipline->get( $did, true );
 			$statement = $this->db->prepare( "DELETE FROM userXdiscipline where userId = ? AND disciplineId = ?" );
 			$statement->bind_param( "ii", $uid, $did );
 			if( $statement->execute() ){
