@@ -16,22 +16,23 @@
 		 */
 		public function listing( $order = 'id' ) {
 			//to kinda standardize it for later needs
-			$this->loadModule( 'roles' );
-			$ROLES = $this->roles->getRolesByModule( Core::getSessionId(), $this->moduleName );
-			if( Core::inArray( 'gCertView', $ROLES ) ) {
-				$page = 1;
-				$limit = 50;
-				$page--;//to make good looking page numbers for users
-				$offset = $page * $limit;
-				$query = "SELECT * FROM certificateList ORDER BY $order";//remove limit for a time LIMIT $page,50
-				if ( !$result = $this->db->query( $query ) ) {
-					echo( 'There was an error running the query [' . $this->db->error . ']' );
-				}
+			$this->loadModules( 'roles discipline' );
+			$fullRoles = $this->roles->getAllForUser( Core::getSessionId() );
+			$userDisciplines = $this->discipline->getIdsForUser( Core::getSessionId() );
+			$page = 1;
+			$limit = 50;
+			$page--;//to make good looking page numbers for users
+			$offset = $page * $limit;
+			$query = "SELECT * FROM certificateList ORDER BY $order";//remove limit for a time LIMIT $page,50
+			if ( !$result = $this->db->query( $query ) ) {
+				echo( 'There was an error running the query [' . $this->db->error . ']' );
+			}
 
-				$return = array();
-				$canEdit = Core::inArray( 'gCertEdit', $ROLES );
-				$canDelete = Core::inArray( 'gCertDelete', $ROLES );
-				while ( $row = $result->fetch_assoc() ) {
+			$return = array();
+			while ( $row = $result->fetch_assoc() ) {
+				if( $this->roles->haveAccess( 'CertView', Core::getSessionId(), $row['discipline'], $fullRoles, $userDisciplines ) ) {
+					$canEdit = $this->roles->haveAccess( 'CertEdit', Core::getSessionId(), $row['discipline'], $fullRoles, $userDisciplines );
+					$canDelete = $this->roles->haveAccess( 'CertEdit', Core::getSessionId(), $row['discipline'], $fullRoles, $userDisciplines );
 					$a = array(
 						'id' => $row['id'],
 						'code' => $row['code'],
@@ -48,31 +49,31 @@
 					);
 					array_push( $return, $a );
 				}
-
-				//get count of data
-				$query = "SELECT COUNT(*) AS items FROM audit";
-				$result->close();
-				if ( !$result = $this->db->query( $query ) ) {
-					echo( 'There was an error running the query [' . $this->db->error . ']' );
-					return null;
-				}
-
-				if ( $result->num_rows == 1 ) {
-					$row = $result->fetch_assoc();
-					$count = $row['items'];
-				}
-				$result->close();
-				$return = array(
-					'listing' => $return,
-					'count' => intval( $count ),
-					'limit' => $limit,
-					'currentPage' => ++$page
-				);
-				if ( IS_AJAX ) {
-					echo Core::ajaxResponse( $return );
-				}
-				return $return;
 			}
+
+			//get count of data
+			$query = "SELECT COUNT(*) AS items FROM audit";
+			$result->close();
+			if ( !$result = $this->db->query( $query ) ) {
+				echo( 'There was an error running the query [' . $this->db->error . ']' );
+				return null;
+			}
+
+			if ( $result->num_rows == 1 ) {
+				$row = $result->fetch_assoc();
+				$count = $row['items'];
+			}
+			$result->close();
+			$return = array(
+				'listing' => $return,
+				'count' => intval( $count ),
+				'limit' => $limit,
+				'currentPage' => ++$page
+			);
+			if ( IS_AJAX ) {
+				echo Core::ajaxResponse( $return );
+			}
+			return $return;
 		}
 
 		/**
@@ -83,10 +84,7 @@
 		public function edit( $params ) {
 			$this->loadModules( 'roles users discipline' );
 			$ROLES = $this->roles->getRolesByModule( $_SESSION['session']['id'], $this->moduleName );
-			if ( $this->users->isLoggedIn() && Core::inArray( 'gCertEdit', $ROLES ) ) {
-				Core::queueStyle( 'assets/css/reset.css' );
-				Core::queueStyle( 'assets/css/ui.css' );
-				//put the data onscreen
+			if ( $this->users->isLoggedIn()  ) {
 				if( gettype( $params ) == 'array' ){
 					$id = $params[0];
 					$lang = (int)$params[1];
@@ -95,10 +93,19 @@
 					$lang = 0;
 				}
 				$data = $this->get( $id, $lang );
-				$data['categories'] = $this->listCategories();
-				$data['disciplines'] = $this->discipline->listing( true );
-				$data['language'] = $lang; //bug fix when there is not a lang cert yet
-				include( CORE_PATH . 'pages/certEdit.php' );
+
+				if( $this->roles->haveAccess( 'CertEdit', Core::getSessionId(), $data['discipline']) ) {
+					Core::queueStyle( 'assets/css/reset.css' );
+					Core::queueStyle( 'assets/css/ui.css' );
+					//put the data onscreen
+
+					$data['categories'] = $this->listCategories();
+					$data['disciplines'] = $this->discipline->listing( true );
+					$data['language'] = $lang; //bug fix when there is not a lang cert yet
+					include( CORE_PATH . 'pages/certEdit.php' );
+				} else{
+					Core::errorPage( 403 );
+				}
 			} else {
 				Core::errorPage( 404 );
 			}
@@ -213,13 +220,11 @@ EOD;
 		 * @param $id
 		 */
 		public function save( $id ) {
-			$this->loadModule( 'users' );
-			$this->loadModule( 'roles' );
-			$ROLES = $this->roles->getRolesByModule( $_SESSION['session']['id'], $this->moduleName );
+			$this->loadModules( 'users roles' );
 			$lang = new Lang( Lang::getCode() );
 			$obj = array();
 			if( $this->users->isLoggedIn() ){
-				if( Core::inArray( 'gCertEdit', $ROLES ) ) {
+				if( $this->roles->haveAccess( 'CertEdit', Core::getSessionId(), Core::sanitize( $_POST['discipline'] ) ) ){
 					$this->loadModule( 'audit' );
 					$id = core::sanitize( $id );
 					$_POST['title'] = core::sanitize( $_POST['title'] ); //certlist description
@@ -292,37 +297,39 @@ EOD;
 		public function create(){
 			$this->loadModules('users roles discipline');
 			$ROLES = $this->roles->getRolesByModule( $_SESSION['session']['id'], $this->moduleName );
-			if( $this->users->isLoggedIn() &&  Core::inArray( 'gCertEdit', $ROLES ) ) {
-				Core::queueStyle( 'assets/css/reset.css' );
-				Core::queueStyle( 'assets/css/ui.css' );
-				//get the next id
+			if( $this->users->isLoggedIn() ) {
+				if( $this->roles->haveAccess( 'CertEdit', Core::getSessionId(), -1 ) ) {
+					Core::queueStyle( 'assets/css/reset.css' );
+					Core::queueStyle( 'assets/css/ui.css' );
+					//get the next id
 
-				$query = "SHOW TABLE STATUS LIKE 'certificateList'";
-				if ( !$result = $this->db->query( $query ) ) {
-					die( 'There was an error running the query [' . $this->db->error . ']' );
+					$query = "SHOW TABLE STATUS LIKE 'certificateList'";
+					if ( !$result = $this->db->query( $query ) ) {
+						die( 'There was an error running the query [' . $this->db->error . ']' );
+					}
+					$row = null;
+					if ( $result->num_rows ) {
+						$row = $result->fetch_assoc();
+						$data = array(
+							'id' => $row['Auto_increment'],
+							'title' => '',
+							'code' => '',
+							'hasAs' => 0,
+							'hasCe' => 0,
+							'category' => 0,
+							'description' => '',
+							'elo' => '',
+							'schedule' => '',
+							'sort' => 0,
+							'categories' => $this->listCategories(),
+							'disciplines' => $this->discipline->listing( true ),
+							'language' => 0,
+							'active' => 0
+						);
+					}
+					$result->close();
+					include( CORE_PATH . 'pages/certEdit.php' );
 				}
-				$row = null;
-				if ( $result->num_rows ) {
-					$row = $result->fetch_assoc();
-					$data = array(
-						'id' => $row['Auto_increment'],
-						'title' => '',
-						'code' => '',
-						'hasAs' => 0,
-						'hasCe' => 0,
-						'category' => 0,
-						'description' => '',
-						'elo' => '',
-						'schedule' => '',
-						'sort' => 0,
-						'categories' => $this->listCategories(),
-						'disciplines' => $this->discipline->listing( true ),
-						'language' => 0,
-						'active' => 0
-					);
-				}
-				$result->close();
-				include( CORE_PATH . 'pages/certEdit.php' );
 			} else{
 				Core::errorPage( 404 );
 			}
@@ -336,16 +343,15 @@ EOD;
 		public function delete( $id ){
 			$this->loadModule( 'users' );
 			$this->loadModule( 'roles' );
-			$ROLES = $this->roles->getRolesByModule( $_SESSION['session']['id'], $this->moduleName );
 			$lang = new Lang( Lang::getCode() );
 			$obj = array();
 //			$_POST = Core::sanitize( $_POST, true );
 			if( $this->users->isLoggedIn() ) {
-				if( Core::inArray( 'gCertDelete', $ROLES ) ) {
+				$row = $this->get( $id, 0, true );
+				if( $this->roles->haveAccess( 'CertDelete', Core::getSessionId(), $row['discipline'] ) ){
 					$id = Core::sanitize( $id );
 					$this->loadModule( 'audit' );
-					$row = $this->get( $id, 0, true );
-					$event = $row['description'];
+					$event = $row['title'];
 
 					$statement = $this->db->prepare( "DELETE FROM certificateList WHERE id=?" );
 					$statement->bind_param( "s", $id );

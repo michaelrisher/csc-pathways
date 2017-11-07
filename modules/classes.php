@@ -17,10 +17,11 @@
 		 */
 		public function listing( $page = 1 ) {
 			$this->loadModules( 'roles discipline' );
-			$userRoles = $this->roles->getRolesByModule( Core::getSessionId(), $this->moduleName );
+//			$userRoles = $this->roles->getRolesByModule( Core::getSessionId(), $this->moduleName );
+			$fullRoles = $this->roles->getAllForUser( Core::getSessionId() );
 			$userDisciplines = $this->discipline->getIdsForUser( Core::getSessionId() );
 			//if user has class view role then do it
-			if ( Core::inArray( 'gClassView', $userRoles ) ) {
+			if ( true ) {
 				$limit = 25;
 				$page--;//to make good looking page numbers for users
 				$offset = $page * $limit;
@@ -50,32 +51,18 @@
 				}
 
 				$return = array();
-				$gEdit = Core::inArray( 'gClassEdit', $userRoles );
-				$gDelete = Core::inArray( 'gClassDelete', $userRoles );
-				$dEdit = Core::inArray( 'dClassEdit', $userRoles );
-				$dDelete = Core::inArray( 'dClassDelete', $userRoles );
-				$canEdit = $gEdit;
-				$canDelete = $gDelete;
 				while ( $row = $result->fetch_assoc() ) {
-					if( !$gEdit && $dEdit ){ //if doesn't have global edit
-						if( Core::inArray( $row['discipline'], $userDisciplines ) ){
-							$canEdit = true;
-						}
+					if ( $this->roles->haveAccess( 'ClassView', Core::getSessionId(), $row['discipline'], $fullRoles, $userDisciplines ) ) {
+						$canEdit = $this->roles->haveAccess( 'ClassEdit', Core::getSessionId(), $row['discipline'], $fullRoles, $userDisciplines );
+						$canDelete = $this->roles->haveAccess( 'ClassDelete', Core::getSessionId(), $row['discipline'], $fullRoles, $userDisciplines );
+						$a = array(
+							'id' => $row['id'],
+							'title' => $row['title'],
+							'edit' => $canEdit,
+							'delete' => $canDelete
+						);
+						array_push( $return, $a );
 					}
-					if( !$gDelete && $dDelete){ //if doesn't have global edit
-						if( Core::inArray( $row['discipline'], $userDisciplines ) ){
-							$canDelete = true;
-						}
-					}
-					$a = array(
-						'id' => $row['id'],
-						'title' => $row['title'],
-						'edit' => $canEdit,
-						'delete' => $canDelete
-					);
-					array_push( $return, $a );
-					if( !$gEdit ) $canEdit = false;
-					if( !$gDelete ) $canDelete = false;
 				}
 
 				//get count of data
@@ -200,8 +187,7 @@ EOD;
 		public function save( $id, $create = false ) {
 			//what if a user from outside discipline wants to create a class for there cert (ie math for a compsci cert)
 			$this->loadModules( 'users audit roles' );
-			$ROLES = $this->roles->getRolesByModule( $_SESSION['session']['id'], $this->moduleName );
-			$lang = new Lang( Lang::getCode() );
+//			$lang = new Lang( Lang::getCode() );
 			$obj = array();
 			$_POST = Core::sanitize( $_POST, true );
 			if ( $this->users->isLoggedIn() ) {
@@ -230,6 +216,8 @@ EOD;
 
 					if ( $setClass && $setClassData ) {
 						$obj['msg'] = 'Saved successfully.';
+						$obj['editable'] = $this->roles->haveAccess( 'ClassEdit', Core::getSessionId(), $_POST['discipline'] );
+						$obj['deletable'] = $this->roles->haveAccess( 'ClassDelete', Core::getSessionId(), $_POST['discipline'] );
 						if( !$create ) {
 							$this->audit->newEvent( "Updated class: " . $_POST['title'] );
 						} else {

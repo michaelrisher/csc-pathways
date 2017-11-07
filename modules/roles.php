@@ -257,15 +257,15 @@ EOD;
 		 * @param int $disciplineId discipline of the object in question
 		 * @return bool
 		 */
-		public function haveAccess( $perm, $userId, $disciplineId ){
+		public function haveAccess( $perm, $userId, $disciplineId, $fullRoles = null, $disciplines = null ){
 			$this->loadModule( 'discipline' );
-			$fullRoles = $this->getAllForUser( $userId );
+			$fullRoles = ( ( isset( $fullRoles ) ) ? ( $fullRoles ) : ( $this->getAllForUser( $userId ) ) );
 			$roles = array();
 			foreach ( $fullRoles as $role ) {
 				array_push( $roles, $role['name'] );
 			}
 
-			$disciplines = $this->discipline->getIdsForUser( $userId );
+			$disciplines = ( ( isset( $disciplines ) ) ? ( $disciplines ) : ( $this->discipline->getIdsForUser( $userId ) ) );;
 
 			if( Core::inArray( 'g' . $perm, $roles ) ){
 				return true;

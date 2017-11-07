@@ -159,10 +159,17 @@ $( document ).ready( function(){
 						displayModal( modal );
 						successful = true;
 						if ( map['create'] ) {
-							$( '.classes .listing ul' ).append( '<li data-id="' + map['id'] + '">' +
-								map['title'] + '<img class="delete" src="' + CORE_URL + 'assets/img/delete.png">'+
-								'<img class="languageEdit tooltip" src="' + CORE_URL + 'assets/img/region.png" title="Edit in Different Language">'+
-								'<img class="edit" src="' + CORE_URL + 'assets/img/edit.svg"></li>' );
+							var str = '<li data-id="' + map['id'] + '">' + map['title'];
+							if ( data.data.deletable ) str += '<img class="delete" src="' + CORE_URL + 'assets/img/delete.png">';
+							if ( data.data.editable ) str += '<img class="languageEdit tooltip" src="' + CORE_URL + 'assets/img/region.png" title="Edit in Different Language"><img class="edit" src="' + CORE_URL + 'assets/img/edit.svg">';
+							str += '</li>';
+
+							$( '.classes .listing ul' ).append( str );
+						} else {
+							var str = map['title'];
+							if ( data.data.deletable ) str += '<img class="delete" src="' + CORE_URL + 'assets/img/delete.png">';
+							if ( data.data.editable ) str += '<img class="languageEdit tooltip" src="' + CORE_URL + 'assets/img/region.png" title="Edit in Different Language"><img class="edit" src="' + CORE_URL + 'assets/img/edit.svg">';
+							$( 'li[data-id=' + map['id'] + ']' ).html( str );
 						}
 						//remove the class cache
 						if ( getStorage( 'invalidateCache' ) ) {
