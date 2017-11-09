@@ -50,7 +50,7 @@
 		 * @return array|void array if forceReturn is true echos echos json otherwise
 		 */
 		public function get( $id, $forceReturn = false ){
-			if( $this->isAdmin() ) {
+			if( $this->isLoggedIn() ) {
 				$query = "SELECT * FROM users WHERE id = '$id'";
 
 				if ( !$result = $this->db->query( $query ) ) {
@@ -94,7 +94,7 @@
 					$user = array(
 						'id' => -1,
 						'username' => '',
-						'isAdmin' => 0,
+//						'isAdmin' => 0,
 						'active' => 0,
 						'lastIP' => '',
 						'creationDate' => date( 'Y-m-d'),
@@ -118,7 +118,7 @@
 							<form>
 								<ul>
 									<input type="hidden" name="id" value="<?= $user['id'] ?>">
-									<input name="isAdmin" type="hidden" value="1" <?= $user['isAdmin'] ? 'checked' : '' ?>>
+									<input name="isAdmin" type="hidden" value="<?= $user['isAdmin'] ? 'checked' : '' ?>">
 									<li>
 										<label for="username">User name</label>
 										<input name="username" type="text" value="<?= $user['username'] ?>">
