@@ -9,18 +9,23 @@
 		private $moduleName = 'users';
 
 		public function listing( $order = 'username' ){
-			$this->loadModule( 'roles' );
-			$ROLES = $this->roles->getRolesByModule( $_SESSION['session']['id'], 'user' );
-			if( Core::inArray( 'gUserView', $ROLES ) ){
-				$query = "SELECT * FROM users WHERE id != -1 ORDER BY " . $order;//remove limit for a time LIMIT $page,50
-				if ( !$result = $this->db->query( $query ) ) {
-					echo( 'There was an error running the query [' . $this->db->error . ']' );
-				}
+			$this->loadModules( 'roles discipline' );
+			$fullRoles = $this->roles->getAllForUser( Core::getSessionId() );
+			$userDisciplines = $this->discipline->getIdsForUser( Core::getSessionId() );
+			$query = "SELECT * FROM users WHERE id != -1 ORDER BY " . $order;//remove limit for a time LIMIT $page,50
+			if ( !$result = $this->db->query( $query ) ) {
+				echo( 'There was an error running the query [' . $this->db->error . ']' );
+			}
 
-				$return = array();
-				$canEdit = Core::inArray( 'gUserEdit', $ROLES );
-				$canDelete = Core::inArray( 'gUserDelete', $ROLES );
-				while ( $row = $result->fetch_assoc() ) {
+			$return = array();
+//			$canEdit = Core::inArray( 'gUserEdit', $ROLES );
+//			$canDelete = Core::inArray( 'gUserDelete', $ROLES );
+			while ( $row = $result->fetch_assoc() ) {
+				//get the roles for users
+				$targetDisciplines = $this->discipline->getIdsForUser( $row['id'] );
+				if( $this->roles->haveAccess( 'UserView', Core::getSessionId(), $targetDisciplines, $fullRoles, $userDisciplines ) ) {
+					$canEdit = $this->roles->haveAccess( 'UserEdit', Core::getSessionId(), $targetDisciplines, $fullRoles, $userDisciplines );
+					$canDelete = $this->roles->haveAccess( 'UserDelete', Core::getSessionId(), $targetDisciplines, $fullRoles, $userDisciplines );
 					$a = array(
 						'id' => $row['id'],
 						'username' => $row['username'],
@@ -29,9 +34,10 @@
 					);
 					array_push( $return, $a );
 				}
-				if( IS_AJAX ){ echo Core::ajaxResponse( $return ); }
-				return $return;
 			}
+			if( IS_AJAX ){ echo Core::ajaxResponse( $return ); }
+			return $return;
+
 		}
 
 		/**
@@ -78,27 +84,27 @@
 		 */
 		public function edit( $id ){
 			$this->loadModules( "roles discipline" );
-			$ROLES = $this->roles->getRolesByModule( $_SESSION['session']['id'], 'user' );
 			//check if user can edit
 			if( $this->isLoggedIn() ) {
-				if ( Core::inArray( 'gUserEdit', $ROLES ) && IS_AJAX ) {
-					//get user and force return
-					if ( $id != -1 ) {
-						$user = $this->get( $id, true );
-					} else {
-						$user = array(
-							'id' => -1,
-							'username' => '',
-							'isAdmin' => 0,
-							'active' => 0,
-							'lastIP' => '',
-							'creationDate' => '',
-							'latestDate' => ''
-						);
-					}
-					$user['creationDate'] = explode(' ',  $user['creationDate'] )[0];
-					$user['latestDate'] = explode(' ',  $user['latestDate'] )[0];
-
+				//get user and force return
+				if ( $id != -1 ) {
+					$user = $this->get( $id, true );
+					$user['disciplines'] = $this->discipline->getIdsForUser( $user['id'] );
+				} else {
+					$user = array(
+						'id' => -1,
+						'username' => '',
+						'isAdmin' => 0,
+						'active' => 0,
+						'lastIP' => '',
+						'creationDate' => date( 'Y-m-d'),
+						'latestDate' => '',
+						'disciplines' => -1
+					);
+				}
+				$user['creationDate'] = explode(' ',  $user['creationDate'] )[0];
+				$user['latestDate'] = explode(' ',  $user['latestDate'] )[0];
+				if ( $this->roles->haveAccess( 'UserEdit', Core::getSessionId(), $user['disciplines'] ) && IS_AJAX ) {
 //				Core::debug( $user );
 					?>
 					<div class='tabWrapper users'>
@@ -148,10 +154,10 @@
 								<?php
 									$canAssign = false;
 //									Core::debug( $ROLES );
-									if( $user['id'] == $_SESSION['session']['id'] && Core::inArray( 'gUserRoles', $ROLES ) ){
+									if( $user['id'] == $_SESSION['session']['id'] && $this->roles->haveAccess( "UserRoles", Core::getSessionId(), $user['disciplines'] ) ){
 										$canAssign = true;
 									}
-									if( Core::inArray( 'gUserRoles', $ROLES ) ){
+									if( $this->roles->haveAccess( "UserRoles", Core::getSessionId(), $user['disciplines'] ) ){
 										$canAssign = true;
 									}
 									$roles = $this->roles->getAllForUser( $user['id'] );
@@ -187,10 +193,10 @@
 									$canAssign = true;
 									$list = array();
 									$canAssign = false;
-									if( $user['id'] == $_SESSION['session']['id'] && Core::inArray( 'gUserRoles', $ROLES ) ){
+									if( $user['id'] == $_SESSION['session']['id'] && $this->roles->haveAccess( "UserRoles", Core::getSessionId(), $user['disciplines'] ) ){
 										$canAssign = true;
 									}
-									if( Core::inArray( 'gUserEdit', $ROLES ) ){
+									if( $this->roles->haveAccess( "UserRoles", Core::getSessionId(), $user['disciplines'] ) ){
 										$canAssign = true;
 									}
 									$disciplines = $this->discipline->getForUser( $user['id'] );
@@ -254,10 +260,11 @@
 			$this->loadModules( 'audit roles discipline' );
 			$USER_ROLES = $this->roles->getRolesByModule( $_SESSION['session']['id'], 'user' );
 			$obj = array();
-			$_POST['id'] = Core::sanitize( $_POST['id'] );
-			$_POST['username'] = Core::sanitize( $_POST['username'] );
-			$_POST['active'] = Core::sanitize( $_POST['active'] );
-			$_POST['isAdmin'] = Core::sanitize( $_POST['isAdmin'] );
+			$_POST = Core::sanitize( $_POST );
+//			$_POST['id'] = Core::sanitize( $_POST['id'] );
+//			$_POST['username'] = Core::sanitize( $_POST['username'] );
+//			$_POST['active'] = Core::sanitize( $_POST['active'] );
+//			$_POST['isAdmin'] = Core::sanitize( $_POST['isAdmin'] );
 			$obj['error'] = ''; //initialize for later use
 
 			if( $this->isLoggedIn() ) {
@@ -266,7 +273,7 @@
 				} else {
 					//save the normal stuff
 					$error = false;
-					if ( Core::inArray( 'gUserEdit', $USER_ROLES ) ) {
+					if ( $this->roles->haveAccess( "UserEdit", Core::getSessionId(), json_decode( $_POST['disciplines'] ) ) ) {
 						$statement = $this->db->prepare( "UPDATE users SET username=?, isAdmin=?, active=? WHERE id=? " );
 						$statement->bind_param( "siii", $_POST['username'], $_POST['isAdmin'], $_POST['active'], $_POST['id'] );
 						if ( $statement->execute() ) {
@@ -403,13 +410,13 @@
 		 * only allowed if the user is admin
 		 */
 		public function delete(){
-			$this->loadModule( 'roles' );
-			$this->loadModule( 'audit' );
-			$ROLES = $this->roles->getRolesByModule( $_SESSION['session']['id'], 'user' );
+			$this->loadModules( 'roles audit discipline' );
+//			$ROLES = $this->roles->getRolesByModule( $_SESSION['session']['id'], 'user' );
 			$obj = array();
 			$_POST = Core::sanitize( $_POST, true );
 			if( $this->isLoggedIn() ) {
-				if ( Core::inArray( 'gUserEdit', $ROLES ) && $this->isLoggedIn() ) {
+				$target = $this->discipline->getIdsForUser( $_POST['id'] );
+				if ( $this->roles->haveAccess( 'UserDelete', Core::getSessionId(), $target ) && $this->isLoggedIn() ) {
 					$query = "SELECT username FROM users WHERE id = '${_POST['id']}'";
 					$event = '';
 					if ( !$result = $this->db->query( $query ) ) {
@@ -446,56 +453,59 @@
 		 * @return string
 		 */
 		public function createResetPassword( $id, $forceReturn = false, $noLog = false ){
-			$this->loadModule( 'audit' );
-			if( $this->isAdmin() ) {
+			$this->loadModules( 'audit roles discipline' );
+			if( $this->isLoggedIn() ) {
 				$hasToken = false;
 				$id = Core::sanitize( $id );
-				//check if token already exists
-				$query = "SELECT * FROM tokens WHERE forUser = " . (int)$id . " AND used = 0";
-				if( $result = $this->db->query($query) ){
-					$row = null;
-					//if there was a user matching
-					if( $result->num_rows == 1 ){
-						$row = $result->fetch_assoc();
-						$token = $row['token'];
-						$hasToken = true;
+				$targetDisciplines = $this->discipline->getIdsForUser( $id );
+				if( $this->roles->haveAccess( 'UserEdit', Core::getSessionId(), $targetDisciplines ) ) {
+					//check if token already exists
+					$query = "SELECT * FROM tokens WHERE forUser = " . (int)$id . " AND used = 0";
+					if ( $result = $this->db->query( $query ) ) {
+						$row = null;
+						//if there was a user matching
+						if ( $result->num_rows == 1 ) {
+							$row = $result->fetch_assoc();
+							$token = $row['token'];
+							$hasToken = true;
+						}
 					}
-				}
 
-				if( !$hasToken ) {
-					//create the token since none exist
-					$token = Core::userFriendlyId( 15 );
-					$statement = $this->db->prepare( "INSERT INTO tokens(token, forUser, byUser) VALUES (?,?,?)" );
-					$statement->bind_param( "sii", $token, $id, $_SESSION['session']['id'] );
-					if ( $statement->execute() ) {
-						$obj['msg'] = "Give the user this link so they can set their password<br>";
+					if ( !$hasToken ) {
+						//create the token since none exist
+						$token = Core::userFriendlyId( 15 );
+						$statement = $this->db->prepare( "INSERT INTO tokens(token, forUser, byUser) VALUES (?,?,?)" );
+						$statement->bind_param( "sii", $token, $id, $_SESSION['session']['id'] );
+						if ( $statement->execute() ) {
+							$obj['msg'] = "Give the user this link so they can set their password<br>";
+							$obj['msg'] .= '<a href="' . CORE_URL . 'users/resetPassword&token=' . $token . '">';
+							$obj['msg'] .= CORE_URL . 'users/resetPassword&token=' . $token . "</a>";
+							if ( !$noLog ) {
+								$user = $this->get( $id, true );
+								$this->audit->newEvent( "Reset password for user: " . $user['username'] );
+							}
+							if ( !$forceReturn ) {
+								echo Core::ajaxResponse( $obj );
+							} else {
+								return $token;
+							}
+						} else {
+							$obj['error'] = $statement->error;
+							if ( !$forceReturn ) {
+								echo Core::ajaxResponse( $obj, false );
+							} else {
+								return $token;
+							}
+						}
+					} else {
+						$obj['msg'] = "User already has an existing unused token<br>Give the user this link so they can set their password<br>";
 						$obj['msg'] .= '<a href="' . CORE_URL . 'users/resetPassword&token=' . $token . '">';
 						$obj['msg'] .= CORE_URL . 'users/resetPassword&token=' . $token . "</a>";
-						if( !$noLog ){
-							$user = $this->get( $id, true );
-							$this->audit->newEvent( "Reset password for user: " . $user['username'] );
-						}
-						if( !$forceReturn ){
+						if ( !$forceReturn ) {
 							echo Core::ajaxResponse( $obj );
 						} else {
 							return $token;
 						}
-					} else {
-						$obj['error'] = $statement->error;
-						if( !$forceReturn ){
-							echo Core::ajaxResponse( $obj, false );
-						} else {
-							return $token;
-						}
-					}
-				} else {
-					$obj['msg'] = "User already has an existing unused token<br>Give the user this link so they can set their password<br>";
-					$obj['msg'] .= '<a href="' . CORE_URL . 'users/resetPassword&token=' . $token . '">';
-					$obj['msg'] .= CORE_URL . 'users/resetPassword&token=' . $token . "</a>";
-					if( !$forceReturn ){
-						echo Core::ajaxResponse( $obj );
-					} else {
-						return $token;
 					}
 				}
 			}

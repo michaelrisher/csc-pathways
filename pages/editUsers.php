@@ -30,13 +30,17 @@
 						<?php
 							$GLOBALS['main']->loadModule( 'users' );
 							$data = $GLOBALS['main']->users->listing();
-							foreach ( $data as $user ) {
-								echo "<li data-id='${user['id']}'>${user['username']}";
-								if( $user['delete'] )
-									echo "<img class='delete tooltip' src='". CORE_URL ."assets/img/delete.png' title='Delete User'/>";
-								if( $user['edit'] )
-									echo "<img class='edit tooltip' src='". CORE_URL ."assets/img/edit.svg' title='Edit User'/>";
-								echo "</li>";
+							if( isset( $data ) ) {
+								foreach ( $data as $user ) {
+									echo "<li data-id='${user['id']}'>${user['username']}";
+									if ( $user['delete'] )
+										echo "<img class='delete tooltip' src='" . CORE_URL . "assets/img/delete.png' title='Delete User'/>";
+									if ( $user['edit'] )
+										echo "<img class='edit tooltip' src='" . CORE_URL . "assets/img/edit.svg' title='Edit User'/>";
+									echo "</li>";
+								}
+							} else{
+								echo "<li>There are no users or you do not have the rights to see users</li>";
 							}
 						?>
 					</ul>

@@ -7,6 +7,8 @@
 	 * Time: 10:02
 	 */
 	class Core {
+		private static $uniqueIds = array();
+
 		public static function queueScript( $url ) {
 			if ( file_exists( CORE_PATH . $url ) ) {
 				$GLOBALS['scriptQueue'][$url] = CORE_URL . $url . '?' . filemtime( $url );

@@ -5,6 +5,7 @@
 	 * Date: 7/12/2017
 	 * Time: 12:01
 	 */
+	$GLOBALS['main']->loadModule( 'roles' );
 ?>
 <div id="headerWrapper">
 	<div id="header">
@@ -18,9 +19,11 @@
 				<li><a href="<?= CORE_URL ?>admin">Admin Home</a></li>
 				<li><a href="<?= CORE_URL ?>editClass">Classes</a></li>
 				<li><a href="<?= CORE_URL ?>editCerts">Certificates</a></li>
-<!--				--><?php //if( $GLOBALS['main']->users->isAdmin() ) { ?>
-					<li><a href="<?= CORE_URL ?>editUsers">Users</a></li>
-<!--				--><?php //} ?>
+				<li><a href="<?= CORE_URL ?>editUsers">Users</a></li>
+				<?php if( $GLOBALS['main']->roles->haveAccess( 'dataManage', Core::getSessionId(), -1 ) ) { ?>
+					<li><a href="<?= CORE_URL ?>editDisciplines">Disciplines</a></li>
+					<li><a href="<?= CORE_URL ?>editPages">Pages</a></li>
+				<?php } ?>
 			</ul>
 			<div class="floatright">
 				<a href="<?= CORE_URL ?>help">Help</a>

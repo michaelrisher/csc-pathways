@@ -7,6 +7,7 @@
 	 * Time: 18:49
 	 */
 	class roles extends Main {
+		private $moduleName = 'roles';
 
 		/**
 		 *
@@ -222,6 +223,7 @@ EOD;
 
 		public function modalUserAddRole(){
 			$roles = $this->listing( 'module', true );
+			$this->loadModule( 'users' );
 			?>
 			<form>
 				<ul>
@@ -232,6 +234,11 @@ EOD;
 								$module='';
 								$firstRun = true;
 								foreach( $roles as $role ){
+									if( $role['name'] == 'dataManage' ){
+										if( !$this->users->isAdmin() ){
+											continue;
+										}
+									}
 									if( $module != $role['module'] ){
 										if( !$firstRun ){
 											echo '</optgroup>';
@@ -271,12 +278,31 @@ EOD;
 				return true;
 			} else {
 				if( Core::inArray( 'd' . $perm, $roles ) ){
-					if ( $disciplineId == -1 ) {
-						return true;
-					} else if( Core::inArray( $disciplineId, $disciplines ) ){
-						return true;
+					if( !is_array( $disciplineId ) ) {
+						if ( $disciplineId == -1 ) {
+							return true;
+						} else if ( Core::inArray( $disciplineId, $disciplines ) ) {
+							return true;
+						}
+					} else {
+						for( $i = 0; $i < count( $disciplineId ); $i++ ){
+							if ( $disciplineId[$i] == -1 ) {
+								return true;
+							} else if ( Core::inArray( $disciplineId[$i], $disciplines ) ) {
+								return true;
+							}
+						}
+					}
+				} else { //for roles like dataManage
+					if( Core::inArray( $perm, $roles ) ){
+						if ( $disciplineId == -1 ) {
+							return true;
+						} else if ( Core::inArray( $disciplineId, $disciplines ) ) {
+							return true;
+						}
 					}
 				}
+
 			}
 			return false;
 		}

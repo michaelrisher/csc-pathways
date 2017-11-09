@@ -157,7 +157,7 @@ $( document ).ready( function(){
 					setModalContent( modal, data.data.msg );
 					displayModal( modal );
 				} else {
-					var modal = createModal( { title: "Error Saving User", buttons: [{ value: 'Ok' }] } );
+					var modal = createModal( { title: "Error Resetting User", buttons: [{ value: 'Ok' }] } );
 					setModalContent( modal, data.data.error );
 					displayModal( modal );
 				}
@@ -290,7 +290,9 @@ $( document ).ready( function(){
 		idsSet.splice( index, 1 );
 		$( '.userRoles input[name=roles]' ).val( JSON.stringify( idsSet ) );
 
-		$( li ).slideUp( 400 );
+		$( li ).slideUp( 400, function(){
+			$( li ).remove();
+		} );
 
 	} );
 
@@ -352,7 +354,7 @@ $( document ).ready( function(){
 
 
 	/******************************************************************************/
-	/******************************delete user role********************************/
+	/******************************delete user discipline**************************/
 	/******************************************************************************/
 	$( document ).on( 'click', '.modal .userDept img.delete', function(){
 		var li = $( this ).closest( 'li' );
@@ -364,7 +366,9 @@ $( document ).ready( function(){
 		idsSet.splice( index, 1 );
 		$( '.userDept input[name=depts]' ).val( JSON.stringify( idsSet ) );
 
-		$( li ).slideUp( 400 );
+		$( li ).slideUp( 400, function(){
+			$( li ).remove();
+		}  );
 
 	} );
 } );
