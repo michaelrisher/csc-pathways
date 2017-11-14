@@ -159,6 +159,7 @@ ORDER by certificateData.language ASC
 EOD;
 			if ( !$result = $this->db->query( $query ) ) {
 				echo Core::ajaxResponse( array( 'error' => "An error occurred please try again" ), false );
+				error_log( 'certs:162 ' . $this->db->error );
 				return null;
 			}
 

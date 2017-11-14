@@ -627,7 +627,7 @@
 			if( !$result = $this->db->query($query) ){
 //				die('There was an error running the query [' . $this->db->error . ']');
 				//if there was an error report it to the user
-				$obj['error'] = $lang->o( 'ajaxErrorOccurred' ); //"An error occurred please try again";
+				$obj['error'] = "An error occurred please try again";
 				echo Core::ajaxResponse( $obj, false );
 				return;
 			}

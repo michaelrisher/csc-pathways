@@ -86,7 +86,7 @@
 					'listing' => $return,
 					'count' => intval( $count ),
 					'limit' => $limit,
-					'currentPage' => ++$page );
+					'currentPage' => (int)++$page );
 				if ( IS_AJAX ) {
 					echo Core::ajaxResponse( $return );
 				}
@@ -297,7 +297,7 @@ EOD;
 		 * ajax to recieve the html modal with all data included
 		 * @param int $id
 		 */
-		public function edit( $id =-1 ){
+		public function edit( $id = -1 ){
 			$this->loadModules( "roles users discipline" );
 			//get first
 			if( $id != -1 ){

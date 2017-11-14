@@ -24,7 +24,7 @@
 	<?php include CORE_PATH . 'assets/inc/logo.php'; ?>
 	<div id="main">
 		<div class="admin">
-			<div class="classes aligncenter margin15Bottom">
+			<div class="disciplines aligncenter margin15Bottom">
 				<p>Disciplines</p>
 				<div class="listing alignleft">
 					<ul>
@@ -37,7 +37,7 @@
 							foreach ( $data as $item ) {
 								echo "<li data-id='${item['id']}'>${item['description']}";
 								echo "<img class='delete tooltip' title='Delete class' src='" . CORE_URL . "assets/img/delete.png'/>";
-								echo "<img class='edit tooltip' title='Edit class' src='" . CORE_URL . "assets/img/edit.svg'/>";
+								echo "<img class='edit tooltip' title='Edit discipline' src='" . CORE_URL . "assets/img/edit.svg'/>";
 								echo "</li>";
 							}
 						} else{
@@ -55,7 +55,7 @@
 </div>
 <?php
 	include_once CORE_PATH . 'assets/inc/footer.php';
-//	Core::queueScript( 'assets/js/classes.js' );
+	Core::queueScript( 'assets/js/discipline.js' );
 	Core::includeScripts();
 ?>
 

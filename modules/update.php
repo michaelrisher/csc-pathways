@@ -26,6 +26,7 @@ EOD;
 				if ( $this->db->query( $query ) ) {
 					echo "ran successfully";
 				} else {
+					$this->db->error;
 					echo "failed update";
 				}
 			}
