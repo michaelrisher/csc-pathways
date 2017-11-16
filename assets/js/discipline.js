@@ -179,7 +179,8 @@ $( document ).ready( function(){
 			}]
 		} );
 
-		setModalContent( modal, "<p>Are you sure you want to delete. This can not be undone</p>" );
+		setModalContent( modal, "<p style='color:red'>If this discipline is being used the references to this discipline will remain. This will cause major problems</p>" +
+			"<p>Are you sure you want to delete. This can not be undone</p>" );
 		displayModal( modal );
 	} );
 

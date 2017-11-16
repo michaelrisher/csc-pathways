@@ -7,7 +7,7 @@
 	 */
 
 	$data = Core::sanitize( $data );
-	$id = $data['params'];
+	$id = $data['params'][1];
 	$GLOBALS['main']->loadModule( 'classes' );
 	$row = $GLOBALS['main']->classes->get( $id, Lang::getCode(), true );
 	$lang = new Lang( Lang::getCode() );

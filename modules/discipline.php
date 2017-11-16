@@ -120,6 +120,11 @@
 								<input disabled type="number" value="<?=$discipline['usage']['users']?>">
 								<span>Classes with discipline</span>
 							</li>
+							<li>
+								<label for="">Pages with discipline</label>
+								<input disabled type="number" value="<?=$discipline['usage']['pages']?>">
+								<span>Classes with discipline</span>
+							</li>
 						</ul>
 					</form><?php
 				 }else {
@@ -224,6 +229,13 @@
 			if ( $result = $this->db->query( $query ) ) {
 				$row = $result->fetch_assoc();
 				$usage['users'] = $row['count'];
+				$result->close();
+			}
+
+			$query = "SELECT count(*) as count from pages where discipline = $did";
+			if ( $result = $this->db->query( $query ) ) {
+				$row = $result->fetch_assoc();
+				$usage['pages'] = $row['count'];
 				$result->close();
 			}
 

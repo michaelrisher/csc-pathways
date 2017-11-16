@@ -15,7 +15,7 @@
 <head>
 	<?php
 		include_once CORE_PATH . 'assets/inc/header.php';
-		Core::queueStyle( 'assets/css/select2.css' );
+//		Core::queueStyle( 'assets/css/select2.css' );
 		Core::includeStyles();
 	?>
 </head>
