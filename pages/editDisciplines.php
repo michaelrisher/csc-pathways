@@ -36,7 +36,7 @@
 						if( isset( $data ) ) {
 							foreach ( $data as $item ) {
 								echo "<li data-id='${item['id']}'>${item['description']}";
-								echo "<img class='delete tooltip' title='Delete class' src='" . CORE_URL . "assets/img/delete.png'/>";
+								echo "<img class='delete tooltip' title='Delete discipline' src='" . CORE_URL . "assets/img/delete.png'/>";
 								echo "<img class='edit tooltip' title='Edit discipline' src='" . CORE_URL . "assets/img/edit.svg'/>";
 								echo "</li>";
 							}

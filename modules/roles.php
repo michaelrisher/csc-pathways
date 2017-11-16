@@ -295,6 +295,9 @@ EOD;
 					}
 				} else { //for roles like dataManage
 					if( Core::inArray( $perm, $roles ) ){
+						if( $perm == 'dataManage' ){ //data managers ignore discipline overrides
+							return true;
+						}
 						if ( $disciplineId == -1 ) {
 							return true;
 						} else if ( Core::inArray( $disciplineId, $disciplines ) ) {

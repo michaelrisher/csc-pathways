@@ -34,8 +34,8 @@
 						if( isset( $data ) ) {
 							foreach ( $data['listing'] as $item ) {
 								echo "<li data-id='${item['id']}'>${item['name']}";
-								echo "<img class='delete tooltip' title='Delete class' src='" . CORE_URL . "assets/img/delete.png'/>";
-								echo "<img class='edit tooltip' title='Edit discipline' src='" . CORE_URL . "assets/img/edit.svg'/>";
+								echo "<img class='delete tooltip' title='Delete Page' src='" . CORE_URL . "assets/img/delete.png'/>";
+								echo "<a href='pages/edit/${item['id']}'><img class='edit tooltip' title='Edit Page' src='" . CORE_URL . "assets/img/edit.svg'/></a>";
 								echo "</li>";
 							}
 						} else{

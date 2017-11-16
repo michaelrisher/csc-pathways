@@ -272,7 +272,7 @@ html, body{ background-color: #d3dce6; }
 				}
 			}
 
-			.certs{
+			.certs, .pages{
 				form{
 					ul{
 						li {
@@ -413,8 +413,28 @@ form{
 			font-family: Arial, Helvetica, sans-serif;
 			font-size: 11px;
 		}
+
+		div.tripleInput{
+			.alignleft;
+			input[type='file']{
+				display: none;
+			}
+			input[type="text"], input[type="date"], input[type="datetime"], input[type="email"], input[type="number"], input[type="search"], input[type="time"], input[type="url"], input[type="password"], textarea, select {
+				width: 350px !important;
+				display: inline-block !important;
+				margin-right: 15px;
+			}
+
+			input[type="submit"],  input[type="button"], button{
+				margin-right: 15px;
+				height: 30px;
+				padding: 5px 20px 5px 20px;
+				vertical-align: middle;
+			}
+		}
 	}
 }
+
 input[disabled], input[readonly]{
 	cursor: not-allowed;
 }
@@ -438,7 +458,7 @@ input[type="text"], input[type="date"], input[type="datetime"], input[type="emai
 	height: 35px;
 }
 
-input[type="submit"],  input[type="button"]{
+input[type="submit"],  input[type="button"], button{
 	background: #2471FF;
 	border: none;
 	padding: 10px 20px 10px 20px;

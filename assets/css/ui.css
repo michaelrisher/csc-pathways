@@ -612,10 +612,12 @@ body {
   padding-left: 46px;
   padding-right: 15px;
 }
-#wrapper #main .admin .certs form ul li {
+#wrapper #main .admin .certs form ul li,
+#wrapper #main .admin .pages form ul li {
   border: 1px solid #a2aab2;
 }
-#wrapper #main .admin .certs form ul li:last-child {
+#wrapper #main .admin .certs form ul li:last-child,
+#wrapper #main .admin .pages form ul li:last-child {
   border: none;
   margin-bottom: 0px;
   text-align: center;
@@ -734,6 +736,35 @@ form ul li > span:last-child {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 11px;
 }
+form ul div.tripleInput {
+  text-align: left;
+}
+form ul div.tripleInput input[type='file'] {
+  display: none;
+}
+form ul div.tripleInput input[type="text"],
+form ul div.tripleInput input[type="date"],
+form ul div.tripleInput input[type="datetime"],
+form ul div.tripleInput input[type="email"],
+form ul div.tripleInput input[type="number"],
+form ul div.tripleInput input[type="search"],
+form ul div.tripleInput input[type="time"],
+form ul div.tripleInput input[type="url"],
+form ul div.tripleInput input[type="password"],
+form ul div.tripleInput textarea,
+form ul div.tripleInput select {
+  width: 350px !important;
+  display: inline-block !important;
+  margin-right: 15px;
+}
+form ul div.tripleInput input[type="submit"],
+form ul div.tripleInput input[type="button"],
+form ul div.tripleInput button {
+  margin-right: 15px;
+  height: 30px;
+  padding: 5px 20px 5px 20px;
+  vertical-align: middle;
+}
 input[disabled],
 input[readonly] {
   cursor: not-allowed;
@@ -766,7 +797,8 @@ select {
   height: 35px;
 }
 input[type="submit"],
-input[type="button"] {
+input[type="button"],
+button {
   background: #2471FF;
   border: none;
   padding: 10px 20px 10px 20px;
@@ -775,21 +807,25 @@ input[type="button"] {
   color: #D2E2FF;
 }
 input[type="submit"]:hover,
-input[type="button"]:hover {
+input[type="button"]:hover,
+button:hover {
   background: #6B9FFF;
   color: #fff;
 }
 input[type="submit"].low,
-input[type="button"].low {
+input[type="button"].low,
+button.low {
   background: #8c8c8c;
   border-bottom: 3px solid #c8c8c8;
 }
 input[type="submit"].low:hover,
-input[type="button"].low:hover {
+input[type="button"].low:hover,
+button.low:hover {
   background: #b6b5b5;
 }
 input[type="submit"].processing,
-input[type="button"].processing {
+input[type="button"].processing,
+button.processing {
   background-image: url('../img/ajax-loader.gif');
   background-repeat: no-repeat;
   background-position-x: 19px;
