@@ -59,7 +59,7 @@
 									}
 								?>
 							</select>
-							<span>Enter the class ID</span>
+							<span>Enter the dicipline for the certificate</span>
 						</li>
 						<li>
 							<label for="units">Units*</label>
