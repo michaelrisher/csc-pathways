@@ -94,7 +94,7 @@
 					$user = array(
 						'id' => -1,
 						'username' => '',
-//						'isAdmin' => 0,
+						'isAdmin' => 0,
 						'active' => 0,
 						'lastIP' => '',
 						'creationDate' => date( 'Y-m-d'),
@@ -119,6 +119,7 @@
 								<ul>
 									<input type="hidden" name="id" value="<?= $user['id'] ?>">
 									<input name="isAdmin" type="hidden" value="<?= $user['isAdmin'] ? 'checked' : '' ?>">
+									<?php if( $user['id'] == -1 ) echo '<input name="create" type="hidden" value="1">'; ?>
 									<li>
 										<label for="username">User name</label>
 										<input name="username" type="text" value="<?= $user['username'] ?>">
@@ -193,10 +194,10 @@
 									$canAssign = true;
 									$list = array();
 									$canAssign = false;
-									if( $user['id'] == $_SESSION['session']['id'] && $this->roles->haveAccess( "UserRoles", Core::getSessionId(), $user['disciplines'] ) ){
+									if( $user['id'] == $_SESSION['session']['id'] && $this->roles->haveAccess( "UserEdit", Core::getSessionId(), $user['disciplines'] ) ){
 										$canAssign = true;
 									}
-									if( $this->roles->haveAccess( "UserRoles", Core::getSessionId(), $user['disciplines'] ) ){
+									if( $this->roles->haveAccess( "UserEdit", Core::getSessionId(), $user['disciplines'] ) ){
 										$canAssign = true;
 									}
 									$disciplines = $this->discipline->getForUser( $user['id'] );
@@ -268,7 +269,7 @@
 			$obj['error'] = ''; //initialize for later use
 
 			if( $this->isLoggedIn() ) {
-				if ( isset( $_POST['create'] ) && $_POST['create'] == 'create' ) {
+				if ( $_POST['id'] == -1 ) {
 					$this->create( $_POST );
 				} else {
 					//save the normal stuff
@@ -367,40 +368,79 @@
 		}
 
 		/**
-		 * get the next unused id in the table
+		 * Create a user for the first time
+		 * @param array $data this is the post data from save function
 		 */
 		private function create( $data ){
-			//TODO if the user can not edit the roles make the default roles be view only
-			if( $this->isAdmin() ) {
-				$this->loadModule( 'audit' );
-				$query = "SHOW TABLE STATUS LIKE 'users'";
-				$id = -1;
-				if ( !$result = $this->db->query( $query ) ) {
-					die( 'There was an error running the query [' . $this->db->error . ']' );
-				}
-				$row = null;
-				if ( $result->num_rows ) {
-					$row = $result->fetch_assoc();
-					$id = $row['Auto_increment'];
-					$statement = $this->db->prepare( "INSERT INTO users( username, password, isAdmin, active ) VALUES( ?,' ',?,? )" );
-					$statement->bind_param( 'sii', $_POST['username'], $_POST['isAdmin'], $_POST['active'] );
-					if( $statement->execute() ){
-						$token = $this->createResetPassword( $id, true, false );
-						$obj['msg'] = "Created User successfully<br>";
-						$obj['msg'] .= "Give the user this link so they can set their password<br>";
-						$obj['msg'] .= '<a href="' . CORE_URL . 'users/resetPassword&token=' . $token . '">';
-						$obj['msg'] .= CORE_URL . 'users/resetPassword&token=' . $token . "</a>";
-						$obj['id'] = $id;
-						echo Core::ajaxResponse( $obj, true );
-						$this->audit->newEvent( 'Created user: ' . $_POST['username']);
-					} else{
-						$obj['error'] = $statement->error;
+			$obj = array();
+			if( $this->isLoggedIn() ) {
+				$error = false;
+				if ( $this->roles->haveAccess( "UserEdit", Core::getSessionId(), -1 ) ) {
+					$statement = $this->db->prepare( "INSERT INTO users (username,isAdmin,active) VALUES (?,?,?) " );
+					$statement->bind_param( "sii", $_POST['username'], $_POST['isAdmin'], $_POST['active'] );
+					if ( $statement->execute() ) {
+						$obj['msg'] = "User created successfully.";
+						$this->audit->newEvent( "Created user: " . $_POST['username'] );
+					} else {
+						$error = true;
+						$obj['error'] .= "An error occurred saving a user.<br>";
 						echo Core::ajaxResponse( $obj, false );
+						return;
+					}
+					//get an id
+					$id = $this->db->insert_id;
+
+					//deal with discipline
+					$postedDisciplines = json_decode( $_POST['disciplines'] );
+
+					$disciplineError = false;
+
+					//add disciplines
+					foreach ( $postedDisciplines as $item ) {
+						$temp = $this->addDiscipline( $id, $item );
+						if ( $temp == false )
+							$disciplineError = true;
+					}
+
+					if ( $disciplineError ) {
+						$obj['error'] .= "An error occurred saving the disciplines<br>";
+						$error = true;
 					}
 				}
-				$result->close();
-			} else{
-				$obj['error'] = "Session expired.<br>Please log in again";
+
+				//if editing roles
+				if ( $this->roles->haveAccess( "UserAssign", Core::getSessionId(), -1 )) {
+					//get all the roles for user and compare to whats is in the database already
+
+					$postedRoles = json_decode( $_POST['roles'] );
+
+					$roleError = false;
+
+					//add roles
+					foreach ( $postedRoles as $item ) {
+						$temp = $this->roles->add( $id, $item );
+						if ( $temp == false )
+							$roleError = true;
+					}
+
+					if ( $roleError ) {
+						$obj['error'] .= "An error occurred saving the roles<br>";
+						$error = true;
+					}
+				}
+
+				if ( $error ) {
+					echo Core::ajaxResponse( $obj, false );
+				} else {
+					$token = $this->createResetPassword( $id, true, false );
+					$obj['msg'] = "Created User successfully<br>";
+					$obj['msg'] .= "Give the user this link so they can set their password<br>";
+					$obj['msg'] .= '<a href="' . CORE_URL . 'users/resetPassword&token=' . $token . '">';
+					$obj['msg'] .= CORE_URL . 'users/resetPassword&token=' . $token . "</a>";
+					echo Core::ajaxResponse( $obj );
+				}
+			} else {
+				$obj['error'] .= "Session expired.<br>Please log in again";
 				echo Core::ajaxResponse( $obj, false );
 			}
 		}
@@ -427,7 +467,14 @@
 
 					$statement = $this->db->prepare( "DELETE FROM users WHERE id=?" );
 					$statement->bind_param( "s", $_POST['id'] );
+
+
+
 					if ( $statement->execute() ) {
+						//delete any roles they have and disciplines
+						$this->deleteAllDisciplines( $_POST['id'] );
+						$this->roles->deleteAll( $_POST['id'] );
+
 						$obj['msg'] = "Deleted successfully.";
 						$this->audit->newEvent( "Deleted user: " . $event );
 						echo Core::ajaxResponse( $obj );
@@ -809,6 +856,20 @@
 				return true;
 			}
 			return false;
+		}
+
+		/**
+		 * Deleting all discipline from a user
+		 * @param int $uid user id
+		 */
+		public function deleteAllDisciplines( $uid ){
+			$this->loadModules( 'audit discipline' );
+			$disciplines = $this->discipline->getIdsForUser( $uid );
+			foreach ( $disciplines as $discipline ) {
+				$statement = $this->db->prepare( "DELETE FROM userXdiscipline where userId = ? AND disciplineId = ?" );
+				$statement->bind_param( "ii", $uid, $discipline );
+				$statement->execute();
+			}
 		}
 
 		/**

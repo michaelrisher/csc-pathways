@@ -30,7 +30,7 @@ $( document ).ready( function(){
 			url: CORE_URL + 'rest/users/edit/-1',
 			success: function ( data ) {
 				if ( data ) {
-					createUserModal( data, false );
+					createUserModal( data, true );
 				} else {
 					var modal = createModal( { title: 'Failed to load user', buttons: [{ value: 'Ok', focus : true }] } );
 					setModalContent( modal, "An error occurred." );

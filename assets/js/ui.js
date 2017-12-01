@@ -160,7 +160,7 @@ $( document ).ready( function () {
 		}
 
 		if ( map['stage'] == 1 ) {
-			var modal = createModal( { title: 'Error', buttons: [{ value: 'Ok' }] } );
+			var modal = createModal( { title: 'Error', buttons: [{ value: 'Ok', focus: true }] } );
 			setModalContent( modal, '' );
 			if ( map['password'].length == 0 ) {
 				$( form ).find( 'input[name=password]' ).closest( 'li' ).addClass( 'error' );

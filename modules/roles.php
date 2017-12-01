@@ -164,6 +164,19 @@ EOD;
 		}
 
 		/**
+		 * Delete all the roles for a user
+		 * @param $uid
+		 */
+		public function deleteAll( $uid ){
+			$roles = $this->getAllForUser( $uid );
+			foreach ( $roles as $role ) {
+				$statement = $this->db->prepare( "DELETE FROM userXroles where userId = ? AND roleId = ?" );
+				$statement->bind_param( "ii", $uid, $role['id'] );
+				$statement->execute();
+			}
+		}
+
+		/**
 		 * Add a userRole
 		 * @param $uid
 		 * @param $rid
