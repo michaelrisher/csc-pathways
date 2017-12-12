@@ -7,7 +7,7 @@
 	 */
 	$language = Lang::getCode();
 	$lang = new Lang( $language );
-	if( MODE != 'local' ){
+	if( MODE == 'live' ){
 ?>
 <!-- Global Site Tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-107370866-1"></script>
