@@ -7,48 +7,59 @@
 	 * Time: 12:22
 	 */
 	class certs extends Main {
+		private $moduleName = 'certs';
+
 		/**
 		 * get a simple-ish listing of the certificate
 		 * @param string $order any custom sort you want to run with the query
 		 * @return array
 		 */
-		public function listing( $order = 'id' ) {
+		public function listing( $order = 'id', $page = 1 ) {
 			//to kinda standardize it for later needs
+			$this->loadModules( 'roles discipline' );
+			$fullRoles = $this->roles->getAllForUser( Core::getSessionId() );
+			$userDisciplines = $this->discipline->getIdsForUser( Core::getSessionId() );
 			$page = 1;
 			$limit = 50;
 			$page--;//to make good looking page numbers for users
 			$offset = $page * $limit;
 			$query = "SELECT * FROM certificateList ORDER BY $order";//remove limit for a time LIMIT $page,50
-
 			if ( !$result = $this->db->query( $query ) ) {
 				echo( 'There was an error running the query [' . $this->db->error . ']' );
 			}
 
 			$return = array();
 			while ( $row = $result->fetch_assoc() ) {
-				$a = array(
-					'id' => $row['id'],
-					'code' => $row['code'],
-					'description' => $row['description'],
-					'category' => $row['category'],
-					'hasAs' => $row['hasAs'],
-					'hasCe' => $row['hasCe'],
-					'units' => $row['units'],
-					'sort' => $row['sort'],
-					'active' => $row['active']
-				);
-				array_push( $return, $a );
+				if( $this->roles->haveAccess( 'CertView', Core::getSessionId(), $row['discipline'], $fullRoles, $userDisciplines ) ) {
+					$canEdit = $this->roles->haveAccess( 'CertEdit', Core::getSessionId(), $row['discipline'], $fullRoles, $userDisciplines );
+					$canDelete = $this->roles->haveAccess( 'CertEdit', Core::getSessionId(), $row['discipline'], $fullRoles, $userDisciplines );
+					$a = array(
+						'id' => $row['id'],
+						'code' => $row['code'],
+						'description' => $row['description'],
+						'category' => $row['category'],
+						'hasAs' => $row['hasAs'],
+						'hasCe' => $row['hasCe'],
+						'units' => $row['units'],
+						'sort' => $row['sort'],
+						'active' => $row['active'],
+						'discipline' => $row['discipline'],
+						'edit' => $canEdit,
+						'delete' => $canDelete
+					);
+					array_push( $return, $a );
+				}
 			}
 
 			//get count of data
 			$query = "SELECT COUNT(*) AS items FROM audit";
 			$result->close();
-			if( !$result = $this->db->query( $query ) ) {
+			if ( !$result = $this->db->query( $query ) ) {
 				echo( 'There was an error running the query [' . $this->db->error . ']' );
 				return null;
 			}
 
-			if( $result->num_rows == 1 ){
+			if ( $result->num_rows == 1 ) {
 				$row = $result->fetch_assoc();
 				$count = $row['items'];
 			}
@@ -71,11 +82,9 @@
 		 * @param $params
 		 */
 		public function edit( $params ) {
-			$this->loadModule( 'users' );
-			if ( $this->users->isLoggedIn() ) {
-				Core::queueStyle( 'assets/css/reset.css' );
-				Core::queueStyle( 'assets/css/ui.css' );
-				//put the data onscreen
+			$this->loadModules( 'roles users discipline' );
+			$ROLES = $this->roles->getRolesByModule( $_SESSION['session']['id'], $this->moduleName );
+			if ( $this->users->isLoggedIn()  ) {
 				if( gettype( $params ) == 'array' ){
 					$id = $params[0];
 					$lang = (int)$params[1];
@@ -84,14 +93,100 @@
 					$lang = 0;
 				}
 				$data = $this->get( $id, $lang );
-				$data['categories'] = $this->listCategories();
-				$data['language'] = $lang; //bug fix when there is not a lang cert yet
-				include( CORE_PATH . 'pages/certEdit.php' );
+
+				if( $this->roles->haveAccess( 'CertEdit', Core::getSessionId(), $data['discipline']) ) {
+					Core::queueStyle( 'assets/css/reset.css' );
+					Core::queueStyle( 'assets/css/ui.css' );
+					//put the data onscreen
+
+					$data['categories'] = $this->listCategories();
+					$data['disciplines'] = $this->discipline->listing( true );
+					$data['language'] = $lang; //bug fix when there is not a lang cert yet
+					include( CORE_PATH . 'pages/certEdit.php' );
+				} else{
+					Core::errorPage( 403 );
+				}
 			} else {
 				Core::errorPage( 404 );
 			}
 		}
 
+		/**
+		 * @param array $input an array of options or an array of array of options for multiple searchs
+		 * @return array
+		 */
+		public function find( $input ){
+			//check if array is an array of arrays
+			$data = null;
+			$multi = false;
+
+			if( isset( $input[0] ) ){
+				$multi = true;
+			}
+			if ( $multi ){
+				for( $i = 0; $i < count( $input ); $i++ ){
+					$input[$i] = array(
+						'order' => isset( $input[$i]['order'] ) ? $input[$i]['order'] : 'id',
+						'page' => isset( $input[$i]['page'] ) ? $input[$i]['page'] : 1,
+						'search' => isset( $input[$i]['search'] ) ? $input[$i]['search'] : ''
+					);
+				}
+				$data = $input;
+			} else {
+				$input = array(
+					'order' => isset( $input['order'] ) ? $input['order'] : 'id',
+					'page' => isset( $input['page'] ) ? $input['page'] : 1,
+					'search' => isset( $input['search'] ) ? $input['search'] : ''
+				);
+				$data = array( $input );
+			}
+
+			$this->loadModules( 'roles discipline' );
+			$fullRoles = $this->roles->getAllForUser( Core::getSessionId() );
+			$userDisciplines = $this->discipline->getIdsForUser( Core::getSessionId() );
+
+			$return =array();
+			foreach ( $data as $item ) {
+				$query = "SELECT * FROM certificateList";
+
+				if( !empty( $item['search'] ) ){
+					$query  .= " WHERE " . $item['search'];
+				}
+
+				if( !empty( $item['order'] ) ){
+					$query .= " ORDER BY " .$item['order'];
+				}
+
+				if ( !$result = $this->db->query( $query ) ) {
+					error_log( 'certs.php->find() ' . $this->db->error ) ;
+				}
+
+				while ( $row = $result->fetch_assoc() ) {
+					if( $this->roles->haveAccess( 'CertView', Core::getSessionId(), $row['discipline'], $fullRoles, $userDisciplines ) ) {
+						$canEdit = $this->roles->haveAccess( 'CertEdit', Core::getSessionId(), $row['discipline'], $fullRoles, $userDisciplines );
+						$canDelete = $this->roles->haveAccess( 'CertEdit', Core::getSessionId(), $row['discipline'], $fullRoles, $userDisciplines );
+						$a = array(
+							'id' => $row['id'],
+							'code' => $row['code'],
+							'description' => $row['description'],
+							'category' => $row['category'],
+							'hasAs' => $row['hasAs'],
+							'hasCe' => $row['hasCe'],
+							'units' => $row['units'],
+							'sort' => $row['sort'],
+							'active' => $row['active'],
+							'discipline' => $row['discipline'],
+							'edit' => $canEdit,
+							'delete' => $canDelete
+						);
+						array_push( $return, $a );
+					}
+				}
+			}
+			$listing = array( 'listing' => $return );
+			$return = $listing;
+			return $return;
+		}
 
 		/**
 		 * get a specific cert from an id
@@ -120,6 +215,7 @@
 SELECT
 certificateList.id,
 certificateList.code,
+certificateList.discipline,
 certificateData.language,
 certificateList.hasAs,
 certificateList.hasCe,
@@ -140,6 +236,7 @@ ORDER by certificateData.language ASC
 EOD;
 			if ( !$result = $this->db->query( $query ) ) {
 				echo Core::ajaxResponse( array( 'error' => "An error occurred please try again" ), false );
+				error_log( 'certs:162 ' . $this->db->error );
 				return null;
 			}
 
@@ -201,65 +298,72 @@ EOD;
 		 * @param $id
 		 */
 		public function save( $id ) {
-			$this->loadModule( 'users' );
+			$this->loadModules( 'users roles' );
 			$lang = new Lang( Lang::getCode() );
 			$obj = array();
 			if( $this->users->isLoggedIn() ){
-				$this->loadModule( 'audit' );
-				$id = core::sanitize( $id );
-				$_POST['title'] = core::sanitize( $_POST['title'] ); //certlist description
-				$_POST['code'] = core::sanitize( $_POST['code'] );
-				$_POST['units'] = core::sanitize( $_POST['units'] );
-				$_POST['category'] = core::sanitize( $_POST['category'] );
-				$_POST['description'] = core::sanitize( $_POST['description'], true );
-				$_POST['elo'] = core::sanitize( $_POST['elo'], true );
-				$_POST['schedule'] = core::sanitize( $_POST['schedule'], true );
-				$_POST['sort'] = core::sanitize( $_POST['sort'] );
-				$language = intval( Core::sanitize( $_POST['language'] ) );
-				$hasCe = isset( $_POST['hasCe'] ) ? 1 : 0; //js returns something like hasCe=on if its on else its not set
-				$hasAs = isset( $_POST['hasAs'] ) ? 1 : 0; //js returns something like hasCe=on if its on else its not set
-				$active = isset( $_POST['active'] ) ? 1 : 0; //js returns something like hasCe=on if its on else its not set
+				if( $this->roles->haveAccess( 'CertEdit', Core::getSessionId(), Core::sanitize( $_POST['discipline'] ) ) ){
+					$this->loadModule( 'audit' );
+					$id = core::sanitize( $id );
+					$_POST['title'] = core::sanitize( $_POST['title'] ); //certlist description
+					$_POST['code'] = core::sanitize( $_POST['code'] );
+					$_POST['units'] = core::sanitize( $_POST['units'] );
+					$_POST['discipline'] = core::sanitize( $_POST['discipline'] );
+					$_POST['category'] = core::sanitize( $_POST['category'] );
+					$_POST['description'] = core::sanitize( $_POST['description'], true );
+					$_POST['elo'] = core::sanitize( $_POST['elo'], true );
+					$_POST['schedule'] = core::sanitize( $_POST['schedule'], true );
+					$_POST['sort'] = core::sanitize( $_POST['sort'] );
+					$language = intval( Core::sanitize( $_POST['language'] ) );
+					$hasCe = isset( $_POST['hasCe'] ) ? 1 : 0; //js returns something like hasCe=on if its on else its not set
+					$hasAs = isset( $_POST['hasAs'] ) ? 1 : 0; //js returns something like hasCe=on if its on else its not set
+					$active = isset( $_POST['active'] ) ? 1 : 0; //js returns something like hasCe=on if its on else its not set
 
 
-				//separate the two tables data
-				$certListUpdated = $this->upsertRecord( 'certificateList', "id=$id", array(
-					'code' => (string)$_POST['code'],
-					'hasAs' => $hasAs,
-					'hasCe' => $hasCe,
-					'category' => (int)$_POST['category'],
-					'units' => (int)$_POST['units'],
-					'description' => $_POST['title'],
-					'sort' => (int)$_POST['sort'],
-					'active' => $active
-				) );
+					//separate the two tables data
+					$certListUpdated = $this->upsertRecord( 'certificateList', "id=$id", array(
+						'code' => (string)$_POST['code'],
+						'hasAs' => $hasAs,
+						'hasCe' => $hasCe,
+						'category' => (int)$_POST['category'],
+						'units' => (int)$_POST['units'],
+						'description' => $_POST['title'],
+						'sort' => (int)$_POST['sort'],
+						'active' => $active,
+						'discipline' => $_POST['discipline']
+					) );
 
-				$error = '';
-				if( !$certListUpdated ){
-					$error = 'List failed to upsert';
-				}
+					$error = '';
+					if ( !$certListUpdated ) {
+						$error = 'List failed to upsert';
+					}
 
-				$certDataUpdated = $this->upsertRecord( 'certificateData', "cert=$id AND language=$language", array(
-					'cert' => $id,
-					'language' => $language,
-					'description' => $_POST['description'],
-					'elo' => $_POST['elo'],
-					'schedule' => $_POST['schedule']
-				) );
+					$certDataUpdated = $this->upsertRecord( 'certificateData', "cert=$id AND language=$language", array(
+						'cert' => $id,
+						'language' => $language,
+						'description' => $_POST['description'],
+						'elo' => $_POST['elo'],
+						'schedule' => $_POST['schedule']
+					) );
 
-				if( !$certDataUpdated ){
-					$error .= '<br>Data failed to upsert';
-				}
+					if ( !$certDataUpdated ) {
+						$error .= '<br>Data failed to upsert';
+					}
 
-				if( $certListUpdated && $certDataUpdated ){
-					$obj['msg'] = $lang->o( 'ajaxSaved' ); //"Saved successfully.";
-					$this->audit->newEvent( "Updated cert: " . $_POST['title'] );
-					echo Core::ajaxResponse( $obj );
+					if ( $certListUpdated && $certDataUpdated ) {
+						$obj['msg'] = $lang->o( 'ajaxSaved' ); //"Saved successfully.";
+						$this->audit->newEvent( "Updated cert: " . $_POST['title'] );
+						echo Core::ajaxResponse( $obj );
+					} else {
+						$obj['error'] = $error;
+						echo Core::ajaxResponse( $obj, false );
+					}
 				} else{
-					$obj['error'] = $error;
+					$obj['error'] = 'Insufficient permissions to edit certificate';
 					echo Core::ajaxResponse( $obj, false );
 				}
 			} else{
-				$obj['error'] = $lang->o( 'ajaxSessionExpire' );// 'Session expired.<br>Please log in again';
+				$obj['error'] = 'Session expired. Please log in again.';// 'Session expired.<br>Please log in again';
 				echo Core::ajaxResponse( $obj, false );
 			}
 		}
@@ -269,32 +373,44 @@ EOD;
 		 * only allowed if the user is admin
 		 */
 		public function create(){
-			Core::queueStyle( 'assets/css/reset.css' );
-			Core::queueStyle( 'assets/css/ui.css' );
-			//get the next id
-			$query = "SHOW TABLE STATUS LIKE 'certificateList'";
-			if( !$result = $this->db->query( $query ) ) {
-				die('There was an error running the query [' . $this->db->error . ']');
+			$this->loadModules('users roles discipline');
+			$ROLES = $this->roles->getRolesByModule( $_SESSION['session']['id'], $this->moduleName );
+			if( $this->users->isLoggedIn() ) {
+				if( $this->roles->haveAccess( 'CertEdit', Core::getSessionId(), -1 ) ) {
+					Core::queueStyle( 'assets/css/reset.css' );
+					Core::queueStyle( 'assets/css/ui.css' );
+					//get the next id
+
+					$query = "SHOW TABLE STATUS LIKE 'certificateList'";
+					if ( !$result = $this->db->query( $query ) ) {
+						die( 'There was an error running the query [' . $this->db->error . ']' );
+					}
+					$row = null;
+					if ( $result->num_rows ) {
+						$row = $result->fetch_assoc();
+						$data = array(
+							'id' => $row['Auto_increment'],
+							'title' => '',
+							'code' => '',
+							'hasAs' => 0,
+							'hasCe' => 0,
+							'category' => 0,
+							'description' => '',
+							'elo' => '',
+							'schedule' => '',
+							'sort' => 0,
+							'categories' => $this->listCategories(),
+							'disciplines' => $this->discipline->listing( true ),
+							'language' => 0,
+							'active' => 0
+						);
+					}
+					$result->close();
+					include( CORE_PATH . 'pages/certEdit.php' );
+				}
+			} else{
+				Core::errorPage( 404 );
 			}
-			$row = null;
-			if( $result->num_rows ) {
-				$row = $result->fetch_assoc();
-				$data = array(
-					'id' => $row['Auto_increment'],
-					'title' => '',
-					'code' => '',
-					'hasAs' => 0,
-					'hasCe' => 0,
-					'category' => 0,
-					'description' => '',
-					'elo' => '',
-					'schedule' => '',
-					'sort' => 0,
-					'categories' => $this->listCategories()
-				);
-			}
-			$result->close();
-			include( CORE_PATH . 'pages/certEdit.php' );
 		}
 
 		/**
@@ -304,36 +420,38 @@ EOD;
 		 */
 		public function delete( $id ){
 			$this->loadModule( 'users' );
-			$this->loadModule( 'audit' );
+			$this->loadModule( 'roles' );
 			$lang = new Lang( Lang::getCode() );
 			$obj = array();
-			$_POST = Core::sanitize( $_POST, true );
+//			$_POST = Core::sanitize( $_POST, true );
 			if( $this->users->isLoggedIn() ) {
-				$query = "SELECT description FROM certificateList WHERE id = '${_POST['id']}'";
-				$event = '';
-				if ( !$result = $this->db->query( $query ) ) {
-					$event = $_POST['id'];
-				}
-				$row = $result->fetch_assoc();
-				$event = $row['description'];
+				$row = $this->get( $id, 0, true );
+				if( $this->roles->haveAccess( 'CertDelete', Core::getSessionId(), $row['discipline'] ) ){
+					$id = Core::sanitize( $id );
+					$this->loadModule( 'audit' );
+					$event = $row['title'];
 
-				$statement = $this->db->prepare("DELETE FROM certificateList WHERE id=?");
-				$statement->bind_param( "s", $_POST['id']);
-				$statementData = $this->db->prepare("DELETE FROM certificateData WHERE cert=?");
-				$statementData->bind_param( "s", $_POST['id']);
-				if( $statement->execute() && $statementData->execute() ){
-					$obj['msg'] = $lang->o( 'ajaxDelete' ); //"Deleted successfully.";
-					$this->audit->newEvent( "Deleted certificate: " . $event );
-					echo Core::ajaxResponse( $obj );
-				} else{
-					$obj['error'] = $statement->error;
+					$statement = $this->db->prepare( "DELETE FROM certificateList WHERE id=?" );
+					$statement->bind_param( "s", $id );
+					$statementData = $this->db->prepare( "DELETE FROM certificateData WHERE cert=?" );
+					$statementData->bind_param( "s", $id );
+					if ( $statement->execute() && $statementData->execute() ) {
+						$obj['msg'] = 'Deleted successfully';
+						$this->audit->newEvent( "Deleted certificate: " . $event );
+						echo Core::ajaxResponse( $obj );
+					} else {
+						$obj['error'] = $statement->error;
+						echo Core::ajaxResponse( $obj, false );
+					}
+
+					$statement->close();
+					$statementData->close();
+				} else {
+					$obj['error'] = 'Insufficient permissions to delete certificates';
 					echo Core::ajaxResponse( $obj, false );
 				}
-				$result->close();
-				$statement->close();
-				$statementData->close();
 			} else{
-				$obj['error'] = $lang->o( 'ajaxSessionExpire' ); //"Session expired.<br>Please log in again";
+				$obj['error'] = 'Session expired. Please log in again.';
 				echo Core::ajaxResponse( $obj, false );
 			}
 		}
@@ -341,5 +459,13 @@ EOD;
 		function show( $id ){
 			$data['params'] = $id;
 			include( CORE_PATH . 'pages/cert.php' );
+		}
+
+		public function listingByCodes( $codes ){
+			$output = array();
+			for( $i = 0; $i < count( $codes ); $i++ ){
+				array_push( $output, array( 'search' => "code='" . $codes[$i] . "'") );
+			}
+			return $this->find( $output );
 		}
 	}

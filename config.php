@@ -29,8 +29,18 @@
 		define( 'DB_USER', 'pathways' );
 		define( 'DB_PASS', 'S0larF0r3st!' );
 		define( 'DB_DB', 'pathways' );
+	} else if( MODE == 'staging' ){
+		define( 'CORE_DIR', 'pathways/' );
+		define( 'CORE_PATH', '/home/michael_risher/public_html/' . CORE_DIR );//$_SERVER['DOCUMENT_ROOT'] . substr( $_SERVER['SCRIPT_NAME'], 0, -9 ) );
+		define( 'CORE_ROOT', '/home/michael_risher/public_html/' );//$_SERVER['DOCUMENT_ROOT'] . substr( $_SERVER['SCRIPT_NAME'], 0, ( -9 - strlen( CORE_DIR ) ) ) );
+		define( 'CORE_REQUEST_TYPE', $_SERVER['REQUEST_METHOD'] );
+		define( 'CORE_URL', ( isset( $_SERVER['HTTPS'] ) ? 'https' : 'http' ) . '://' . $_SERVER[ 'HTTP_HOST' ] . '/' );
+		define( 'DB_IP', 'localhost' );
+		define( 'DB_USER', 'pathways' );
+		define( 'DB_PASS', 'S0larF0r3st!' );
+		define( 'DB_DB', 'staging_pathways' );
 	}
-	
+
 	
 	if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
 		define( 'IS_AJAX', true );

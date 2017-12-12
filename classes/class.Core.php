@@ -7,6 +7,8 @@
 	 * Time: 10:02
 	 */
 	class Core {
+		private static $uniqueIds = array();
+
 		public static function queueScript( $url ) {
 			if ( file_exists( CORE_PATH . $url ) ) {
 				$GLOBALS['scriptQueue'][$url] = CORE_URL . $url . '?' . filemtime( $url );
@@ -63,12 +65,19 @@
 			}
 		}
 
+		/**
+		 * @deprecated
+		 */
 		public static function initShortClassBlock(){
 			$str = '';
 			$str .= '<div class="8week aligncenter">'.
 				'<span>8 Week Classes</span>';
 			echo $str;
 		}
+
+		/**
+		 * @deprecated
+		 */
 		public static function shortClassBlock( $leftCode, $leftTitle, $rightCode = null, $rightTitle = null ){
 			$str = '';
 			$str .= '<div class="clearfix">';
@@ -82,10 +91,12 @@
 			echo $str;
 		}
 
+		/**
+		 * @deprecated
+		 */
 		public static function endShortClassBlock(){
 			echo '</div>';
 		}
-
 
 		/**
 		 * clean strings of bad stuffs
@@ -246,6 +257,38 @@
 		 */
 		public static function getIp(){
 			return $_SERVER['REMOTE_ADDR'];
+		}
 
+		/**
+		 * converts an assoc array to a flat indexed array
+		 * @param array $array
+		 * @return array
+		 */
+		public static function assocToFlat( $array ){
+			$temp = array();
+			foreach ( $array as $item ) {
+				array_push( $temp, $item );
+			}
+			return $temp;
+		}
+
+		public static function inArray( $needle, $array ){
+			if( array_search( $needle, $array ) !== false ){
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		public static function getSessionId(){
+			if( isset( $_SESSION['session'] ) ){
+				return $_SESSION['session']['id'];
+			}
+			return -1;
+		}
+
+		public static function htmlEcho( $s ){
+			echo $s;
+			echo '<br>';
 		}
 	}

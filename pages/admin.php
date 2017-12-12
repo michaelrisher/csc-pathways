@@ -23,6 +23,13 @@
 	<?php include CORE_PATH . 'assets/inc/logo.php'; ?>
 	<div id="main">
 		<div class="admin">
+			<?php
+//				Core::debug( $_SESSION );
+				$GLOBALS['main']->loadModule( 'roles' );
+//				Core::debug( $GLOBALS['main']->roles->getAllForUser( $_SESSION['session']['id']) );
+				$t = $GLOBALS['main']->roles->doesUserHaveRole( $_SESSION['session']['id'], 'gClassView' );
+//				echo ( $t ? '1' : '0' );
+			?>
 			<div class="audit aligncenter">
 				<p>Audit Log</p>
 				<div class="listing alignleft">

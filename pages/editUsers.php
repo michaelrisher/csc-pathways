@@ -5,7 +5,7 @@
 	 * Date: 6/21/2017
 	 * Time: 11:47
 	 */
-	if( !$GLOBALS['main']->users->isAdmin() ){
+	if( !$GLOBALS['main']->users->isLoggedIn() ){
 		Core::errorPage( 404 );
 	}
 ?>
@@ -14,6 +14,7 @@
 <head>
 	<?php
 		include_once CORE_PATH . 'assets/inc/header.php';
+		Core::queueStyle( 'assets/css/select2.css' );
 		Core::includeStyles();
 	?>
 </head>
@@ -29,11 +30,17 @@
 						<?php
 							$GLOBALS['main']->loadModule( 'users' );
 							$data = $GLOBALS['main']->users->listing();
-							foreach ( $data as $user ) {
-								echo "<li data-id='${user['id']}'>${user['username']}";
-								echo "<img class='delete tooltip' src='". CORE_URL ."assets/img/delete.png' title='Delete User'/>";
-								echo "<img class='edit tooltip' src='". CORE_URL ."assets/img/edit.svg' title='Edit User'/>";
-								echo "</li>";
+							if( isset( $data ) ) {
+								foreach ( $data as $user ) {
+									echo "<li data-id='${user['id']}'>${user['username']}";
+									if ( $user['delete'] )
+										echo "<img class='delete tooltip' src='" . CORE_URL . "assets/img/delete.png' title='Delete User'/>";
+									if ( $user['edit'] )
+										echo "<img class='edit tooltip' src='" . CORE_URL . "assets/img/edit.svg' title='Edit User'/>";
+									echo "</li>";
+								}
+							} else{
+								echo "<li>There are no users or you do not have the rights to see users</li>";
 							}
 						?>
 					</ul>
@@ -48,6 +55,8 @@
 </div>
 <?php
 	include_once CORE_PATH . 'assets/inc/footer.php';
+	Core::queueScript( 'assets/js/users.js' );
+	Core::queueScript( 'assets/js/select2.js' );
 	Core::includeScripts();
 ?>
 

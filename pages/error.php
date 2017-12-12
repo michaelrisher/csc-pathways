@@ -21,6 +21,17 @@
 		<div class="errorPage">
 			<div class="aligncenter">
 				<p>Error <?= isset( $data['error'] )? $data['error'] : ''?></p>
+				<p><?php
+					switch( $data['error'] ){
+						case 400: echo 'Bad Request'; break;
+						case 401: echo 'Not Authorized'; break;
+						case 402: echo 'Payment Required'; break;
+						case 403: echo 'Forbidden'; break;
+						case 404: echo 'Not Found'; break;
+						case 405: echo 'Method Not Allowed'; break;
+						case 406: echo 'Not Acceptable'; break;
+					}
+					?></p>
 			</div>
 		</div>
 	</div>

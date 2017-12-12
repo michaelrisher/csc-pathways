@@ -15,7 +15,7 @@
 <head>
 	<?php
 		include_once CORE_PATH . 'assets/inc/header.php';
-		Core::queueStyle( 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css' );
+		Core::queueStyle( 'assets/css/select2.css' );
 		Core::includeStyles();
 	?>
 </head>
@@ -38,12 +38,20 @@
 						} else {
 							$data = $GLOBALS['main']->classes->listing();
 						}
-						foreach ( $data['listing'] as $class ) {
-							echo "<li data-id='${class['id']}'>${class['title']}";
-							echo "<img class='delete tooltip' title='Delete class' src='". CORE_URL ."assets/img/delete.png'/>";
-							echo "<img class='languageEdit tooltip' title='Edit in Different Language' src='". CORE_URL ."assets/img/region.png'/>";
-							echo "<img class='edit tooltip' title='Edit class' src='". CORE_URL ."assets/img/edit.svg'/>";
-							echo "</li>";
+//						Core::debug( $data );
+						if( isset( $data['listing'] ) ) {
+							foreach ( $data['listing'] as $class ) {
+								echo "<li data-id='${class['id']}'>${class['title']}";
+								if( $class['delete'] )
+									echo "<img class='delete tooltip' title='Delete class' src='" . CORE_URL . "assets/img/delete.png'/>";
+								if( $class['edit'] ) {
+									echo "<img class='languageEdit tooltip' title='Edit in Different Language' src='" . CORE_URL . "assets/img/region.png'/>";
+									echo "<img class='edit tooltip' title='Edit class' src='" . CORE_URL . "assets/img/edit.svg'/>";
+								}
+								echo "</li>";
+							}
+						} else{
+							echo "<li>There are no classes or you do not have the rights to see classes</li>";
 						}
 					?>
 					</ul>
@@ -52,31 +60,35 @@
 					<p>Pages</p>
 					<div>
 					<?php
-						$pages = ceil( $data['count'] / $data['limit'] );
-						$currentPage = $data['currentPage'];
-						$amount = 3;
-//						echo '#' . $pages;
-						$search = isset( $_GET['q'] ) ? ( '?q=' .$_GET['q']) : '';
-						if(  $currentPage > 1 ){
-							echo "<a href='" . CORE_URL . "editClass/1" . $search ."'>|&lt;</a>";
-						}
-						//left side of current math
-						if( $currentPage <= $amount ){
-							$left = ( ( $currentPage - $amount ) + $amount ) - 1;
-						} else{
-							$left = $amount;
-						}
-						for( $i = $left; $i >= 1; $i-- ){
-							echo "<a href='" . CORE_URL . 'editClass/' . ( $currentPage - $i ) . $search . "'>"  . ( $currentPage - $i ) . "</a>";
-						}
-						echo "<a href='" . CORE_URL . 'editClass/' . ( $currentPage ) . $search . "' class='current'>"  . ( $currentPage ) . "</a>";
-						//right side of current math
-						for( $i = 1; $i <= $amount; $i++ ){
-							if( ( $currentPage + $i ) > $pages ){ break; }
-							echo "<a href='" . CORE_URL . 'editClass/' . ( $currentPage + $i ) . $search . "'>"  . ( $currentPage + $i ) . "</a>";
-						}
-						if(  $currentPage < $pages ){
-							echo "<a href='" . CORE_URL . "editClass/" . $pages . $search . "'>&gt;|</a>";
+						if ( isset( $data['count'] ) && $data['limit'] ) {
+							$pages = ceil( $data['count'] / $data['limit'] );
+							$currentPage = $data['currentPage'];
+							$amount = 3;
+//							echo '#' . $pages;
+							$search = isset( $_GET['q'] ) ? ( '?q=' . $_GET['q'] ) : '';
+							if ( $currentPage > 1 ) {
+								echo "<a href='" . CORE_URL . "editClass/1" . $search . "'>|&lt;</a>";
+							}
+							//left side of current math
+							if ( $currentPage <= $amount ) {
+								$left = ( ( $currentPage - $amount ) + $amount ) - 1;
+							} else {
+								$left = $amount;
+							}
+							for ( $i = $left; $i >= 1; $i-- ) {
+								echo "<a href='" . CORE_URL . 'editClass/' . ( $currentPage - $i ) . $search . "'>" . ( $currentPage - $i ) . "</a>";
+							}
+							echo "<a href='" . CORE_URL . 'editClass/' . ( $currentPage ) . $search . "' class='current'>" . ( $currentPage ) . "</a>";
+							//right side of current math
+							for ( $i = 1; $i <= $amount; $i++ ) {
+								if ( ( $currentPage + $i ) > $pages ) {
+									break;
+								}
+								echo "<a href='" . CORE_URL . 'editClass/' . ( $currentPage + $i ) . $search . "'>" . ( $currentPage + $i ) . "</a>";
+							}
+							if ( $currentPage < $pages ) {
+								echo "<a href='" . CORE_URL . "editClass/" . $pages . $search . "'>&gt;|</a>";
+							}
 						}
 					?>
 					</div>
@@ -90,7 +102,8 @@
 </div>
 <?php
 	include_once CORE_PATH . 'assets/inc/footer.php';
-	Core::queueScript( 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js' );
+	Core::queueScript( 'assets/js/select2.js' );
+	Core::queueScript( 'assets/js/classes.js' );
 	Core::includeScripts();
 ?>
 

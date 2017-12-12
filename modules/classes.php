@@ -7,6 +7,7 @@
 	 * Time: 10:15
 	 */
 	class classes extends Main {
+		private $moduleName = 'classes';
 
 		/**
 		 * get a simple listing of classes only id and title are returned
@@ -15,8 +16,12 @@
 		 * @return array
 		 */
 		public function listing( $page = 1 ) {
-			$this->loadModule( 'users' );
-			if ( $this->users->isLoggedIn() ) {
+			$this->loadModules( 'roles discipline' );
+//			$userRoles = $this->roles->getRolesByModule( Core::getSessionId(), $this->moduleName );
+			$fullRoles = $this->roles->getAllForUser( Core::getSessionId() );
+			$userDisciplines = $this->discipline->getIdsForUser( Core::getSessionId() );
+			//if user has class view role then do it
+			if ( true ) {
 				$limit = 25;
 				$page--;//to make good looking page numbers for users
 				$offset = $page * $limit;
@@ -33,7 +38,8 @@
 //				$search = isset( $_POST['search'] ) ? $_POST['search'] : '' ;
 				if( isset( $_POST['all'] ) ){
 					$query = "SELECT * FROM classes ORDER BY sort";
-				} else if( empty( $search ) ){
+				}
+				else if( empty( $search ) ){
 					$query = "SELECT * FROM classes ORDER BY sort LIMIT $offset,$limit";//remove limit for a time LIMIT $page,50
 				} else {
 					$query = "SELECT * FROM classes WHERE title LIKE '%$search%'ORDER BY sort LIMIT $offset,$limit";
@@ -46,11 +52,17 @@
 
 				$return = array();
 				while ( $row = $result->fetch_assoc() ) {
-					$a = array(
-						'id' => $row['id'],
-						'title' => $row['title']
-					);
-					array_push( $return, $a );
+					if ( $this->roles->haveAccess( 'ClassView', Core::getSessionId(), $row['discipline'], $fullRoles, $userDisciplines ) ) {
+						$canEdit = $this->roles->haveAccess( 'ClassEdit', Core::getSessionId(), $row['discipline'], $fullRoles, $userDisciplines );
+						$canDelete = $this->roles->haveAccess( 'ClassDelete', Core::getSessionId(), $row['discipline'], $fullRoles, $userDisciplines );
+						$a = array(
+							'id' => $row['id'],
+							'title' => $row['title'],
+							'edit' => $canEdit,
+							'delete' => $canDelete
+						);
+						array_push( $return, $a );
+					}
 				}
 
 				//get count of data
@@ -74,7 +86,7 @@
 					'listing' => $return,
 					'count' => intval( $count ),
 					'limit' => $limit,
-					'currentPage' => ++$page );
+					'currentPage' => (int)++$page );
 				if ( IS_AJAX ) {
 					echo Core::ajaxResponse( $return );
 				}
@@ -115,6 +127,7 @@ SELECT
     classes.sort,
     classes.title,
     classes.units,
+    classes.discipline,
     classes.transfer,
     classData.prereq,
     classData.coreq,
@@ -123,7 +136,7 @@ SELECT
 FROM
     classes
 INNER JOIN classData on classes.id = classData.class
-WHERE classes.id = '$id'
+WHERE classes.id = $id
 ORDER BY classData.language ASC
 EOD;
 
@@ -156,7 +169,8 @@ EOD;
 				'prereq' => $row['prereq'],
 				'coreq' => $row['coreq'],
 				'description' => $row['description'],
-				'language' => $langCode
+				'language' => $langCode,
+				'discipline' => $row['discipline']
 			);
 
 			if ( IS_AJAX && !$forceReturn ) {
@@ -170,48 +184,56 @@ EOD;
 		 * save a class from the admin page
 		 * only allowed if the user is admin
 		 */
-		public function save( $create = true ) {
-			$this->loadModule( 'users' );
-			$this->loadModule( 'audit' );
-			$lang = new Lang( Lang::getCode() );
+		public function save( $id, $create = false ) {
+			//what if a user from outside discipline wants to create a class for there cert (ie math for a compsci cert)
+			$this->loadModules( 'users audit roles' );
+//			$lang = new Lang( Lang::getCode() );
 			$obj = array();
 			$_POST = Core::sanitize( $_POST, true );
 			if ( $this->users->isLoggedIn() ) {
-				//get the sort from the title
-				$sort = explode( ' - ', $_POST['title'] )[0];
-				$sort = preg_replace( '/\D/', '', $sort );
+				if( $this->roles->haveAccess( 'ClassEdit', Core::getSessionId(), -1 ) ) {
+					//get the sort from the title
+					$sort = explode( ' - ', $_POST['title'] )[0];
+					$sort = preg_replace( '/\D/', '', $sort );
 
-				$setClass = $this->upsertRecord( 'classes', "id='${_POST['id']}'", array(
-					'id' => $_POST['id'],
-					'title' => $_POST['title'],
-					'units' => intval( $_POST['units'] ),
-					'transfer' => $_POST['transfer'],
-					'sort' => intval( $sort )
-				));
+					$setClass = $this->upsertRecord( 'classes', "id=${id}", array(
+						'id' => $id,
+						'title' => $_POST['title'],
+						'units' => intval( $_POST['units'] ),
+						'transfer' => $_POST['transfer'],
+						'discipline' => $_POST['discipline'],
+						'sort' => intval( $sort )
+					) );
 
-				$setClassData = $this->upsertRecord( 'classData', "class='${_POST['id']}' AND language=${_POST['language']}", array(
-					'class' => $_POST['id'],
-					'language' => $_POST['language'],
-					'prereq' => $_POST['prereq'],
-					'advisory' => $_POST['advisory'],
-					'coreq' => $_POST['coreq'],
-					'description' => $_POST['description'],
-				) );
+					$setClassData = $this->upsertRecord( 'classData', "class=${id} AND language=${_POST['language']}", array(
+						'class' => $id,
+						'language' => $_POST['language'],
+						'prereq' => $_POST['prereq'],
+						'advisory' => $_POST['advisory'],
+						'coreq' => $_POST['coreq'],
+						'description' => $_POST['description'],
+					) );
 
-				if ( $setClass && $setClassData ) {
-					$obj['msg'] = $lang->o( 'ajaxSaved' );
-					if( !$create ) {
-						$this->audit->newEvent( "Updated class: " . $_POST['title'] );
+					if ( $setClass && $setClassData ) {
+						$obj['msg'] = 'Saved successfully.';
+						$obj['editable'] = $this->roles->haveAccess( 'ClassEdit', Core::getSessionId(), $_POST['discipline'] );
+						$obj['deletable'] = $this->roles->haveAccess( 'ClassDelete', Core::getSessionId(), $_POST['discipline'] );
+						if( !$create ) {
+							$this->audit->newEvent( "Updated class: " . $_POST['title'] );
+						} else {
+							$this->audit->newEvent( "Create class: " . $_POST['title'] );
+						}
+						echo Core::ajaxResponse( $obj );
 					} else {
-						$this->audit->newEvent( "Created class: " . $_POST['title'] );
+						$obj['error'] = "An error occurred please contact administrator";
+						echo Core::ajaxResponse( $obj, false );
 					}
-					echo Core::ajaxResponse( $obj );
 				} else {
-					$obj['error'] = $lang->o( 'ajaxErrorOccurred' );
+					$obj['error'] = "Insufficient permissions to edit classes";
 					echo Core::ajaxResponse( $obj, false );
 				}
 			} else {
-				$obj['error'] = $lang->o( 'ajaxSessionExpire' );
+				$obj['error'] = "Session expired. Please log in again.";
 				echo Core::ajaxResponse( $obj, false );
 			}
 		}
@@ -221,32 +243,33 @@ EOD;
 		 * only allowed if the user is admin
 		 */
 		public function delete() {
-			$this->loadModule( 'users' );
-			$this->loadModule( 'audit' );
+			$this->loadModules( 'roles audit users' );
 			$lang = new Lang( Lang::getCode() );
 			$obj = array();
 			$_POST = Core::sanitize( $_POST, true );
-			if ( $this->users->isLoggedIn() ) {
-				$query = "SELECT title FROM classes WHERE id = '${_POST['id']}'";
-				$event = '';
-				if ( !$result = $this->db->query( $query ) ) {
-					$event = $_POST['id'];
-				}
-				$row = $result->fetch_assoc();
-				$event = $row['title'];
-
-				$statement = $this->db->prepare( "DELETE FROM classes WHERE id=?" );
-				$statement->bind_param( "s", $_POST['id'] );
-				if ( $statement->execute() ) {
-					$obj['msg'] = $lang->o( 'ajaxDelete' );
-					$this->audit->newEvent( "Deleted class: " . $event );
-					echo Core::ajaxResponse( $obj );
-				} else {
-					$obj['error'] = $statement->error;
+			if( $this->users->isLoggedIn() ) {
+				$class = $this->get( $_POST['id'], 'en', true );
+				$disciplineId = $class['discipline'];
+				if ( $this->roles->haveAccess( 'ClassDelete', Core::getSessionId(), $disciplineId ) ) {
+					$event = isset( $class['title'] ) ? $class['title'] : $_POST['id'];
+					$statement = $this->db->prepare( "DELETE FROM classes WHERE id=?" );
+					$statementData = $this->db->prepare( "DELETE FROM classData WHERE class=?" );
+					$statementData->bind_param( "i", $_POST['id'] );
+					$statement->bind_param( "i", $_POST['id'] );
+					if ( $statement->execute() && $statementData->execute() ) {
+						$obj['msg'] = $lang->o( 'ajaxDelete' );
+						$this->audit->newEvent( "Deleted class: " . $event );
+						echo Core::ajaxResponse( $obj );
+					} else {
+						$obj['error'] = $statement->error;
+						echo Core::ajaxResponse( $obj, false );
+					}
+				} else{
+					$obj['error'] = "You do not have access to delete classes";
 					echo Core::ajaxResponse( $obj, false );
 				}
 			} else {
-				$obj['error'] = $lang->o( 'ajaxSessionExpire' );
+				$obj['error'] = "Session expired. Please log in again.";
 				echo Core::ajaxResponse( $obj, false );
 			}
 		}
@@ -256,53 +279,128 @@ EOD;
 		 * only allowed if the user is admin
 		 */
 		public function create() {
-			$this->save( true );
-			/*
-			$this->loadModule( 'users' );
-			$this->loadModule( 'audit' );
-			$lang = new Lang( Lang::getCode() );
-			$obj = array();
-			$_POST = Core::sanitize( $_POST );
-			if ( $this->users->isLoggedIn() ) {
-				$statement = $this->db->prepare( "INSERT INTO classes(id, title, units, transfer, prereq, advisory, coreq, description) VALUES (?,?,?,?,?,?,?,?)" );
-				$statement->bind_param( "ssdsssss", $_POST['id'], $_POST['title'], $_POST['units'], $_POST['transfer'], $_POST['prereq'], $_POST['advisory'], $_POST['coreq'], $_POST['description'] );
-				if ( $statement->execute() ) {
-					$obj['msg'] = $lang->o( 'ajaxCreate' );
-					echo Core::ajaxResponse( $obj );
-					$this->audit->newEvent( "Created class: " . $_POST['title'] );
-				} else {
-					$error = $statement->error;
-					if ( preg_match( "/Duplicate entry '(.+?)' for key 'id'/", $error ) ) {
-						$value = preg_replace( "/Duplicate entry '(.+?)' for key 'id'/", '$1', $error );
-						$obj['error'] = "That id of \"$value\" already exists";
-						$obj['errorCode'] = 1;
-					} else {
-						$obj['error'] = $statement->error;
-					}
-					echo Core::ajaxResponse( $obj, false );
-				}
-			} else {
-				$obj['error'] = $lang->o( 'ajaxSessionExpire' );
-				echo Core::ajaxResponse( $obj, false );
+			//todo make this standard where the module makes the modal
+			$query = "SHOW TABLE STATUS LIKE 'classes'";
+			if ( !$result = $this->db->query( $query ) ) {
+				die( 'There was an error running the query [' . $this->db->error . ']' );
 			}
-			*/
+			$row = null;
+			$id = -1;
+			if ( $result->num_rows ) {
+				$row = $result->fetch_assoc();
+				$id = $row['Auto_increment'];
+			}
+			$this->save( $id, true );
 		}
 
 		/**
-		 * get the number of pages with the limit
-		 * @deprecated
-		 * @param int $limit the number od results to limit
-		 * @return float
+		 * ajax to recieve the html modal with all data included
+		 * @param int $id
 		 */
-		public function getPages( $limit = 25){
-			$this->loadModule( 'users' );
-			if( $this->users->isLoggedIn() ) {
-				$query = "SELECT COUNT(id) as pages FROM classes";
-
-				if ( $result = $this->db->query( $query ) ) {
-					$row = $result->fetch_assoc();
-					return ceil( $row['pages'] / $limit );
+		public function edit( $id = -1 ){
+			$this->loadModules( "roles users discipline" );
+			//get first
+			if( $id != -1 ){
+				$langCode = 0;
+				if ( isset( $_POST ) && isset( $_POST['language'] ) ) {
+					Core::sanitize( $_POST['language'] );
+					$langCode = $_POST['language'];
 				}
+				$class = $this->get( $id, $langCode, true );
+				$class['create'] = 0;
+			} else{ //we are creating a class
+				$query = "SHOW TABLE STATUS LIKE 'classes'";
+				if ( !$result = $this->db->query( $query ) ) {
+					die( 'There was an error running the query [' . $this->db->error . ']' );
+				}
+				$row = null;
+				$id = -1;
+				if ( $result->num_rows ) {
+					$row = $result->fetch_assoc();
+					$id = $row['Auto_increment'];
+				}
+				$class = array(
+					'id' => $id,
+					'title' => '',
+					'units' => 0,
+					'transfer' => '',
+					'advisory' => '',
+					'prereq' => '',
+					'coreq' => '',
+					'description' => '',
+					'language' => 0,
+					'create' => 1,
+					'discipline' => -1
+				);
+			}
+			//check if user can edit
+			if( $this->users->isLoggedIn() ) {
+				if( $this->roles->haveAccess( 'ClassEdit', Core::getSessionId(), $class['discipline'] ) && IS_AJAX ){
+					//get disciplines
+					$disciplines = $this->discipline->listing( true );
+					?>
+					<p>* fields are required</p>
+					<form>
+						<?php if( $class['create'] ){?>
+						<input type="hidden" name="create" value="<?=$class['create']?>">
+						<?php } ?>
+						<input type="hidden" name="id" value="<?=$class['id']?>">
+						<input type="hidden" name="language" value="<?=$class['language']?>">
+						<ul>
+							<li>
+								<label for="title">Title*</label>
+								<input name="title" type="text" value="<?=$class['title']?>" class="tooltip" title="Class title should look like: CIS-1 - Title">
+								<span>Enter the class title</span>
+							</li>
+							<li>
+								<label for="discipline">Discipline*</label>
+								<select name="discipline">
+									<option disabled selected> -- Select A Discipline -- </option>
+									<?php
+									foreach( $disciplines as $discipline ){
+										echo "<option " . ( ( $discipline['id'] == $class['discipline'] ) ? ( 'selected' ) : ( '' ) ) . " value='${discipline['id']}'>${discipline['description']}</option>";
+									}
+									?>
+								</select>
+								<span>Enter the class ID</span>
+							</li>
+							<li>
+								<label for="units">Units*</label>
+								<input name="units" type="number" value="<?=$class['units']?>">
+								<span>Enter the class units</span>
+							</li>
+							<li>
+								<label for="transfer">Transfer</label>
+								<input name="transfer" type="text" value="<?=$class['transfer']?>">
+								<span>Enter the class transfer</span>
+							</li>
+							<li>
+								<label for="advisory">Advisory</label>
+								<input name="advisory" type="text" value="<?=$class['advisory']?>">
+								<span>Enter the class advisory<a class="addClass floatright">+ Add Class</a></span>
+							</li>
+							<li>
+								<label for="prereq">Prerequisite</label>
+								<input name="prereq" type="text" value="<?=$class['prereq']?>">
+								<span>Enter the class prerequisite<a class="addClass floatright">+ Add Class</a></span>
+							</li>
+							<li>
+								<label for="coreq">Corequisite</label>
+								<input name="coreq" type="text" value="<?=$class['coreq']?>">
+								<span>Enter the class corequisite<a class="addClass floatright">+ Add Class</a></span>
+							</li>
+							<li>
+								<label for="description">Description*</label>
+								<textarea onkeyup="adjustTextarea(this)" name="description" type="textarea"><?=$class['description']?></textarea>
+								<span>Enter the class Description</span>
+							</li>
+						</ul>
+					</form><?php
+				} else {
+					echo "<p>You do not have access to edit classes</p>";
+				}
+			} else {
+				echo "<p>Session expired. Please log in again.</p>";
 			}
 		}
 
@@ -373,6 +471,10 @@ EOD;
 			}
 		}
 
+		/**
+		 * shows a classes when as html
+		 * @param $id
+		 */
 		public function show( $id ) {
 			$data['params'] = $id;
 			include CORE_PATH . 'pages/class.php';

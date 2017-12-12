@@ -210,7 +210,7 @@ html, body{ background-color: #d3dce6; }
 				}
 			}
 
-			.audit, .classes, .certs, .users{
+			& > div /*.audit, .classes, .certs, .users*/{
 				& > p{
 					font-weight: bold;
 					padding: 10px 0 10px 0;
@@ -236,6 +236,11 @@ html, body{ background-color: #d3dce6; }
 						height: 20px;
 						vertical-align: text-top;
 						padding: 0 5px 0 5px;
+						&.key{
+							float: none;
+							padding: 0;
+							cursor: default;
+						}
 					}
 				}
 
@@ -272,7 +277,7 @@ html, body{ background-color: #d3dce6; }
 				}
 			}
 
-			.certs{
+			.certs, .pages{
 				form{
 					ul{
 						li {
@@ -374,7 +379,7 @@ form{
 		margin:0;
 		li{
 			display: block;
-			padding: 9px;
+			padding: 8px;
 			border:1px solid #a2aab2;
 			margin-bottom: 30px;
 			border-radius: 3px;
@@ -403,7 +408,7 @@ form{
 			font-family: Arial, Helvetica, sans-serif;
 		}
 
-		li > span{
+		li > span:last-child{
 			background: #4e4e4e;
 			display: block;
 			padding: 3px;
@@ -413,11 +418,32 @@ form{
 			font-family: Arial, Helvetica, sans-serif;
 			font-size: 11px;
 		}
+
+		div.tripleInput{
+			.alignleft;
+			input[type='file']{
+				display: none;
+			}
+			input[type="text"], input[type="date"], input[type="datetime"], input[type="email"], input[type="number"], input[type="search"], input[type="time"], input[type="url"], input[type="password"], textarea, select {
+				width: 350px !important;
+				display: inline-block !important;
+				margin-right: 15px;
+			}
+
+			input[type="submit"],  input[type="button"], button{
+				margin-right: 15px;
+				height: 30px;
+				padding: 5px 20px 5px 20px;
+				vertical-align: middle;
+			}
+		}
 	}
 }
+
 input[disabled], input[readonly]{
 	cursor: not-allowed;
 }
+
 input[type="text"], input[type="date"], input[type="datetime"], input[type="email"], input[type="number"], input[type="search"], input[type="time"], input[type="url"], input[type="password"], textarea, select {
 	box-sizing: border-box;
 	-webkit-box-sizing: border-box;
@@ -433,7 +459,11 @@ input[type="text"], input[type="date"], input[type="datetime"], input[type="emai
 	font-family: Georgia, "Times New Roman", Times, serif;
 }
 
-input[type="submit"],  input[type="button"]{
+.select2-container{
+	height: 35px;
+}
+
+input[type="submit"],  input[type="button"], button{
 	background: #2471FF;
 	border: none;
 	padding: 10px 20px 10px 20px;
@@ -524,8 +554,9 @@ input[type="submit"],  input[type="button"]{
 
 		form {
 			margin: 10px auto;
-			max-width: 450px;
+			max-width: 500px;
 			background: #fff;
+			padding: 10px;
 
 			ul {
 				li {
@@ -552,6 +583,59 @@ input[type="submit"],  input[type="button"]{
 			color: #20c5f7;
 			text-decoration: underline;
 			cursor: pointer;
+		}
+		
+		.tabWrapper{
+			.tabs {
+				margin: 10px auto;
+				width: 500px;
+				.tab {
+					margin-right: -4px;
+					display: inline-block;
+					//border: 1px solid #4e4e4e;
+					padding: 10px 15px;
+					//border-top-left-radius: 5px;
+					//border-top-right-radius: 5px;
+					cursor: pointer;
+					background: #d1d1d1;
+					&.active {
+						background-color: #4e4e4e !important;
+						color: #fff !important;
+					}
+
+					&:hover{
+						background: #b3b3b3;
+					}
+				}
+			}
+		}
+
+		.userRoles, .userDept {
+			.listing {
+				max-height: 320px;
+				overflow-y: scroll;
+				li {
+					padding: 10px;
+					list-style: none;
+					border: 1px solid black;
+					border-bottom: none;
+					&:nth-child(even) {
+						background: #b1bcc7;
+					}
+					&:last-child{
+						border-bottom: 1px solid black;
+					}
+
+					img {
+						float: right;
+						padding: 0 5px 0 5px;
+						vertical-align: text-top;
+					}
+				}
+			}
+			.add{
+				.padding10Top;
+			}
 		}
 	}
 }
@@ -585,4 +669,9 @@ input[type="submit"],  input[type="button"]{
 
 input:focus{
 	//border: 2px solid red !important;
+}
+
+img.delete.tooltip{
+	height: 20px;
+	cursor: pointer;
 }

@@ -30,10 +30,15 @@
 						$GLOBALS['main']->loadModule( 'certs' );
 						$data = $GLOBALS['main']->certs->listing();
 						foreach ( $data['listing'] as $cert ) {
-							echo "<li data-id='${cert['id']}'>${cert['code']} - ${cert['description']}";
-							echo "<img class='delete tooltip' title='Delete certificate' src='". CORE_URL ."assets/img/delete.png'/>";
-							echo "<img class='languageEdit tooltip' title='Edit in Different Language' src='". CORE_URL ."assets/img/region.png'/>";
-							echo "<a href='certs/edit/${cert['id']}'><img class='edit tooltip' title='Edit certificate' src='". CORE_URL ."assets/img/edit.svg'/></a>";
+							echo "<li data-id='${cert['id']}'>";
+							//echo "<img class='key tooltip' title='Id: ${cert['id']}' src='". CORE_URL ."assets/img/key.png'/>";
+							echo "${cert['code']} - ${cert['description']}";
+							if( $cert['delete'] )
+								echo "<img class='delete tooltip' title='Delete certificate' src='". CORE_URL ."assets/img/delete.png'/>";
+							if( $cert['edit'] ) {
+								echo "<img class='languageEdit tooltip' title='Edit in Different Language' src='" . CORE_URL . "assets/img/region.png'/>";
+								echo "<a href='certs/edit/${cert['id']}'><img class='edit tooltip' title='Edit certificate' src='" . CORE_URL . "assets/img/edit.svg'/></a>";
+							}
 							echo "</li>";
 						}
 					?>
@@ -51,6 +56,7 @@
 </div>
 <?php
 	include_once CORE_PATH . 'assets/inc/footer.php';
+	Core::queueScript( 'assets/js/certs.js' );
 	Core::includeScripts();
 ?>
 

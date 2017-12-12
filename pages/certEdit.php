@@ -15,7 +15,7 @@
 <head>
 	<?php
 		include_once CORE_PATH . 'assets/inc/header.php';
-		Core::queueStyle( 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css' );
+		Core::queueStyle( 'assets/css/select2.css' );
 		Core::includeStyles();
 	?>
 </head>
@@ -49,6 +49,18 @@
 							<input type="text" name="code" value="<?=isset( $data['code'] ) ? $data['code'] : ''?>"/>
 							<span>Enter the certificate code number</span>
 						</li>
+						<li class="alignleft">
+							<label for="discipline">Discipline*</label>
+							<select name="discipline">
+								<option disabled selected> -- Select A Discipline -- </option>
+								<?php
+									foreach( $data['disciplines'] as $discipline ){
+										echo "<option " . ( ( $discipline['id'] == $data['discipline'] ) ? ( 'selected' ) : ( '' ) ) . " value='${discipline['id']}'>${discipline['description']}</option>";
+									}
+								?>
+							</select>
+							<span>Enter the dicipline for the certificate</span>
+						</li>
 						<li>
 							<label for="units">Units*</label>
 							<input type="number" name="units" value="<?=isset( $data['units'] ) ? $data['units'] : 0?>"/>
@@ -60,35 +72,35 @@
 							<div><input type="checkbox" name="hasAs" <?=$data['hasAs'] == 1 ? 'checked' : ''?>/>Has an Associate</div>
 							<span>Check if the program has a certificate and/or associate</span>
 						</li>
-						<li>
-							<label for="category">Category</label>
-							<select name="category">
-								<?php
-									foreach ( $data['categories'] as $cat ) {
-										echo "<option value='${cat['id']}'";
-										if( $cat['id'] == $data['category'] ){
-											echo " selected";
-										}
-										echo ">${cat['category']}</option>";
-									}
-
-								?>
-							</select>
-							<span>Enter the certificate category</span>
-						</li>
+<!--						<li>-->
+<!--							<label for="category">Category</label>-->
+<!--							<select name="category">-->
+<!--								--><?php
+//									foreach ( $data['categories'] as $cat ) {
+//										echo "<option value='${cat['id']}'";
+//										if( $cat['id'] == $data['category'] ){
+//											echo " selected";
+//										}
+//										echo ">${cat['category']}</option>";
+//									}
+//
+//								?>
+<!--							</select>-->
+<!--							<span>Enter the certificate category</span>-->
+<!--						</li>-->
 						<li>
 							<label for="description">Description*</label>
-							<textarea class="froala-editor" name="description" id="description" ><?=isset( $data['description'] ) ? $data['description'] : ''?></textarea>
+							<textarea class="editor" name="description" id="description" ><?=isset( $data['description'] ) ? $data['description'] : ''?></textarea>
 							<span>Enter the certificate description</span>
 						</li>
 						<li>
 							<label for="elo">Expected Learning Outcomes*</label>
-							<textarea class="froala-editor" name="elo" id="elo" ><?=isset( $data['elo'] ) ? $data['elo'] : ''?></textarea>
+							<textarea class="editor" name="elo" id="elo" ><?=isset( $data['elo'] ) ? $data['elo'] : ''?></textarea>
 							<span>Enter the certificate expected learning outcome</span>
 						</li>
 						<li>
 							<label for="schedule">Schedule*</label>
-							<textarea class="froala-editor" name="schedule" id="schedule" ><?=isset( $data['schedule'] ) ? $data['schedule'] : ''?></textarea>
+							<textarea class="editor" name="schedule" id="schedule" ><?=isset( $data['schedule'] ) ? $data['schedule'] : ''?></textarea>
 							<span>Enter the certificate schedule</span>
 						</li>
 						<li>
@@ -103,8 +115,8 @@
 						</li>
 						<li>
 							<input type="submit" value="Save" />
+							<input type="button" class="margin15Left low cancel" value="Cancel" />
 						</li>
-
 					</ul>
 				</form>
 			</div>
@@ -115,10 +127,12 @@
 	Core::queueScript( 'assets/js/core.js');
 	Core::queueScript( "assets/tinymce/tinymce.min.js" );
 	Core::queueScript( 'assets/js/ui.js');
-	Core::queueScript( 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js' );
+	Core::queueScript( 'assets/js/select2.js' );
+	Core::queueScript( 'assets/js/certs.js');
 	Core::includeScripts();
-?>
 
+?>
+<script>$('[name=discipline]').select2();</script>
 </body>
 </html>
 
