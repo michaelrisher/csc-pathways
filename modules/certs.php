@@ -14,7 +14,7 @@
 		 * @param string $order any custom sort you want to run with the query
 		 * @return array
 		 */
-		public function listing( $order = 'id' ) {
+		public function listing( $order = 'id', $page = 1 ) {
 			//to kinda standardize it for later needs
 			$this->loadModules( 'roles discipline' );
 			$fullRoles = $this->roles->getAllForUser( Core::getSessionId() );
@@ -109,6 +109,83 @@
 			} else {
 				Core::errorPage( 404 );
 			}
+		}
+
+		/**
+		 * @param array $input an array of options or an array of array of options for multiple searchs
+		 * @return array
+		 */
+		public function find( $input ){
+			//check if array is an array of arrays
+			$data = null;
+			$multi = false;
+
+			if( isset( $input[0] ) ){
+				$multi = true;
+			}
+			if ( $multi ){
+				for( $i = 0; $i < count( $input ); $i++ ){
+					$input[$i] = array(
+						'order' => isset( $input[$i]['order'] ) ? $input[$i]['order'] : 'id',
+						'page' => isset( $input[$i]['page'] ) ? $input[$i]['page'] : 1,
+						'search' => isset( $input[$i]['search'] ) ? $input[$i]['search'] : ''
+					);
+				}
+				$data = $input;
+			} else {
+				$input = array(
+					'order' => isset( $input['order'] ) ? $input['order'] : 'id',
+					'page' => isset( $input['page'] ) ? $input['page'] : 1,
+					'search' => isset( $input['search'] ) ? $input['search'] : ''
+				);
+				$data = array( $input );
+			}
+
+			$this->loadModules( 'roles discipline' );
+			$fullRoles = $this->roles->getAllForUser( Core::getSessionId() );
+			$userDisciplines = $this->discipline->getIdsForUser( Core::getSessionId() );
+
+			$return =array();
+			foreach ( $data as $item ) {
+				$query = "SELECT * FROM certificateList";
+
+				if( !empty( $item['search'] ) ){
+					$query  .= " WHERE " . $item['search'];
+				}
+
+				if( !empty( $item['order'] ) ){
+					$query .= " ORDER BY " .$item['order'];
+				}
+
+				if ( !$result = $this->db->query( $query ) ) {
+					error_log( 'certs.php->find() ' . $this->db->error ) ;
+				}
+
+				while ( $row = $result->fetch_assoc() ) {
+					if( $this->roles->haveAccess( 'CertView', Core::getSessionId(), $row['discipline'], $fullRoles, $userDisciplines ) ) {
+						$canEdit = $this->roles->haveAccess( 'CertEdit', Core::getSessionId(), $row['discipline'], $fullRoles, $userDisciplines );
+						$canDelete = $this->roles->haveAccess( 'CertEdit', Core::getSessionId(), $row['discipline'], $fullRoles, $userDisciplines );
+						$a = array(
+							'id' => $row['id'],
+							'code' => $row['code'],
+							'description' => $row['description'],
+							'category' => $row['category'],
+							'hasAs' => $row['hasAs'],
+							'hasCe' => $row['hasCe'],
+							'units' => $row['units'],
+							'sort' => $row['sort'],
+							'active' => $row['active'],
+							'discipline' => $row['discipline'],
+							'edit' => $canEdit,
+							'delete' => $canDelete
+						);
+						array_push( $return, $a );
+					}
+				}
+			}
+			$listing = array( 'listing' => $return );
+			$return = $listing;
+			return $return;
 		}
 
 		/**
@@ -382,5 +459,13 @@ EOD;
 		function show( $id ){
 			$data['params'] = $id;
 			include( CORE_PATH . 'pages/cert.php' );
+		}
+
+		public function listingByCodes( $codes ){
+			$output = array();
+			for( $i = 0; $i < count( $codes ); $i++ ){
+				array_push( $output, array( 'search' => "code='" . $codes[$i] . "'") );
+			}
+			return $this->find( $output );
 		}
 	}

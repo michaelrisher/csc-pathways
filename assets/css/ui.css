@@ -585,6 +585,11 @@ body {
   vertical-align: text-top;
   padding: 0 5px 0 5px;
 }
+#wrapper #main .admin > div li img.key {
+  float: none;
+  padding: 0;
+  cursor: default;
+}
 #wrapper #main .admin > div .pages {
   margin: 10px;
 }

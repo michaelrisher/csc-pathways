@@ -72,35 +72,35 @@
 							<div><input type="checkbox" name="hasAs" <?=$data['hasAs'] == 1 ? 'checked' : ''?>/>Has an Associate</div>
 							<span>Check if the program has a certificate and/or associate</span>
 						</li>
-						<li>
-							<label for="category">Category</label>
-							<select name="category">
-								<?php
-									foreach ( $data['categories'] as $cat ) {
-										echo "<option value='${cat['id']}'";
-										if( $cat['id'] == $data['category'] ){
-											echo " selected";
-										}
-										echo ">${cat['category']}</option>";
-									}
-
-								?>
-							</select>
-							<span>Enter the certificate category</span>
-						</li>
+<!--						<li>-->
+<!--							<label for="category">Category</label>-->
+<!--							<select name="category">-->
+<!--								--><?php
+//									foreach ( $data['categories'] as $cat ) {
+//										echo "<option value='${cat['id']}'";
+//										if( $cat['id'] == $data['category'] ){
+//											echo " selected";
+//										}
+//										echo ">${cat['category']}</option>";
+//									}
+//
+//								?>
+<!--							</select>-->
+<!--							<span>Enter the certificate category</span>-->
+<!--						</li>-->
 						<li>
 							<label for="description">Description*</label>
-							<textarea class="froala-editor" name="description" id="description" ><?=isset( $data['description'] ) ? $data['description'] : ''?></textarea>
+							<textarea class="editor" name="description" id="description" ><?=isset( $data['description'] ) ? $data['description'] : ''?></textarea>
 							<span>Enter the certificate description</span>
 						</li>
 						<li>
 							<label for="elo">Expected Learning Outcomes*</label>
-							<textarea class="froala-editor" name="elo" id="elo" ><?=isset( $data['elo'] ) ? $data['elo'] : ''?></textarea>
+							<textarea class="editor" name="elo" id="elo" ><?=isset( $data['elo'] ) ? $data['elo'] : ''?></textarea>
 							<span>Enter the certificate expected learning outcome</span>
 						</li>
 						<li>
 							<label for="schedule">Schedule*</label>
-							<textarea class="froala-editor" name="schedule" id="schedule" ><?=isset( $data['schedule'] ) ? $data['schedule'] : ''?></textarea>
+							<textarea class="editor" name="schedule" id="schedule" ><?=isset( $data['schedule'] ) ? $data['schedule'] : ''?></textarea>
 							<span>Enter the certificate schedule</span>
 						</li>
 						<li>

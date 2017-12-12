@@ -21,14 +21,10 @@
 		include_once CORE_PATH . 'assets/inc/header.php';
 		Core::includeStyles();
 		$GLOBALS['main']->loadModule('certs');
-		$data = $GLOBALS['main']->certs->listing('category, sort');
 		$category = array();
-		foreach( $data['listing'] as $item ){
-			if( !@is_array( $category[$item['category']] ) ){ //@ means suppress warning
-				$category[$item['category']] = array();
-			}
-			array_push( $category[$item['category']], $item );
-		}
+		$category[0] = $GLOBALS['main']->certs->listingByCodes( array( 650, 728, 803, 809, 816, 806 ) )['listing'];
+		$category[1] = $GLOBALS['main']->certs->listingByCodes( array( 810, 740 ) )['listing'];
+		$category[2] = $GLOBALS['main']->certs->listingByCodes( array( 843, 820, 726 ) )['listing'];
 	?>
 </head>
 <body>
@@ -62,7 +58,7 @@
 							<td><?= $lang->o( 'certListUnit' )?></td>
 						</tr>
 						<?php
-							foreach( $category[1] as $item ){
+							foreach( $category[0] as $item ){
 								if( $item['active'] ) {
 									echo "<tr class='treeCert'>";
 									echo "<td>" . Core::fakeLink( 'cert', $item['id'], $item['description'] ) . "</td>";
@@ -92,7 +88,7 @@
 							<td><?= $lang->o( 'certListUnit' )?></td>
 						</tr>
 						<?php
-							foreach( $category[2] as $item ){
+							foreach( $category[1] as $item ){
 								echo "<tr class='treeCert'>";
 								echo "<td>" . Core::fakeLink( 'cert', $item['id'], $item['description']) . "</td>";
 								echo "<td>";
@@ -123,7 +119,7 @@
 							<td><?= $lang->o( 'certListUnit' )?></td>
 						</tr>
 						<?php
-							foreach( $category[3] as $item ){
+							foreach( $category[2] as $item ){
 								echo "<tr class='treeCert'>";
 								echo "<td>" . Core::fakeLink( 'cert', $item['id'], $item['description']) . "</td>";
 								echo "<td>";

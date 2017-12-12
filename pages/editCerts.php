@@ -30,7 +30,9 @@
 						$GLOBALS['main']->loadModule( 'certs' );
 						$data = $GLOBALS['main']->certs->listing();
 						foreach ( $data['listing'] as $cert ) {
-							echo "<li data-id='${cert['id']}'>${cert['code']} - ${cert['description']}";
+							echo "<li data-id='${cert['id']}'>";
+							//echo "<img class='key tooltip' title='Id: ${cert['id']}' src='". CORE_URL ."assets/img/key.png'/>";
+							echo "${cert['code']} - ${cert['description']}";
 							if( $cert['delete'] )
 								echo "<img class='delete tooltip' title='Delete certificate' src='". CORE_URL ."assets/img/delete.png'/>";
 							if( $cert['edit'] ) {
