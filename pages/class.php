@@ -6,7 +6,6 @@
 	 * Time: 12:29
 	 */
 
-	Core::debug( $data );
 	if( is_array( $data['params'] ) ){
 		$id = $data['params'][1];
 	} else {
