@@ -5,6 +5,7 @@
 	 * Date: 6/19/2017
 	 * Time: 12:38
 	 */
+	$data = Core::sanitize( $data );
 	if( is_array( $data['params'] ) ){
 		$id = $data['params'][1];
 	} else {

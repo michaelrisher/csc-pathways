@@ -6,8 +6,12 @@
 	 * Time: 12:29
 	 */
 
-	$data = Core::sanitize( $data );
-	$id = $data['params'][1];
+	Core::debug( $data );
+	if( is_array( $data['params'] ) ){
+		$id = $data['params'][1];
+	} else {
+		$id = $data['params'];
+	}
 	$GLOBALS['main']->loadModule( 'classes' );
 	$row = $GLOBALS['main']->classes->get( $id, Lang::getCode(), true );
 	$lang = new Lang( Lang::getCode() );
