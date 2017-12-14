@@ -7,8 +7,9 @@
 	 */
 	if( is_array( $data['params'] ) ){
 		$id = $data['params'][1];
+	} else {
+		$id = $data['params'];
 	}
-	$id = $data['params'];
 	$GLOBALS['main']->loadModule( 'certs' );
 	$data = $GLOBALS['main']->certs->get( $id, Lang::getCode(), true );
 	$lang = new Lang( Lang::getCode() );

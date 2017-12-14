@@ -12,7 +12,7 @@
 	<div id="warning">
 		<?php Core::queueScript( 'assets/js/fontawesome-all.js') ?>
 		<div class="flex notice">
-			<strong><i class="fas fa-exclamation-circle"></i>&nbsp;Site is under maintenance.&nbsp;</strong>
+			<strong><i class="fas fa-exclamation-circle"></i>&nbsp;Site is undergoing maintenance.&nbsp;</strong>
 			<p>Some features may not work correctly.</p>
 		</div>
 		<div>
@@ -29,7 +29,7 @@
 			<div id="warning">
 				<?php Core::queueScript( 'assets/js/fontawesome-all.js') ?>
 				<div class="flex notice">
-					<strong><i class="fas fa-exclamation-circle"></i>&nbsp;Administration portion is under maintenance.&nbsp;</strong>
+					<strong><i class="fas fa-exclamation-circle"></i>&nbsp;Administration portion is undergoing maintenance.&nbsp;</strong>
 					<p>Some features may not work correctly.</p>
 				</div>
 				<div>
