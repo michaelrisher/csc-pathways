@@ -5,6 +5,7 @@
 	 * Date: 7/12/2017
 	 * Time: 12:01
 	 */
+	include CORE_PATH . 'assets/inc/notice.php';
 ?>
 <div id="headerWrapper">
 	<div id="header">

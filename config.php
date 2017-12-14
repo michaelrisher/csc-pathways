@@ -6,7 +6,12 @@
 	 * Time: 09:47
 	 */
 	define( 'MODE', 'local' );
-	
+	define( 'MAINTENANCE', false);
+	define( 'ADMIN_MAINTENANCE', false);
+	define( 'NOTICE', false);
+	define( 'NOTICE_MESSAGE', "This is a notice message");
+	define( 'ERROR', false);
+	define( 'ERROR_MESSAGE', "This is a error message");
 
 	define( 'NO_TIMEOUT', true );
 	if( MODE == 'local' ) {
@@ -19,10 +24,10 @@
 		define( 'DB_USER', 'root' );
 		define( 'DB_PASS', '' );
 		define( 'DB_DB', 'pathways' );
-	} else if( MODE == 'live' | MODE == 'staging' ) {
+	} else if( MODE == 'live') {
 		define( 'CORE_DIR', 'pathways/' );
-		define( 'CORE_PATH', '/home/michael_risher/public_html/' . CORE_DIR );//$_SERVER['DOCUMENT_ROOT'] . substr( $_SERVER['SCRIPT_NAME'], 0, -9 ) );
-		define( 'CORE_ROOT', '/home/michael_risher/public_html/' );//$_SERVER['DOCUMENT_ROOT'] . substr( $_SERVER['SCRIPT_NAME'], 0, ( -9 - strlen( CORE_DIR ) ) ) );
+		define( 'CORE_PATH', '/home/cscpathways/public_html/' . CORE_DIR );//$_SERVER['DOCUMENT_ROOT'] . substr( $_SERVER['SCRIPT_NAME'], 0, -9 ) );
+		define( 'CORE_ROOT', '/home/cscpathways/public_html/' );//$_SERVER['DOCUMENT_ROOT'] . substr( $_SERVER['SCRIPT_NAME'], 0, ( -9 - strlen( CORE_DIR ) ) ) );
 		define( 'CORE_REQUEST_TYPE', $_SERVER['REQUEST_METHOD'] );
 		define( 'CORE_URL', ( isset( $_SERVER['HTTPS'] ) ? 'https' : 'http' ) . '://' . $_SERVER[ 'HTTP_HOST' ] . '/' );
 		define( 'DB_IP', 'localhost' );

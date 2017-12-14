@@ -5,7 +5,10 @@
 	 * Date: 6/19/2017
 	 * Time: 12:38
 	 */
-	$id = $data['params'][1];
+	if( is_array( $data['params'] ) ){
+		$id = $data['params'][1];
+	}
+	$id = $data['params'];
 	$GLOBALS['main']->loadModule( 'certs' );
 	$data = $GLOBALS['main']->certs->get( $id, Lang::getCode(), true );
 	$lang = new Lang( Lang::getCode() );

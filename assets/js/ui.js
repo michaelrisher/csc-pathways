@@ -305,6 +305,14 @@ $( document ).ready( function () {
 	});
 
 	/******************************************************************************/
+	/******************************Notice Dismiss**********************************/
+	/******************************************************************************/
+	$( document ).on( 'click', '.noticeDismiss', function(){
+		$( this ).closest( '#warningWrapper' ).slideUp();
+		setCookie( "noticeDismissed", "1", 1 );
+	} );
+
+	/******************************************************************************/
 	/*******************************Modal Events***********************************/
 	/******************************************************************************/
 	//$(document).on(event, selector, handler).
@@ -539,7 +547,7 @@ function readCookie( name ) {
 }
 
 /**
- * put a cokkie into storage
+ * put a cookie into storage
  * @param name
  * @param data
  * @param expires
@@ -547,7 +555,7 @@ function readCookie( name ) {
 function setCookie( name, data, expires ){
 	if( expires ){
 		var date = new Date();
-		date.setTime(date.getTime()+( expires * 24 * 60 * 60 * 1000));
+		date.setTime( date.getTime()+( expires * 24 * 60 * 60 * 1000) );
 		expires = date.toUTCString();
 		document.cookie = name + "=" + data + "; expires=" + expires + "; path=/";
 	} else{

@@ -16,7 +16,7 @@
 	<?php
 		include_once CORE_PATH . 'assets/inc/header.php';
 		Core::queueStyle( 'assets/css/select2.css' );
-		Core::queueStyle( "http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" );
+		Core::queueStyle( "assets/css/font-awesome.css" );
 		Core::includeStyles();
 	?>
 </head>

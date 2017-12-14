@@ -10,7 +10,6 @@
 
 
 		/**
-		 * TODO run on live
 		 * remove old data from classes
 		 */
 		public function removeOldData(){
@@ -34,7 +33,6 @@ EOD;
 
 
 		/**
-		 * TODO run on live
 		 * updates the class table to change the id to an auto increment number.
 		 * have to search for usage
 		 * 1. in class data table

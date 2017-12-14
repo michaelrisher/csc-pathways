@@ -31,29 +31,28 @@
 				</div>
 				<div class="listing alignleft">
 					<ul>
-					<?php
-						$GLOBALS['main']->loadModule( 'classes' );
-						if( is_numeric( $params ) ){
-							$data = $GLOBALS['main']->classes->listing( $params );
-						} else {
-							$data = $GLOBALS['main']->classes->listing();
-						}
-//						Core::debug( $data );
-						if( isset( $data['listing'] ) ) {
-							foreach ( $data['listing'] as $class ) {
-								echo "<li data-id='${class['id']}'>${class['title']}";
-								if( $class['delete'] )
-									echo "<img class='delete tooltip' title='Delete class' src='" . CORE_URL . "assets/img/delete.png'/>";
-								if( $class['edit'] ) {
-									echo "<img class='languageEdit tooltip' title='Edit in Different Language' src='" . CORE_URL . "assets/img/region.png'/>";
-									echo "<img class='edit tooltip' title='Edit class' src='" . CORE_URL . "assets/img/edit.svg'/>";
-								}
-								echo "</li>";
+						<?php
+							$GLOBALS['main']->loadModule( 'classes' );
+							if( isset( $params[1] ) && is_numeric( $params[1] ) ){
+								$data = $GLOBALS['main']->classes->listing( $params[1] );
+							} else {
+								$data = $GLOBALS['main']->classes->listing();
 							}
-						} else{
-							echo "<li>There are no classes or you do not have the rights to see classes</li>";
-						}
-					?>
+							if( isset( $data['listing'] ) ) {
+								foreach ( $data['listing'] as $class ) {
+									echo "<li data-id='${class['id']}'>${class['title']}";
+									if( $class['delete'] )
+										echo "<img class='delete tooltip' title='Delete class' src='" . CORE_URL . "assets/img/delete.png'/>";
+									if( $class['edit'] ) {
+										echo "<img class='languageEdit tooltip' title='Edit in Different Language' src='" . CORE_URL . "assets/img/region.png'/>";
+										echo "<img class='edit tooltip' title='Edit class' src='" . CORE_URL . "assets/img/edit.svg'/>";
+									}
+									echo "</li>";
+								}
+							} else{
+								echo "<li>There are no classes or you do not have the rights to see classes</li>";
+							}
+						?>
 					</ul>
 				</div>
 				<div class="pages aligncenter" >

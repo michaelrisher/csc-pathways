@@ -101,9 +101,15 @@ $( document ).ready( function(){
 							onclick: function ( id ) {
 								var that = $( '.modal[data-id=' + id + ']' );
 								var val = $( that ).find( 'select' ).val();
+								var optionStr = $( 'option[value=' + val + ']', that ).html();
 								var classCode = $( 'option[value=' + val + ']', that ).html().match( /[a-zA-Z]{3}\-\d{1,4}[a-zA-Z]*/ )[0];
 								var float = $( 'input[name=float]:checked', that ).val();
-								editor.insertContent( '[class id="' + $( that ).find( 'select' ).val() + '" text="' + classCode + '" /]' );
+								var check = $( that ).find( 'input[name=append]' );
+								var str = '[class id="' + $( that ).find( 'select' ).val() + '" text="' + classCode + '" /]';
+								if( check.is( ':checked' ) ){
+									var str = '[class id="' + $( that ).find( 'select' ).val() + '" text="' + optionStr + '" /]';
+								}
+								editor.insertContent( str );
 								return true;
 							}
 						}, {
@@ -117,6 +123,7 @@ $( document ).ready( function(){
 						html += "<option value='" + data[i].id + "'>" + data[i].title + "</option>";
 					}
 					html += '</select><span>Pick a class to add</span></li>';
+					html += '<li class="alignleftImp"><label>Append Title</label><div><input type="checkbox" name="append">Append class title to link</div><span>Append class title to link</span>';
 					html += '</ul></form>';
 					setModalContent( modal, html );
 					displayModal( modal );

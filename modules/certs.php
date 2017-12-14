@@ -220,7 +220,6 @@ certificateData.language,
 certificateList.hasAs,
 certificateList.hasCe,
 certificateList.units,
-certificateList.category,
 certificateList.description AS title,
 certificateList.sort,
 certificateList.active,
@@ -229,7 +228,6 @@ certificateData.elo,
 certificateData.schedule
 FROM
 certificateList
-INNER JOIN enumCategories ON certificateList.category = enumCategories.id
 INNER JOIN certificateData ON certificateList.id = certificateData.cert
 WHERE certificateList.id = $id
 ORDER by certificateData.language ASC
@@ -309,7 +307,7 @@ EOD;
 					$_POST['code'] = core::sanitize( $_POST['code'] );
 					$_POST['units'] = core::sanitize( $_POST['units'] );
 					$_POST['discipline'] = core::sanitize( $_POST['discipline'] );
-					$_POST['category'] = core::sanitize( $_POST['category'] );
+//					$_POST['category'] = core::sanitize( $_POST['category'] );
 					$_POST['description'] = core::sanitize( $_POST['description'], true );
 					$_POST['elo'] = core::sanitize( $_POST['elo'], true );
 					$_POST['schedule'] = core::sanitize( $_POST['schedule'], true );
@@ -325,7 +323,7 @@ EOD;
 						'code' => (string)$_POST['code'],
 						'hasAs' => $hasAs,
 						'hasCe' => $hasCe,
-						'category' => (int)$_POST['category'],
+//						'category' => (int)$_POST['category'],
 						'units' => (int)$_POST['units'],
 						'description' => $_POST['title'],
 						'sort' => (int)$_POST['sort'],
