@@ -376,17 +376,17 @@ EOD;
 							</li>
 							<li>
 								<label for="advisory">Advisory</label>
-								<input name="advisory" type="text" value="<?=$class['advisory']?>">
+								<input name="advisory" type="text" value="<?=htmlentities( $class['advisory'] )?>">
 								<span>Enter the class advisory<a class="addClass floatright">+ Add Class</a></span>
 							</li>
 							<li>
 								<label for="prereq">Prerequisite</label>
-								<input name="prereq" type="text" value="<?=$class['prereq']?>">
+								<input name="prereq" type="text" value="<?=htmlentities( $class['prereq'] )?>">
 								<span>Enter the class prerequisite<a class="addClass floatright">+ Add Class</a></span>
 							</li>
 							<li>
 								<label for="coreq">Corequisite</label>
-								<input name="coreq" type="text" value="<?=$class['coreq']?>">
+								<input name="coreq" type="text" value="<?=htmlentities( $class['coreq'] )?>">
 								<span>Enter the class corequisite<a class="addClass floatright">+ Add Class</a></span>
 							</li>
 							<li>
