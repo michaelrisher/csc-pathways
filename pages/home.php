@@ -128,6 +128,9 @@
 					}
 				?>
 			</div>
+			<div class="datablock<?= ( isset( $_GET ) && isset( $_GET['class'] )) ? '' : ' none';?>" id="classGroup">
+				<?php //include 'classGroup.php'; ?>
+			</div>
 			<div class="datablock<?= ( isset( $_GET ) && isset( $_GET['class'] )) ? '' : ' none';?>" id="class">
 				<?php
 					if( isset( $_GET ) && isset( $_GET['class'] ) ){

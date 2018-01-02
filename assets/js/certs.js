@@ -14,7 +14,7 @@ $( document ).ready( function(){
 			autoresize_max_height: 600,
 			toolbar: 'undo redo | bold italic underline subscript superscript | fontselect fontsizeselect forecolor backcolor ' +
 			'alignleft aligncenter alignright alignjustify | formatselect table ' +
-			' bullist | addclass shortClass scheduleTable | code',
+			' bullist | addclass addClassGroup shortClass scheduleTable | code',
 			menubar: false,
 			setup: function ( editor ) {
 				editor.addButton( 'addclass', {
@@ -43,6 +43,40 @@ $( document ).ready( function(){
 								}
 							} );
 						}
+					}
+				} );
+				editor.addButton( 'addClassGroup', {
+					text: 'Add Gen Ed',
+					icon: false,
+					tooltip: 'Add a general education group(ie humanities)',
+					onclick: function () {
+						var modal = createModal( {
+							title: "Choose General Education Group",
+							buttons: [{
+								value: 'Add',
+								onclick: function ( id ) {
+									var that = $( '.modal[data-id=' + id + ']' );
+									var val = $( that ).find( 'select' ).val();
+									var optionStr = $( 'option[value=' + val + ']', that ).html();
+									var str = '[classGroup id="' + $( that ).find( 'select' ).val() + '" text="' + optionStr + '" /]';
+									editor.insertContent( str );
+									return true;
+								}
+							}, {
+								value: 'Cancel',
+								class: 'low'
+							}]
+						} );
+						var html = '<form><ul><li><label for="group">Group</label>' +
+							'<select name="group">';
+						var data = ["Communications and Analytic Thinking", "English", "Health Science", "Humanities", "Natural Sciences", "Self-Development", "Social and Behavioral Sciences"];
+						for ( var i = 0; i < data.length; i++ ) {
+							html += "<option value='" + ( i + 1 ) + "'>" + data[i] + "</option>";
+						}
+						html += '</select><span>Pick a group to add</span></li>';
+						html += '</ul></form>';
+						setModalContent( modal, html );
+						displayModal( modal );
 					}
 				} );
 				editor.addButton( 'scheduleTable', {

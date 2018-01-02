@@ -22,7 +22,7 @@
 				<div class="aligncenter clearfix margin15">
 					<div class="clearfix">
 						<img alt="To Certificate Info" title="To Certificate Info" class="floatright margin10Right back tooltip" data-to="cert" width=20 src="<?= CORE_URL . 'assets/img/back.png' ?>"/>
-						<img alt="<?= $lang->o('copyLink')?>" title="<?= $lang->o('copyLink')?>" class="floatright margin15Right link tooltip" data-to="top" width=20 src="<?= CORE_URL . 'assets/img/link.png' ?>"/>
+						<img alt="<?= $lang->o('copyLink')?>" title="<?= $lang->o('copyLink')?>" class="floatright margin15Right link tooltip" width=20 src="<?= CORE_URL . 'assets/img/link.png' ?>"/>
 					</div>
 					<p class="info"><?= $lang->o('classInfoHeader')?></p>
 				</div>

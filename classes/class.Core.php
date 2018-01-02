@@ -245,8 +245,8 @@
 		 * @return mixed
 		 */
 		public static function replaceClassLink( $string ){
-			return preg_replace( '/\[class\s*id=[\'|\"](.+?)[\'|\"]\s*text=[\'|\"](.+?)[\'|\"]\s*\/\]/',
-				"<a class='fakeLink' data-to='class' data-code='$1'>$2</a>",
+			return preg_replace( '/\[(.+?)\s*id=[\'|\"](.+?)[\'|\"]\s*text=[\'|\"](.+?)[\'|\"]\s*\/\]/',
+				"<a class='fakeLink' data-to='$1' data-code='$2'>$3</a>",
 				$string
 			);//regex to match the link string
 		}

@@ -404,6 +404,33 @@ EOD;
 			}
 		}
 
+		public function getGroup( $id, $forceReturn = false ){
+			$id = (int)Core::sanitize( $id );
+			$return = null;
+			$query = "SELECT * FROM classGroups WHERE id = ?";
+
+			$statement = $this->db->prepare( $query );
+			$statement->bind_param( 'i', $id );
+
+			if( $statement->execute() ){
+				$result = $statement->get_result();
+				if( $result->num_rows > 0 ){
+					$row = $result->fetch_assoc();
+					$return = array(
+						'id' => $row['id'],
+						'title' => $row['title'],
+						'text' => $row['text']
+					);
+				}
+			}
+
+			if ( IS_AJAX && !$forceReturn ) {
+				echo Core::ajaxResponse( $return );
+			} else {
+				return $return;
+			}
+		}
+
 		/**
 		 * adding a sort column keeping for future reference
 		 * @deprecated

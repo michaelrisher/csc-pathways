@@ -506,53 +506,64 @@ body {
   padding-left: 5px;
 }
 #wrapper #main #cert,
-#wrapper #main #class {
+#wrapper #main #class,
+#wrapper #main #classGroup {
   margin: 100px 0 25px 0;
   border: 1px solid black;
 }
 #wrapper #main #cert sup,
-#wrapper #main #class sup {
+#wrapper #main #class sup,
+#wrapper #main #classGroup sup {
   vertical-align: super;
   font-size: smaller;
 }
 #wrapper #main #cert .info,
-#wrapper #main #class .info {
+#wrapper #main #class .info,
+#wrapper #main #classGroup .info {
   font-weight: bold;
   margin: 0 0 30px 0;
 }
 #wrapper #main #cert .info .back,
-#wrapper #main #class .info .back {
+#wrapper #main #class .info .back,
+#wrapper #main #classGroup .info .back {
   cursor: pointer;
 }
 #wrapper #main #cert p.title,
-#wrapper #main #class p.title {
+#wrapper #main #class p.title,
+#wrapper #main #classGroup p.title {
   font-size: larger;
   font-weight: bold;
   padding: 0 0 20px 0;
 }
 #wrapper #main #cert ul,
-#wrapper #main #class ul {
+#wrapper #main #class ul,
+#wrapper #main #classGroup ul {
   padding-left: 40px;
 }
 #wrapper #main #cert ul li,
-#wrapper #main #class ul li {
+#wrapper #main #class ul li,
+#wrapper #main #classGroup ul li {
   display: list-item;
 }
 #wrapper #main #cert table,
-#wrapper #main #class table {
+#wrapper #main #class table,
+#wrapper #main #classGroup table {
   width: 100%;
 }
 #wrapper #main #cert table a,
-#wrapper #main #class table a {
+#wrapper #main #class table a,
+#wrapper #main #classGroup table a {
   display: block;
 }
 #wrapper #main #cert table td,
-#wrapper #main #class table td {
+#wrapper #main #class table td,
+#wrapper #main #classGroup table td {
   border: 1px dotted black;
   padding: 5px;
 }
 #wrapper #main #cert table td > table td,
-#wrapper #main #class table td > table td {
+#wrapper #main #class table td > table td,
+#wrapper #main #classGroup table td > table td {
   border: none !important;
   padding: 0 !important;
 }

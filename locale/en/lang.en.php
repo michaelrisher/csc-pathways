@@ -41,6 +41,7 @@
 			'ajaxLogin' => 'Successfully logged in.',
 			'ajaxLoginDisabled' => 'Account has been deactivated.',
 			'ajaxLoginIncorrect' => 'Your username or email is incorrect.',
-			'ajaxNoRights' => 'Insufficient permissions to edit classes'
+			'ajaxNoRights' => 'Insufficient permissions to edit classes',
+			'classGroupHeader' => 'Class Group Information'
 		);
 	}
