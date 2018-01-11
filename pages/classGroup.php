@@ -29,7 +29,7 @@
 			<div class="alignjustify">
 				<p class="margin10Bottom">Here are the classes that you can take in the humanities class group.</p>
 				<div>
-					<?= $row['text'] ?>
+					<?= Core::replaceClassLink( $row['text'] ) ?>
 				</div>
 
 			</div>

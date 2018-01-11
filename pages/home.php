@@ -128,8 +128,14 @@
 					}
 				?>
 			</div>
-			<div class="datablock<?= ( isset( $_GET ) && isset( $_GET['class'] )) ? '' : ' none';?>" id="classGroup">
-				<?php //include 'classGroup.php'; ?>
+			<div class="datablock<?= ( isset( $_GET ) && isset( $_GET['classGroup'] )) ? '' : ' none';?>" id="classGroup">
+				<?php
+					if ( isset( $_GET ) && isset( $_GET['classGroup'] ) ) {
+						$GLOBALS['main']->loadModule( 'classes' );
+						$_GET = Core::sanitize( $_GET );
+						$GLOBALS['main']->classes->showClassGroup( $_GET['classGroup'] );
+					}
+				?>
 			</div>
 			<div class="datablock<?= ( isset( $_GET ) && isset( $_GET['class'] )) ? '' : ' none';?>" id="class">
 				<?php

@@ -13,8 +13,12 @@
 </head>
 <body>
 <?php
-	$GLOBALS['main']->loadModule( 'certs' );
-	$data = $GLOBALS['main']->certs->listingByCodes( array( 650, 728, 803 ) );
+	$GLOBALS['main']->loadModules( 'certs classes' );
+	$data = $GLOBALS['main']->classes->find( array( "search" => 'title="EXA-1 - Example class a simple testj"' ) );
+	Core::debug( $data );
+	$data = $GLOBALS['main']->classes->find( array( "search" => 'title="EXA-1 - Example class a simple test"' ) );
+	Core::debug( $data );
+	$data = $GLOBALS['main']->classes->find( array( "search" => 'title LIKE "EXA-1%"' ) );
 	Core::debug( $data );
 
 

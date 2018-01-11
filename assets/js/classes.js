@@ -119,20 +119,30 @@ $( document ).ready( function(){
 		} );
 		var hasError = false;
 		//verify data
+		var scrollTo = null;
+		if( typeof map['discipline'] == 'undefined' ){
+			scrollTo = $( form ).find( 'select[name=discipline]' ).closest( 'li' );
+			scrollTo.addClass( 'error' );
+			hasError = true;
+		}
 		if ( map['title'].length == 0 ) {
-			$( form ).find( 'input[name=title]' ).closest( 'li' ).addClass( 'error' );
+			scrollTo = $( form ).find( 'input[name=title]' ).closest( 'li' );
+			scrollTo.addClass( 'error' );
 			hasError = true;
 		}
 		if ( map['units'].length == 0 ) {
-			$( form ).find( 'input[name=units]' ).closest( 'li' ).addClass( 'error' );
+			scrollTo = $( form ).find( 'input[name=units]' ).closest( 'li' );
+			scrollTo.addClass( 'error' );
 			hasError = true;
 		}
 		if ( map['description'].length == 0 ) {
-			$( form ).find( 'textarea[name=description]' ).closest( 'li' ).addClass( 'error' );
+			scrollTo = $( form ).find( 'textarea[name=description]' ).closest( 'li' );
+			scrollTo.addClass( 'error' );
 			hasError = true;
 		}
 		if( !regex['classTitle'].test( map['title'] ) ){ //if doesnt match the
-			$( form ).find( 'input[name=title]' ).closest( 'li' ).addClass( 'error' );
+			scrollTo = $( form ).find( 'input[name=title]' ).closest( 'li' );
+			scrollTo.addClass( 'error' );
 			hasError = true;
 			var modalNew = createModal({ title: "Error", buttons : [{value: "Ok"}] });
 			setModalContent( modalNew, "<p>Title must match this pattern</p><p>EXA-1 - Example title for class example-1</p>");
@@ -188,6 +198,10 @@ $( document ).ready( function(){
 			} );
 			return successful;
 		} else {
+			//scroll to error
+			$( 'div.modalContent' ).animate( {
+				scrollTop: $( scrollTo ).offset().top - $('div.modalContent' ).offset().top
+			}, 500 );
 			saveBtn.removeClass( 'processing' );
 			return false;
 		}

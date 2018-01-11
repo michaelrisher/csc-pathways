@@ -67,7 +67,7 @@
 
 				//get count of data
 				if( empty( $search ) ) {
-					$query = "SELECT COUNT( id ) AS items FROM classes";
+					$query = "SELECT COUNT( id ) AS items FROM classes ";
 				} else {
 					$query = "SELECT COUNT( id ) AS items FROM classes WHERE title LIKE '%$search%'";
 				}
@@ -187,14 +187,28 @@ EOD;
 		public function save( $id, $create = false ) {
 			//what if a user from outside discipline wants to create a class for there cert (ie math for a compsci cert)
 			$this->loadModules( 'users audit roles' );
+			if( !$create ){
+				//double check we aren't creating since the create var is deprecated
+				$create = isset( $_POST['create'] ) ? $_POST['create'] : false;
+			}
 //			$lang = new Lang( Lang::getCode() );
 			$obj = array();
 			$_POST = Core::sanitize( $_POST, true );
 			if ( $this->users->isLoggedIn() ) {
 				if( $this->roles->haveAccess( 'ClassEdit', Core::getSessionId(), -1 ) ) {
 					//get the sort from the title
-					$sort = explode( ' - ', $_POST['title'] )[0];
-					$sort = preg_replace( '/\D/', '', $sort );
+					$code = explode( ' - ', $_POST['title'] )[0];
+					$sort = preg_replace( '/\D/', '', $code );
+
+					//if creating make sure the title is different
+					$findClass = $this->find( array( 'search' => 'title LIKE "' . $code . '%"' ) );
+					if( $create ){
+						if ( count( $findClass['listing'] ) > 0 ) {
+							$obj['error'] = "A class with the same code exists already";
+							echo Core::ajaxResponse( $obj, false );
+							return;
+						}
+					}
 
 					$setClass = $this->upsertRecord( 'classes', "id=${id}", array(
 						'id' => $id,
@@ -362,7 +376,7 @@ EOD;
 									}
 									?>
 								</select>
-								<span>Enter the class ID</span>
+								<span>Enter the class discipline</span>
 							</li>
 							<li>
 								<label for="units">Units*</label>
@@ -404,6 +418,75 @@ EOD;
 			}
 		}
 
+		public function find( $options ){
+			//check if array is an array of arrays
+			$data = null;
+			$multi = false;
+
+			if( isset( $options[0] ) ){
+				$multi = true;
+			}
+			if ( $multi ){
+				for( $i = 0; $i < count( $options ); $i++ ){
+					$input[$i] = array(
+						'order' => isset( $options[$i]['order'] ) ? $options[$i]['order'] : 'id',
+						'page' => isset( $options[$i]['page'] ) ? $options[$i]['page'] : 1,
+						'search' => isset( $options[$i]['search'] ) ? $options[$i]['search'] : ''
+					);
+				}
+				$data = $options;
+			} else {
+				$options = array(
+					'order' => isset( $options['order'] ) ? $options['order'] : 'id',
+					'page' => isset( $options['page'] ) ? $options['page'] : 1,
+					'search' => isset( $options['search'] ) ? $options['search'] : ''
+				);
+				$data = array( $options );
+			}
+
+			$this->loadModules( 'roles discipline' );
+			$fullRoles = $this->roles->getAllForUser( Core::getSessionId() );
+			$userDisciplines = $this->discipline->getIdsForUser( Core::getSessionId() );
+
+			$return =array();
+			foreach ( $data as $item ) {
+				$query = "SELECT * FROM classes";
+
+				if( !empty( $item['search'] ) ){
+					$query  .= " WHERE " . $item['search'];
+				}
+
+				if( !empty( $item['order'] ) ){
+					$query .= " ORDER BY " .$item['order'];
+				}
+
+				if ( !$result = $this->db->query( $query ) ) {
+					error_log( 'classes.php->find() ' . $this->db->error ) ;
+				}
+
+				while ( $row = $result->fetch_assoc() ) {
+					if( $this->roles->haveAccess( 'ClassView', Core::getSessionId(), $row['discipline'], $fullRoles, $userDisciplines ) ) {
+						$canEdit = $this->roles->haveAccess( 'ClassEdit', Core::getSessionId(), $row['discipline'], $fullRoles, $userDisciplines );
+						$canDelete = $this->roles->haveAccess( 'ClassEdit', Core::getSessionId(), $row['discipline'], $fullRoles, $userDisciplines );
+						$a = array(
+							'id' => $row['id'],
+							'sort' => $row['sort'],
+							'title' => $row['title'],
+							'units' => $row['units'],
+							'transfer' => $row['transfer'],
+							'units' => $row['units'],
+							'discipline' => $row['discipline'],
+							'edit' => $canEdit,
+							'delete' => $canDelete
+						);
+						array_push( $return, $a );
+					}
+				}
+			}
+			$listing = array( 'listing' => $return );
+			$return = $listing;
+			return $return;
+		}
 		public function getGroup( $id, $forceReturn = false ){
 			$id = (int)Core::sanitize( $id );
 			$return = null;
@@ -505,5 +588,10 @@ EOD;
 		public function show( $id ) {
 			$data['params'] = $id;
 			include CORE_PATH . 'pages/class.php';
+		}
+
+		public function showClassGroup( $id ){
+			$data['params'] = $id;
+			include CORE_PATH . 'pages/classGroup.php';
 		}
 	}

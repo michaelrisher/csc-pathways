@@ -756,7 +756,7 @@ form ul li {
 form ul li.error {
   border: 1px solid red !important;
 }
-form ul li.error > span {
+form ul li.error > span:last-child {
   background: red !important;
 }
 form ul li:last-child {
@@ -959,7 +959,7 @@ button.processing {
 .modal .modalWrapper form ul li.error {
   border: 1px solid red !important;
 }
-.modal .modalWrapper form ul li.error > span {
+.modal .modalWrapper form ul li.error > span:last-child {
   background: red !important;
 }
 .modal .modalWrapper form ul li > label {
