@@ -237,6 +237,7 @@ EOD;
 						'description' => trim( $_POST['description'] ),
 					) );
 
+
 					if ( $setClass && $setClassData ) {
 						$obj['msg'] = 'Saved successfully.';
 						$obj['editable'] = $this->roles->haveAccess( 'ClassEdit', Core::getSessionId(), $_POST['discipline'] );
