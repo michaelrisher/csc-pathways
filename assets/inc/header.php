@@ -27,4 +27,7 @@ var _bftn_options = {
 <!--<script src="https://widget.battleforthenet.com/widget.js" async></script>-->
 <link rel="shortcut icon" href="<?=CORE_URL?>assets/img/favicon.ico" type="image/x-icon">
 <link rel="icon" href="<?=CORE_URL?>assets/img/favicon.ico" type="image/x-icon">
+<meta name="description" content="Pathways to degrees and certificates for Riverside City College">
+<meta name="keywords" content="cscpathways,cispathways,riverside,city,college,pathways,computer,science,rcc">
+<meta name="author" content="Michael Risher">
 <title>CSC Pathways</title>

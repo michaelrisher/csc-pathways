@@ -37,8 +37,8 @@
 					<?php
 						$GLOBALS['main']->loadModule( 'audit' );
 
-						if( is_numeric( $params ) ){
-							$data = $GLOBALS['main']->audit->listing( $data['params'] );
+						if( isset( $params[1] ) && is_numeric( $params[1] ) ){
+							$data = $GLOBALS['main']->audit->listing( $data['params'][1] );
 						} else {
 							$data = $GLOBALS['main']->audit->listing();
 						}

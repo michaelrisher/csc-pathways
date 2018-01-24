@@ -16,7 +16,7 @@
 		 */
 		public function listing( $forceReturn = false){
 			//to kinda standardize it for later needs
-			$query = "SELECT * FROM disciplines";
+			$query = "SELECT * FROM disciplines ORDER BY name";
 
 			if ( !$result = $this->db->query( $query ) ) {
 				echo( 'There was an error running the query [' . $this->db->error . ']' );

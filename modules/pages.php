@@ -221,7 +221,7 @@ class pages extends Main{
 	 * @param int $id id for the item
 	 */
 	public function delete( $id ){
-
+		//TODO delete pages
 	}
 
 	/**
@@ -242,6 +242,8 @@ class pages extends Main{
 		if ( file_exists( CORE_PATH . 'pages/' . $path .'.php' ) ) {
 			Core::queueStyle( 'assets/css/reset.css' );
 			Core::queueStyle( 'assets/css/ui.css' );
+			Core::queueStyle( 'assets/css/jquery-ui.css');
+			Core::queueStyle( 'assets/css/jquery-ui.structure.css');
 			include( CORE_PATH . 'pages/' . $path . '.php' );
 		} else {
 			//check if page exists in the database

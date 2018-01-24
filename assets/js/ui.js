@@ -360,6 +360,20 @@ $( document ).ready( function () {
 		} );
 	} );
 
+	//modal shadow click
+	$( document ).on( 'click', '.modalShadow', function(){
+		//check the data on it to make sure there is no override for this option
+		var id = $( this ).attr( 'data-id' );
+		var modal = window.modals.data[id];
+		if ( modal.shadowClose ) {
+			if( isset( modal.shadowPrompt ) ){
+				confirmModal( modal.shadowPrompt, function(){ closeModalId( id ); return true }, undefined );
+			} else {
+				closeModalId( id );
+			}
+		}
+	} );
+
 	/******************************************************************************/
 	/******************************modal tab switcher******************************/
 	/******************************************************************************/
@@ -401,14 +415,16 @@ window.modals = { ids: [], data: {}, displaying: false };
  * options structure
  * {
  *  title: "string", //the header for the title
- *  footer: true, //has a footer
+ *  footer: true, //has a footer [optional]
+ *  shadowClose: true, //clicking the shadow closes the modal [optional]
+ *  shadowPrompt: "", //prompt for the user to close [optional]
  *  buttons: [ //buttons for footer
  *  	0 : {
  *  		value : "string", //value of the button
- *			name : "string", //name of the input
- *  		onclick : function, //click event to run
- *  		class : "string" //class of the button for style or whatever
- *  		focus : true //focus on this button
+ *			name : "string", //name of the input [optional]
+ *  		onclick : function, //click event to run [optional]
+ *  		class : "string" //class of the button for style or whatever [optional]
+ *  		focus : true //focus on this button [optional]
  *  	}
  *  ]
  * @param options
@@ -419,6 +435,14 @@ function createModal( options ) {
 		id = 1;
 	} else {
 		id = window.modals.ids[window.modals.ids.length - 1] + 1;
+	}
+
+	if ( !isset( options['shadowClose'] ) ) {
+		options['shadowClose'] = true;
+	}
+
+	if ( !isset( options['focus'] ) ) {
+		options['focus'] = false;
 	}
 	var zIndex = ' style="z-index: ' + ( 5 + ( id - 1 ) ) + '" ';
 	var html = '<div data-id="' + id + '" class="modal none"' + zIndex + '>' +
@@ -444,7 +468,7 @@ function createModal( options ) {
 		}
 		html += '</div>';
 	}
-	$( 'body' ).append( '<div class="modalShadow" data-id="' + id + '"' + zIndex + '>&nbsp;</div>' ).append( html );
+	$( 'body' ).append( '<div class="modalShadow none" data-id="' + id + '"' + zIndex + '>&nbsp;</div>' ).append( html );
 	window.modals.data[id] = options
 	window.modals.ids.push( id );
 	return $( '.modal[data-id=' + id + ']' );
@@ -464,13 +488,40 @@ function appendModalContent( modal, html ){
 
 function displayModal( modal, focusIndex ) {
 	//center the modal on the screen
+	var id = $( modal ).attr( 'data-id' );
 	$( modal ).css( 'left', ( $( 'body' ).width() / 2 ) - ( $( modal ).width() / 2 ) + 'px' );
 	$( modal ).css( 'top', ( $(document ).scrollTop() ) + 'px' );
+	$( '.modalShadow[data-id=' + id + ']' ).fadeIn( 300 );
 	$( modal ).fadeIn( 300 );
+	//find focus if any exist
+	var data = window.modals.data[id];
+	for ( var i = 0; i < data.buttons.length; i++ ) {
+		if( data.buttons[i].focus  ){
+			$( '.modal[data-id=' + id + '] input[name="' + data.buttons[i].name + '"]' ).focus();
+			$( '.modal[data-id=' + id + '] input[value="' + data.buttons[i].value + '"]' ).focus();
+		}
+	}
 	//$('html, body').animate({
 	//	scrollTop: $( modal ).offset().top
 	//}, 200);
 	window.modals.displaying = $( modal ).attr( 'data-id' );
+}
+
+function closeModalId( id ){
+	var modal = $( '.modal[data-id=' + id + ']');
+	delete window.modals.data[id];
+	window.modals.ids.splice( window.modals.ids.indexOf( id ), 1 );
+	if( $( '.modal:not([data-id=' + id + '])' ).last().length ){
+		window.modals.displaying = $( '.modal' ).last().attr( 'data-id' );
+	} else {
+		window.modals.displaying = false;
+	}
+	$( modal ).fadeOut( 300, function () {
+		$( modal ).remove();
+	} );
+	$( '.modalShadow[data-id=' + id + ']' ).fadeOut( 300, function(){
+		$(this ).remove();
+	});
 }
 
 function closeModal( modal ) {
@@ -489,7 +540,26 @@ function closeModal( modal ) {
 	$( '.modalShadow[data-id=' + id + ']' ).fadeOut( 300, function(){
 		$(this ).remove();
 	});
+}
 
+function confirmModal( question, yesAction, noAction ){
+	var modal = createModal( {
+		title : "Confirm",
+		buttons: [
+			{
+				value: "Yes",
+				onclick: yesAction
+			},
+			{
+				value: "Cancel",
+				onclick: noAction,
+				class: 'low'
+			}
+		]
+	} );
+	setModalContent( modal, question );
+	displayModal( modal );
+	$( modal ).effect( 'shake' );
 }
 
 function modalLi( type, name, label, data, text ) {
@@ -677,6 +747,13 @@ function getQueryString(){
 		obj[s[0]] = s[1];
 	}
 	return obj;
+}
+
+function isset( value ){
+	if( typeof value !== 'undefined' ){
+		return true;
+	}
+	return false;
 }
 
 var regex = {};

@@ -5,10 +5,13 @@ $( document ).ready( function(){
 	function editModal( data, create ){
 		var modal = createModal( {
 			title: ( ( create ) ? ( 'Create Discipline' ) : ( 'Edit Discipline' ) ),
+			shadowClose: true,
+			shadowPrompt: "Are you sure you want to close? The discipline will not be saved",
 			buttons: [
 				{
 					value: 'Save',
 					name: 'save',
+					focus: true,
 					onclick: save
 				},
 				{
@@ -19,6 +22,7 @@ $( document ).ready( function(){
 		} );
 		setModalContent( modal, data );
 		displayModal( modal );
+		$( 'input[name=name]' ).focus();
 	}
 
 	/************************ Edit ************************/
@@ -34,7 +38,7 @@ $( document ).ready( function(){
 				} else {
 					var modal = createModal( { title: 'Failed to load discipline', buttons: [{ value: 'Ok', focus : true }] } );
 					setModalContent( modal, "An error occurred." );
-					displayModal( modal, true )
+					displayModal( modal, true );
 				}
 			}
 		} );
@@ -51,7 +55,7 @@ $( document ).ready( function(){
 				} else {
 					var modal = createModal( { title: 'Error', buttons: [{ value: 'Ok', focus : true }] } );
 					setModalContent( modal, "Failed to contact database. Please try again." );
-					displayModal( modal, true )
+					displayModal( modal, true );
 				}
 			}
 		} );
@@ -101,14 +105,14 @@ $( document ).ready( function(){
 						displayModal( modal );
 						successful = true;
 						if ( map['create'] ) {
-							var str = '<li data-id="' + data.data.id + '">' + map['description'];
+							var str = '<li data-id="' + data.data.id + '">' + map['name'] + ' ' + map['description'];
 							str += '<img class="delete" src="' + CORE_URL + 'assets/img/delete.png">';
 							str += '<img class="edit" src="' + CORE_URL + 'assets/img/edit.svg">';
 							str += '</li>';
 
 							$( '.listing ul' ).append( str );
 						} else {
-							var str = map['description'];
+							var str = map['name'] + ' ' + map['description'];
 							str += '<img class="delete" src="' + CORE_URL + 'assets/img/delete.png">';
 							str += '<img class="edit" src="' + CORE_URL + 'assets/img/edit.svg">';
 							$( 'li[data-id=' + map['id'] + ']' ).html( str );

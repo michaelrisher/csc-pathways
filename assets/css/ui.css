@@ -862,7 +862,10 @@ button {
 }
 input[type="submit"]:hover,
 input[type="button"]:hover,
-button:hover {
+button:hover,
+input[type="submit"]:focus,
+input[type="button"]:focus,
+button:focus {
   background: #6B9FFF;
   color: #fff;
 }
@@ -874,7 +877,10 @@ button.low {
 }
 input[type="submit"].low:hover,
 input[type="button"].low:hover,
-button.low:hover {
+button.low:hover,
+input[type="submit"].low:focus,
+input[type="button"].low:focus,
+button.low:focus {
   background: #b6b5b5;
 }
 input[type="submit"].processing,

@@ -51,7 +51,7 @@
 					'listing' => $return,
 					'count' => intval( $count ),
 					'limit' => $limit,
-					'currentPage' => ++$page
+					'currentPage' => (int)++$page
 				);
 			}
 		}

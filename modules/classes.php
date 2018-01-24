@@ -204,16 +204,25 @@ EOD;
 					$findClass = $this->find( array( 'search' => 'title LIKE "' . $code . '%"' ) );
 					if( $create ){
 						if ( count( $findClass['listing'] ) > 0 ) {
-							$obj['error'] = "A class with the same code exists already";
-							echo Core::ajaxResponse( $obj, false );
-							return;
+							$isDuplicate = false;
+							foreach( $findClass['listing'] as $found ){
+								//get found class code
+								$foundCode = explode( ' - ', $found['title'] );
+								$foundNum = preg_replace( '/\D/', '', $foundCode);
+								if( $sort == $foundNum ){ $isDuplicate = true; }
+							}
+							if( $isDuplicate ) {
+								$obj['error'] = "A class with the same code exists already";
+								echo Core::ajaxResponse( $obj, false );
+								return;
+							}
 						}
 					}
 
 					$setClass = $this->upsertRecord( 'classes', "id=${id}", array(
 						'id' => $id,
-						'title' => $_POST['title'],
-						'units' => intval( $_POST['units'] ),
+						'title' => trim( $_POST['title'] ),
+						'units' => floatval( $_POST['units'] ),
 						'transfer' => $_POST['transfer'],
 						'discipline' => $_POST['discipline'],
 						'sort' => intval( $sort )
@@ -222,10 +231,10 @@ EOD;
 					$setClassData = $this->upsertRecord( 'classData', "class=${id} AND language=${_POST['language']}", array(
 						'class' => $id,
 						'language' => $_POST['language'],
-						'prereq' => $_POST['prereq'],
-						'advisory' => $_POST['advisory'],
-						'coreq' => $_POST['coreq'],
-						'description' => $_POST['description'],
+						'prereq' => trim( $_POST['prereq'] ),
+						'advisory' => trim( $_POST['advisory'] ),
+						'coreq' => trim( $_POST['coreq'] ),
+						'description' => trim( $_POST['description'] ),
 					) );
 
 					if ( $setClass && $setClassData ) {
@@ -372,7 +381,7 @@ EOD;
 									<option disabled selected> -- Select A Discipline -- </option>
 									<?php
 									foreach( $disciplines as $discipline ){
-										echo "<option " . ( ( $discipline['id'] == $class['discipline'] ) ? ( 'selected' ) : ( '' ) ) . " value='${discipline['id']}'>${discipline['description']}</option>";
+										echo "<option " . ( ( $discipline['id'] == $class['discipline'] ) ? ( 'selected' ) : ( '' ) ) . " value='${discipline['id']}'>${discipline['name']} ${discipline['description']}</option>";
 									}
 									?>
 								</select>
@@ -380,7 +389,7 @@ EOD;
 							</li>
 							<li>
 								<label for="units">Units*</label>
-								<input name="units" type="number" value="<?=$class['units']?>">
+								<input name="units" type="number" step="0.5" value="<?=$class['units']?>">
 								<span>Enter the class units</span>
 							</li>
 							<li>

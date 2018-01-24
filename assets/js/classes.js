@@ -25,6 +25,8 @@ $( document ).ready( function(){
 	function createClassModal( data, create ){
 		var modal = createModal( {
 			title: ( ( create ) ? ( 'Create Class' ) : ( 'Edit Class' ) ),
+			shadowClose: true,
+			shadowPrompt: "Are you sure you want to close? The class will not be saved",
 			buttons: [
 				{
 					value: 'Save',
@@ -41,6 +43,7 @@ $( document ).ready( function(){
 		displayModal( modal );
 		adjustTextarea( $( modal ).find( 'textarea' )[0] );
 		$( 'select', modal ).select2();
+		$( 'input[name=title]' ).focus();
 	}
 
 	//language edit
@@ -321,8 +324,9 @@ $( document ).ready( function(){
 						var that = $( '.modal[data-id=' + id + ']' );
 						var val = $( that ).find( 'select').val();
 						//$( input ).val( $( input ).val() + '~' + $( that ).find( 'select' ).val() + '~' );
-						var classCode = $( 'option[value=' + val + ']', that ).html().match( /[a-zA-Z]{3}\-\d{1,4}[a-zA-Z]*/ )[0];
+						var classCode = $( 'option[value=' + val + ']', that ).html().match( /[a-zA-Z]{3}\-\w?\d{1,4}[a-zA-Z]*/ )[0];
 						$( input ).val( $( input ).val() + '[class id="' + $( that ).find( 'select' ).val() + '" text="' + classCode + '" /]' );
+						$( input ).focus();
 						return true;
 					}
 				}, {

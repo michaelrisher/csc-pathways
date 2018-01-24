@@ -39,6 +39,8 @@
 							}
 							if ( $row['prereq'] != null || !empty( $row['prereq'] ) ) {
 								echo '<p class="italic">' . $lang->o('classInfoPrereq') . ': ' . Core::replaceClassLink( $row['prereq'] ) . '</p>';
+							} else {
+								echo '<p class="italic">' . $lang->o('classInfoPrereq') . ': None</p>';
 							}
 							if ( $row['advisory'] != null || !empty( $row['advisory'] ) ) {
 								echo '<p class="italic">' . $lang->o('classInfoAdvisory') . ': ' . Core::replaceClassLink( $row['advisory'] ) . '</p>';
