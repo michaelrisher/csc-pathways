@@ -101,5 +101,56 @@ $( document ).ready( function(){
 			}, 500 );
 		}
 	} );
+
+
+	/************************ Delete ************************/
+	$( document ).on( 'click', 'li img.delete', function () {
+		var id = $( this ).closest( 'li' ).attr( 'data-id' );
+		var modal = createModal( {
+			title: 'Confirm',
+			buttons: [{
+				value: "Delete",
+				onclick: function ( modalId ) {
+					var successful = false;
+					$.ajax( {
+						type: 'POST',
+						url: CORE_URL + 'rest/pages/delete/' + id,
+						dataType: 'json',
+						async: false,
+						success: function ( data ) {
+							if ( data.success ) {
+								var modal = createModal( {
+									title: "Page Deleted Successfully",
+									buttons: [{ value: 'Ok' }]
+								} );
+								setModalContent( modal, data.data.msg );
+								displayModal( modal );
+								successful = true;
+								var that = $( '.pages .listing li[data-id=' + id + ']' );
+								that.slideUp( 400, function () {
+									that.remove();
+								} );
+							} else {
+								successful = false;
+								var modal = createModal( {
+									title: "An Error Occurred",
+									buttons: [{ value: 'Ok' }]
+								} );
+								setModalContent( modal, data.data.error );
+								displayModal( modal );
+							}
+						}
+					} );
+					return successful;
+				}
+			}, {
+				value: "Cancel",
+				class: "low"
+			}]
+		} );
+
+		setModalContent( modal, "<p>Are you sure you want to delete. This can not be undone</p>" );
+		displayModal( modal );
+	} );
 } );
 

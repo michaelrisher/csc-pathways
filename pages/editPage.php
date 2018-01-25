@@ -54,7 +54,7 @@
 							<select name="discipline">
 								<option disabled selected> -- Select A Discipline -- </option>
 								<?php
-									foreach( $data['disciplines'] as $discipline ){
+									foreach( $data['disciplines']['listing'] as $discipline ){
 										echo "<option " . ( ( $discipline['id'] == $data['discipline'] ) ? ( 'selected' ) : ( '' ) ) . " value='${discipline['id']}'>${discipline['description']}</option>";
 									}
 								?>
@@ -99,7 +99,9 @@
 						</li>
 						<li>
 							<input type="submit" value="Save" />
-							<input type="button" class="margin15Left low cancel" value="Cancel" />
+							<a href="<?=CORE_URL?>/editPages">
+								<input type="button" class="margin15Left low cancel" value="Cancel" />
+							</a>
 						</li>
 					</ul>
 				</form>

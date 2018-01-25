@@ -23,7 +23,7 @@
 	<?php include CORE_PATH . 'assets/inc/logo.php'; ?>
 	<div id="main">
 		<div class="admin">
-			<div class="disciplines aligncenter margin15Bottom">
+			<div class="pages aligncenter margin15Bottom">
 				<p>Pages</p>
 				<div class="listing alignleft">
 					<ul>
@@ -82,7 +82,9 @@
 					</div>
 				</div>
 				<div class="margin25Top">
-					<input type="button" value="Create Page" name="createPage"/>
+					<a href="<?=CORE_URL?>pages/create?create=">
+						<input type="button" value="Create Page" name="createPage"/>
+					</a>
 				</div>
 			</div>
 		</div>

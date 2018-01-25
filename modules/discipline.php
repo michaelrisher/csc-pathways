@@ -14,9 +14,26 @@
 		 * @param bool|false $forceReturn
 		 * @return array
 		 */
-		public function listing( $forceReturn = false){
+		public function listing( $page = 1, $forceReturn = false){
+			$limit = 25;
+			$page--;
+			$offset = $page * $limit;
+
+			if( isset( $_POST ) ){
+				$_POST = Core::sanitize( $_POST );
+			}
+			if( isset( $_GET ) ){
+				$_GET = Core::sanitize( $_GET );
+			}
+			$all = ( ( $page < 0 || isset( $_POST['all'] ) ) ? true : false );
 			//to kinda standardize it for later needs
-			$query = "SELECT * FROM disciplines ORDER BY name";
+
+			if( $all ){
+				$query = "SELECT * FROM disciplines ORDER BY name";
+			} else {
+				$query = "SELECT * FROM disciplines ORDER BY name LIMIT $offset,$limit";
+			}
+
 
 			if ( !$result = $this->db->query( $query ) ) {
 				echo( 'There was an error running the query [' . $this->db->error . ']' );
@@ -32,6 +49,25 @@
 				array_push( $return, $a );
 			}
 
+			//get count of data
+			$query = "SELECT COUNT( id ) AS items FROM disciplines ";
+			$result->close();
+			if( !$result = $this->db->query( $query ) ) {
+				echo( 'There was an error running the query [' . $this->db->error . ']' );
+				return null;
+			}
+
+			if( $result->num_rows == 1 ){
+				$row = $result->fetch_assoc();
+				$count = $row['items'];
+			}
+			$result->close();
+			$return = array(
+				'listing' => $return,
+				'count' => intval( $count ),
+				'limit' => $limit,
+				'currentPage' => (int)++$page
+			);
 
 			if ( IS_AJAX && !$forceReturn ) {
 				echo Core::ajaxResponse( $return );

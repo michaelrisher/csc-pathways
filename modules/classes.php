@@ -20,78 +20,77 @@
 //			$userRoles = $this->roles->getRolesByModule( Core::getSessionId(), $this->moduleName );
 			$fullRoles = $this->roles->getAllForUser( Core::getSessionId() );
 			$userDisciplines = $this->discipline->getIdsForUser( Core::getSessionId() );
-			//if user has class view role then do it
-			if ( true ) {
-				$limit = 25;
-				$page--;//to make good looking page numbers for users
-				$offset = $page * $limit;
-				$search = '';
-				if( isset( $_POST ) || isset( $_GET ) ){
-					$_POST = Core::sanitize( $_POST );
-					if( isset( $_POST['search'] ) ){
-						$search = $_POST['search'];
-					}
-					if( isset( $_GET['q'] ) ){
-						$search = Core::sanitize( $_GET['q'] );
-					}
-				}
-//				$search = isset( $_POST['search'] ) ? $_POST['search'] : '' ;
-				if( isset( $_POST['all'] ) ){
-					$query = "SELECT * FROM classes ORDER BY sort";
-				}
-				else if( empty( $search ) ){
-					$query = "SELECT * FROM classes ORDER BY sort LIMIT $offset,$limit";//remove limit for a time LIMIT $page,50
-				} else {
-					$query = "SELECT * FROM classes WHERE title LIKE '%$search%'ORDER BY sort LIMIT $offset,$limit";
-				}
 
-				if ( !$result = $this->db->query( $query ) ) {
-					echo( 'There was an error running the query [' . $this->db->error . ']' );
-					return null;
+			$limit = 25;
+			$page--;//to make good looking page numbers for users
+			$offset = $page * $limit;
+			$search = '';
+			if( isset( $_POST ) || isset( $_GET ) ){
+				$_POST = Core::sanitize( $_POST );
+				if( isset( $_POST['search'] ) ){
+					$search = $_POST['search'];
 				}
-
-				$return = array();
-				while ( $row = $result->fetch_assoc() ) {
-					if ( $this->roles->haveAccess( 'ClassView', Core::getSessionId(), $row['discipline'], $fullRoles, $userDisciplines ) ) {
-						$canEdit = $this->roles->haveAccess( 'ClassEdit', Core::getSessionId(), $row['discipline'], $fullRoles, $userDisciplines );
-						$canDelete = $this->roles->haveAccess( 'ClassDelete', Core::getSessionId(), $row['discipline'], $fullRoles, $userDisciplines );
-						$a = array(
-							'id' => $row['id'],
-							'title' => $row['title'],
-							'edit' => $canEdit,
-							'delete' => $canDelete
-						);
-						array_push( $return, $a );
-					}
+				if( isset( $_GET['q'] ) ){
+					$search = Core::sanitize( $_GET['q'] );
 				}
-
-				//get count of data
-				if( empty( $search ) ) {
-					$query = "SELECT COUNT( id ) AS items FROM classes ";
-				} else {
-					$query = "SELECT COUNT( id ) AS items FROM classes WHERE title LIKE '%$search%'";
-				}
-				$result->close();
-				if( !$result = $this->db->query( $query ) ) {
-					echo( 'There was an error running the query [' . $this->db->error . ']' );
-					return null;
-				}
-
-				if( $result->num_rows == 1 ){
-					$row = $result->fetch_assoc();
-					$count = $row['items'];
-				}
-				$result->close();
-				$return = array(
-					'listing' => $return,
-					'count' => intval( $count ),
-					'limit' => $limit,
-					'currentPage' => (int)++$page );
-				if ( IS_AJAX ) {
-					echo Core::ajaxResponse( $return );
-				}
-				return $return;
 			}
+//				$search = isset( $_POST['search'] ) ? $_POST['search'] : '' ;
+			if( isset( $_POST['all'] ) ){
+				$query = "SELECT * FROM classes ORDER BY sort";
+			}
+			else if( empty( $search ) ){
+				$query = "SELECT * FROM classes ORDER BY sort LIMIT $offset,$limit";//remove limit for a time LIMIT $page,50
+			} else {
+				$query = "SELECT * FROM classes WHERE title LIKE '%$search%'ORDER BY sort LIMIT $offset,$limit";
+			}
+
+			if ( !$result = $this->db->query( $query ) ) {
+				echo( 'There was an error running the query [' . $this->db->error . ']' );
+				return null;
+			}
+
+			$return = array();
+			while ( $row = $result->fetch_assoc() ) {
+				if ( $this->roles->haveAccess( 'ClassView', Core::getSessionId(), $row['discipline'], $fullRoles, $userDisciplines ) ) {
+					$canEdit = $this->roles->haveAccess( 'ClassEdit', Core::getSessionId(), $row['discipline'], $fullRoles, $userDisciplines );
+					$canDelete = $this->roles->haveAccess( 'ClassDelete', Core::getSessionId(), $row['discipline'], $fullRoles, $userDisciplines );
+					$a = array(
+						'id' => $row['id'],
+						'title' => $row['title'],
+						'edit' => $canEdit,
+						'delete' => $canDelete
+					);
+					array_push( $return, $a );
+				}
+			}
+
+			//get count of data
+			if( empty( $search ) ) {
+				$query = "SELECT COUNT( id ) AS items FROM classes ";
+			} else {
+				$query = "SELECT COUNT( id ) AS items FROM classes WHERE title LIKE '%$search%'";
+			}
+			$result->close();
+			if( !$result = $this->db->query( $query ) ) {
+				echo( 'There was an error running the query [' . $this->db->error . ']' );
+				return null;
+			}
+
+			if( $result->num_rows == 1 ){
+				$row = $result->fetch_assoc();
+				$count = $row['items'];
+			}
+			$result->close();
+			$return = array(
+				'listing' => $return,
+				'count' => intval( $count ),
+				'limit' => $limit,
+				'currentPage' => (int)++$page );
+			if ( IS_AJAX ) {
+				echo Core::ajaxResponse( $return );
+			}
+			return $return;
+
 		}
 
 		/**
@@ -361,7 +360,7 @@ EOD;
 			if( $this->users->isLoggedIn() ) {
 				if( $this->roles->haveAccess( 'ClassEdit', Core::getSessionId(), $class['discipline'] ) && IS_AJAX ){
 					//get disciplines
-					$disciplines = $this->discipline->listing( true );
+					$disciplines = $this->discipline->listing( 0, true );
 					?>
 					<p>* fields are required</p>
 					<form>
@@ -381,7 +380,7 @@ EOD;
 								<select name="discipline">
 									<option disabled selected> -- Select A Discipline -- </option>
 									<?php
-									foreach( $disciplines as $discipline ){
+									foreach( $disciplines['listing'] as $discipline ){
 										echo "<option " . ( ( $discipline['id'] == $class['discipline'] ) ? ( 'selected' ) : ( '' ) ) . " value='${discipline['id']}'>${discipline['name']} ${discipline['description']}</option>";
 									}
 									?>

@@ -144,7 +144,7 @@ class pages extends Main{
 				Core::queueStyle( 'assets/css/ui.css' );
 				//put the data onscreen
 
-				$data['disciplines'] = $this->discipline->listing( true );
+				$data['disciplines'] = $this->discipline->listing( -1, true );
 				include( CORE_PATH . 'pages/editPage.php' );
 			} else{
 				Core::errorPage( 403 );
@@ -221,7 +221,70 @@ class pages extends Main{
 	 * @param int $id id for the item
 	 */
 	public function delete( $id ){
-		//TODO delete pages
+		$this->loadModule( 'users' );
+		$this->loadModule( 'roles' );
+		$obj = array();
+		if( $this->users->isLoggedIn() ) {
+			$id = Core::sanitize( $id );
+			$row = $this->get( $id, true );
+			if( $this->roles->haveAccess( 'dataManage', Core::getSessionId(), -1 ) ){
+				$this->loadModule( 'audit' );
+				$event = $row['name'];
+
+				$statement = $this->db->prepare( "DELETE FROM pages WHERE id=?" );
+				$statement->bind_param( "i", $id );
+				if ( $statement->execute() ) {
+					$obj['msg'] = 'Deleted successfully';
+					$this->audit->newEvent( "Deleted Page: " . $event );
+					echo Core::ajaxResponse( $obj );
+				} else {
+					$obj['error'] = $statement->error;
+					echo Core::ajaxResponse( $obj, false );
+				}
+
+				$statement->close();
+			} else {
+				$obj['error'] = 'Insufficient permissions to delete certificates';
+				echo Core::ajaxResponse( $obj, false );
+			}
+		} else{
+			$obj['error'] = 'Session expired. Please log in again.';
+			echo Core::ajaxResponse( $obj, false );
+		}
+	}
+
+	public function create(){
+		$this->loadModules('users roles discipline');
+		if( $this->users->isLoggedIn() ) {
+			if( $this->roles->haveAccess( 'dataManage', Core::getSessionId(), -1 ) ) {
+				Core::queueStyle( 'assets/css/reset.css' );
+				Core::queueStyle( 'assets/css/ui.css' );
+				//get the next id
+
+				$query = "SHOW TABLE STATUS LIKE 'pages'";
+				if ( !$result = $this->db->query( $query ) ) {
+					die( 'There was an error running the query [' . $this->db->error . ']' );
+				}
+				$row = null;
+				if ( $result->num_rows ) {
+					$row = $result->fetch_assoc();
+					$data = array(
+						'id' => $row['Auto_increment'],
+						'headerTemplate' => '',
+						'stylesheet' => '',
+						'javascript' => '',
+						'bodyTemplate' => '',
+						'name' => '',
+						'path' => '',
+						'disciplines' => $this->discipline->listing( -1, true ),
+					);
+				}
+				$result->close();
+				include( CORE_PATH . 'pages/editPage.php' );
+			}
+		} else{
+			Core::errorPage( 404 );
+		}
 	}
 
 	/**

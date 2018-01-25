@@ -30,11 +30,15 @@
 					<ul>
 					<?php
 						$GLOBALS['main']->loadModule( 'discipline' );
-						$data = $GLOBALS['main']->discipline->listing();
+						if( isset( $params[1] ) && is_numeric( $params[1] ) ){
+							$data = $GLOBALS['main']->discipline->listing( $params[1] );
+						} else {
+							$data = $GLOBALS['main']->discipline->listing();
+						}
 
 //						Core::debug( $data );
 						if( isset( $data ) ) {
-							foreach ( $data as $item ) {
+							foreach ( $data['listing'] as $item ) {
 								echo "<li data-id='${item['id']}'>${item['name']} ${item['description']}";
 								echo "<img class='delete tooltip' title='Delete discipline' src='" . CORE_URL . "assets/img/delete.png'/>";
 								echo "<img class='edit tooltip' title='Edit discipline' src='" . CORE_URL . "assets/img/edit.svg'/>";
@@ -45,6 +49,43 @@
 						}
 					?>
 					</ul>
+				</div>
+				<div class="pages aligncenter" >
+					<p>Pages</p>
+					<div>
+						<?php
+							if ( isset( $data['count'] ) && $data['limit'] ) {
+								$pages = ceil( $data['count'] / $data['limit'] );
+								$currentPage = $data['currentPage'];
+								$amount = 3;
+//							echo '#' . $pages;
+								$search = isset( $_GET['q'] ) ? ( '?q=' . $_GET['q'] ) : '';
+								if ( $currentPage > 1 ) {
+									echo "<a href='" . CORE_URL . "editDisciplines/1" . $search . "'>|&lt;</a>";
+								}
+								//left side of current math
+								if ( $currentPage <= $amount ) {
+									$left = ( ( $currentPage - $amount ) + $amount ) - 1;
+								} else {
+									$left = $amount;
+								}
+								for ( $i = $left; $i >= 1; $i-- ) {
+									echo "<a href='" . CORE_URL . 'editDisciplines/' . ( $currentPage - $i ) . $search . "'>" . ( $currentPage - $i ) . "</a>";
+								}
+								echo "<a href='" . CORE_URL . 'editDisciplines/' . ( $currentPage ) . $search . "' class='current'>" . ( $currentPage ) . "</a>";
+								//right side of current math
+								for ( $i = 1; $i <= $amount; $i++ ) {
+									if ( ( $currentPage + $i ) > $pages ) {
+										break;
+									}
+									echo "<a href='" . CORE_URL . 'editDisciplines/' . ( $currentPage + $i ) . $search . "'>" . ( $currentPage + $i ) . "</a>";
+								}
+								if ( $currentPage < $pages ) {
+									echo "<a href='" . CORE_URL . "editDisciplines/" . $pages . $search . "'>&gt;|</a>";
+								}
+							}
+						?>
+					</div>
 				</div>
 				<div class="margin25Top">
 					<input type="button" value="Create Discipline" name="createDiscipline"/>

@@ -23,7 +23,7 @@
 	<div id="wrapper">
 		<?php include CORE_PATH . 'assets/inc/logo.php' ?>
 		<div id="main">
-			<div id="tree">
+			<div id="tree" class="datablock">
 				<div class="aligncenter treemap">
 					<img src="<?= CORE_URL . 'assets/img/tree.png'?>" alt="Picture of a path to follow, top class cis 1a, bottom left class csc or cis 5, bottom right class cis 17a/b"/>
 				</div>

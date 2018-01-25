@@ -1,13 +1,39 @@
 var searchTypingTimer = -1;
+//todo remove class group when leaving it.
+
 $( document ).ready( function () {
 	$( 'html' ).on( 'click', '.fakeLink', function ( e ) {
 		e.preventDefault();
+		var parentDiv = $( this ).closest( '.datablock' );
+		console.log( parentDiv );
 		var loc = $( this ).attr( 'data-to' );//location we are going to
 		var idLocation = '#' + loc; //the class to look up
 		var goto = $( this ).attr( 'data-code' ); //the code for the filename eg CE803
 
+		//hide class when switching certs
 		if ( loc == 'cert' && !$( '#class' ).hasClass( 'none' ) ) {
 			$( "#class" ).toggleClass( 'none' );
+			var qsa = queryString( 'class', null );
+			updateUrl( stripQueryString() + queryStringToUrl( qsa ) );
+		}
+
+		//hide classgroup when switching certs
+		if ( loc == 'cert' && !$( '#classGroup' ).hasClass( 'none' ) ) {
+			$( "#classGroup" ).toggleClass( 'none' );
+			var qsa = queryString( 'classGroup', null );
+			updateUrl( stripQueryString() + queryStringToUrl( qsa ) );
+		}
+
+		//hide classgroup if clicked a class from cert block
+		if( loc == 'class' && parentDiv.attr( 'id' ) == 'cert' ){
+			$( "#classGroup" ).addClass( 'none' );
+			var qsa = queryString( 'classGroup', null );
+			updateUrl( stripQueryString() + queryStringToUrl( qsa ) );
+		}
+
+		//hide class if classGroup is clicked
+		if( loc == 'classGroup' ){
+			$( "#class" ).addClass( 'none' );
 			var qsa = queryString( 'class', null );
 			updateUrl( stripQueryString() + queryStringToUrl( qsa ) );
 		}
@@ -38,7 +64,21 @@ $( document ).ready( function () {
 				updateUrl( stripQueryString() + queryStringToUrl( qsa ) );
 				$( 'html, body' ).animate( { //update scroll once ajax finishes
 					scrollTop: $( idLocation ).offset().top
-				}, 500 );
+				}, 500, function(){
+					//check if class was clicked and update the up link to go to the next element
+					//could be cert or classGroup
+					if( loc == 'class' ){
+						if( $( '#classGroup' ).hasClass( 'none' ) ){
+							$( '#class .back' ).attr( 'alt', 'To Certificate Info');
+							$( '#class .back' ).attr( 'title', 'To Certificate Info');
+							$( '#class .back' ).attr( 'data-to', 'cert');
+						} else {
+							$( '#class .back' ).attr( 'alt', 'To Class Group Info');
+							$( '#class .back' ).attr( 'title', 'To Class Group Info');
+							$( '#class .back' ).attr( 'data-to', 'classGroup');
+						}
+					}
+				} );
 			},
 			fail: function ( data ) {
 				failedAjax( idLocation );

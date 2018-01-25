@@ -100,7 +100,7 @@
 					//put the data onscreen
 
 					$data['categories'] = $this->listCategories();
-					$data['disciplines'] = $this->discipline->listing( true );
+					$data['disciplines'] = $this->discipline->listing( -1, true );
 					$data['language'] = $lang; //bug fix when there is not a lang cert yet
 					include( CORE_PATH . 'pages/certEdit.php' );
 				} else{
@@ -423,16 +423,16 @@ EOD;
 			$obj = array();
 //			$_POST = Core::sanitize( $_POST, true );
 			if( $this->users->isLoggedIn() ) {
+				$id = Core::sanitize( $id );
 				$row = $this->get( $id, 0, true );
 				if( $this->roles->haveAccess( 'CertDelete', Core::getSessionId(), $row['discipline'] ) ){
-					$id = Core::sanitize( $id );
 					$this->loadModule( 'audit' );
 					$event = $row['title'];
 
 					$statement = $this->db->prepare( "DELETE FROM certificateList WHERE id=?" );
-					$statement->bind_param( "s", $id );
+					$statement->bind_param( "i", $id );
 					$statementData = $this->db->prepare( "DELETE FROM certificateData WHERE cert=?" );
-					$statementData->bind_param( "s", $id );
+					$statementData->bind_param( "i", $id );
 					if ( $statement->execute() && $statementData->execute() ) {
 						$obj['msg'] = 'Deleted successfully';
 						$this->audit->newEvent( "Deleted certificate: " . $event );
