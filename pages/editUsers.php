@@ -37,6 +37,8 @@
 										echo "<img class='delete tooltip' src='" . CORE_URL . "assets/img/delete.png' title='Delete User'/>";
 									if ( $user['edit'] )
 										echo "<img class='edit tooltip' src='" . CORE_URL . "assets/img/edit.svg' title='Edit User'/>";
+									else
+										echo "<img class='view tooltip' src='" . CORE_URL . "assets/img/view.png' title='View User'/>";
 									echo "</li>";
 								}
 							} else{
@@ -46,7 +48,12 @@
 					</ul>
 				</div>
 				<div class="margin25Top">
+					<?php
+						$GLOBALS['main']->loadModule( 'roles' );
+						if( $GLOBALS['main']->roles->haveAccess( 'UserEdit', Core::getSessionId(), -1 ) ){
+					?>
 					<input type="button" value="Create User" name="createUser"/>
+					<?php } ?>
 				</div>
 			</div>
 		</div>

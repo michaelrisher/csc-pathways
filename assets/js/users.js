@@ -6,6 +6,24 @@ $( document ).ready( function(){
 	/******************************************************************************/
 	/*******************************User Edit/Create*******************************/
 	/******************************************************************************/
+	$( document ).on( 'click', '#main .users li img.view', function () {
+		//get the class info
+		var id = $( this ).closest( 'li' ).attr( 'data-id' );
+		$.ajax( {
+			type: 'POST',
+			url: CORE_URL + 'rest/users/edit/' + id,
+			success: function ( data ) {
+				if ( data ) {
+					createUserModal( data, false, true );
+				} else {
+					var modal = createModal( { title: 'Failed to load user', buttons: [{ value: 'Ok', focus : true }] } );
+					setModalContent( modal, "An error occurred." );
+					displayModal( modal, true )
+				}
+			}
+		} );
+	} );
+
 	$( document ).on( 'click', '#main .users li img.edit', function () {
 		//get the class info
 		var id = $( this ).closest( 'li' ).attr( 'data-id' );
@@ -40,7 +58,8 @@ $( document ).ready( function(){
 		} );
 	} );
 
-	function createUserModal( data, create ) {
+	function createUserModal( data, create, readonly ) {
+		readonly = ( typeof readonly == 'undefined' ? false : true );
 		var modalData = {
 			title: 'Edit User',
 			buttons: [
@@ -64,11 +83,22 @@ $( document ).ready( function(){
 			modalData.buttons.splice( 1, 1 );
 			modalData.title = "Create User";
 		}
+		if ( readonly ) {
+			modalData.title = "View User";
+			modalData.buttons = [
+				{
+					value: 'Close'
+				}
+			]
+		}
 		var modal = createModal( modalData );
 		setModalContent( modal, data );
 		displayModal( modal );
 	}
 
+	/******************************************************************************/
+	/**********************************User Save***********************************/
+	/******************************************************************************/
 	function saveUser( id ) {
 		var modal = $( '.modal[data-id=' + id + ']' );
 		var form = $( modal ).find( 'form' );
@@ -98,19 +128,14 @@ $( document ).ready( function(){
 			var successful = false;
 			window.processing = true;
 			saveBtn.addClass( 'processing' );
+			map.create = ( ( map.create ) ? ( map.create ) : ( 0 ) );
+			map.isAdmin = ( ( map.isAdmin ) ? ( map.isAdmin ) : ( 0 ) );
+			map.active = ( ( map.active ) ? ( map.active ) : ( 0 ) );
 			$.ajax( {
 				type: 'POST',
 				url: CORE_URL + 'rest/users/save',
 				dataType: 'json',
-				data: {
-					id: map.id,
-					create: (map.create) ? map.create : 0,
-					username: map.username,
-					isAdmin: ( map.isAdmin ) ? map.isAdmin : 0,
-					active: ( map.active ) ? map.active : 0,
-					roles: map.roles,
-					disciplines : map.depts
-				},
+				data: map,
 				async: false,
 				success: function ( data ) {
 					//alert( JSON.stringify( data ) );
@@ -142,6 +167,9 @@ $( document ).ready( function(){
 		}
 	}
 
+	/******************************************************************************/
+	/*********************************Reset User**********************************/
+	/******************************************************************************/
 	function resetUser( id ) {
 		var modal = $( '.modal[data-id=' + id + ']' );
 		var userId = modal.find( 'input[name=id]' ).val();
@@ -224,77 +252,38 @@ $( document ).ready( function(){
 	/******************************************************************************/
 	/*******************************Add user role**********************************/
 	/******************************************************************************/
-	$( document ).on( 'click', '.modal .userRoles .add input[type=button]', function(){
-		$.ajax( {
-			type: 'POST',
-			url: CORE_URL + 'rest/roles/modalUserAddRole',
-			success: function ( data ) {
-				//alert( JSON.stringify( data ) );
-				if ( data ) {
-					var modal = createModal( {
-						title: "Add Role",
-						buttons: [{
-							value: 'Add',
-							onclick : function( id ){
-								//get value
-								var value = $( '.modal[data-id=' + id + '] select' ).val();
-								//get ids already displayed in the listing
-								var idsSet = JSON.parse( $( '.userRoles input[name=roles]' ).val() );
-								//check id isnt already there
-								for( var i = 0; i < idsSet.length; i++ ){
-									if( idsSet[i] == value ){
-										var modal = createModal( { title: "Error", buttons: [{ value: 'Ok', focus:true }] } );
-										setModalContent( modal, "You cannot add the same role twice." );
-										displayModal( modal );
-										return false;
-									}
-								}
-								idsSet.push( value );
-								var html = "<li data-id='" + value + "'>";
-								html += $( '.modal[data-id=' + id + '] select option:selected' ).text();
-								html += '<img class="delete tooltip" src="' + CORE_URL + 'assets/img/delete.png" title="Delete Role">'
-								html += '</li>';
-								//add to listing
-								$( '.userRoles .listing' ).append( html );
-								//add to input
-								$( '.userRoles input[name=roles]' ).val( JSON.stringify( idsSet ) );
-								return true;
-							}
-						},{
-							value: 'Cancel',
-							class: 'low'
-						}]
-					} );
-					setModalContent( modal, data );
-					displayModal( modal );
-				} else {
-					var modal = createModal( { title: "Error Saving User", buttons: [{ value: 'Ok' }] } );
-					setModalContent( modal, data.data.error );
-					displayModal( modal );
-				}
+	$( document ).on( 'change', '.modal #roleTable input[type=checkbox]', function() {
+		var that = $(this);
+		var module = $( this ).attr( 'data' ).split( '-' )[0];
+		var field = $( this ).attr( 'data' ).split( '-' )[1];
+		var action = field.substr( 1 );
+		var fields = $( 'input[type=checkbox][data*="' + module + '"][name*="' + action + '"]' );
+		var otherPair;
+		//find the other button either in global or discipline
+		fields.each( function ( i, elem ) {
+			if( $( that ).val() != $( elem ).val() ){
+				otherPair = elem;
 			}
 		} );
-	} );
-
-
-	/******************************************************************************/
-	/******************************delete user role********************************/
-	/******************************************************************************/
-	$( document ).on( 'click', '.modal .userRoles img.delete', function(){
-		var li = $( this ).closest( 'li' );
-		var id = $( li ).attr( 'data-id' );
-		//get ids already displayed in the listing
-		var idsSet = JSON.parse( $( '.userRoles input[name=roles]' ).val() );
-
-		var index = idsSet.indexOf( id );
-		idsSet.splice( index, 1 );
-		$( '.userRoles input[name=roles]' ).val( JSON.stringify( idsSet ) );
-
-		$( li ).slideUp( 400, function(){
-			$( li ).remove();
-		} );
-
-	} );
+		if( isset( otherPair ) ) {
+			if ( $( otherPair ).is( ':checked' ) ) {
+				//uncheck it
+				$( otherPair ).prop( 'checked', false );
+			}
+		} else{
+			//it could be the dataManage
+			if( $( that ).attr( 'data' ) == 'all-dataManage' ) {
+				if( $( that ).is( ':checked' ) ){
+					//uncheck all to start fresh
+					$( '.modal .userRoles input[type=checkbox]:not([data=all-dataManage])' ).prop( 'checked', false );
+					//check all the global boxes
+					$( 'input[data*="class-g"]').prop( 'checked', true );
+					$( 'input[data*="cert-g"]').prop( 'checked', true );
+					$( 'input[data*="user-g"]').prop( 'checked', true );
+				}
+			}
+		}
+	});
 
 	/******************************************************************************/
 	/*******************************Add user discipline**********************************/
@@ -314,7 +303,7 @@ $( document ).ready( function(){
 								//get value
 								var value = $( '.modal[data-id=' + id + '] select' ).val();
 								//get ids already displayed in the listing
-								var idsSet = JSON.parse( $( '.userDept input[name=depts]' ).val() );
+								var idsSet = JSON.parse( $( '.userDept input[name=disciplines]' ).val() );
 								//check id isnt already there
 								for( var i = 0; i < idsSet.length; i++ ){
 									if( idsSet[i] == value ){
@@ -332,7 +321,7 @@ $( document ).ready( function(){
 								//add to listing
 								$( '.userDept .listing' ).append( html );
 								//add to input
-								$( '.userDept input[name=depts]' ).val( JSON.stringify( idsSet ) );
+								$( '.userDept input[name=disciplines]' ).val( JSON.stringify( idsSet ) );
 								return true;
 							}
 						},{
@@ -360,11 +349,11 @@ $( document ).ready( function(){
 		var li = $( this ).closest( 'li' );
 		var id = $( li ).attr( 'data-id' );
 		//get ids already displayed in the listing
-		var idsSet = JSON.parse( $( '.userDept input[name=depts]' ).val() );
+		var idsSet = JSON.parse( $( '.userDept input[name=disciplines]' ).val() );
 
 		var index = idsSet.indexOf( id );
 		idsSet.splice( index, 1 );
-		$( '.userDept input[name=depts]' ).val( JSON.stringify( idsSet ) );
+		$( '.userDept input[name=disciplines]' ).val( JSON.stringify( idsSet ) );
 
 		$( li ).slideUp( 400, function(){
 			$( li ).remove();

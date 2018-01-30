@@ -32,6 +32,7 @@
 					} else{
 						echo "Editing ${data['title']}";
 					}
+					$disabled = $data['readonly'] ? 'disabled=disabled' : '';
 				?>
 				</p>
 				<form action="certs/save/<?=$data['id']?>" method="post">
@@ -41,17 +42,17 @@
 					<ul>
 						<li>
 							<label for="title">Title*</label>
-							<input type="text" name="title" value="<?=isset( $data['title'] ) ? $data['title'] : ''?>"/>
+							<input type="text" name="title" value="<?=isset( $data['title'] ) ? $data['title'] : ''?>" <?=$disabled?>/>
 							<span>Enter the certificate description</span>
 						</li>
 						<li>
 							<label for="code">Code*</label>
-							<input type="text" name="code" value="<?=isset( $data['code'] ) ? $data['code'] : ''?>"/>
+							<input type="text" name="code" value="<?=isset( $data['code'] ) ? $data['code'] : ''?>" <?=$disabled?>/>
 							<span>Enter the certificate code number</span>
 						</li>
 						<li class="alignleft">
 							<label for="discipline">Discipline*</label>
-							<select name="discipline">
+							<select name="discipline" <?=$disabled?>>
 								<option disabled selected> -- Select A Discipline -- </option>
 								<?php
 									foreach( $data['disciplines']['listing'] as $discipline ){
@@ -63,7 +64,7 @@
 						</li>
 						<li>
 							<label for="units">Units*</label>
-							<input type="number" name="units" value="<?=isset( $data['units'] ) ? $data['units'] : 0?>"/>
+							<input type="number" name="units" value="<?=isset( $data['units'] ) ? $data['units'] : 0?>" <?=$disabled?>/>
 							<span>Enter the certificate units</span>
 						</li>
 						<li class="alignleft">
@@ -90,32 +91,36 @@
 <!--						</li>-->
 						<li>
 							<label for="description">Description*</label>
-							<textarea class="editor" name="description" id="description" ><?=isset( $data['description'] ) ? $data['description'] : ''?></textarea>
+							<textarea class="editor" name="description" id="description" <?=$disabled?>><?=isset( $data['description'] ) ? $data['description'] : ''?></textarea>
 							<span>Enter the certificate description</span>
 						</li>
 						<li>
 							<label for="elo">Expected Learning Outcomes*</label>
-							<textarea class="editor" name="elo" id="elo" ><?=isset( $data['elo'] ) ? $data['elo'] : ''?></textarea>
+							<textarea class="editor" name="elo" id="elo" <?=$disabled?>><?=isset( $data['elo'] ) ? $data['elo'] : ''?></textarea>
 							<span>Enter the certificate expected learning outcome</span>
 						</li>
 						<li>
 							<label for="schedule">Schedule*</label>
-							<textarea class="editor" name="schedule" id="schedule" ><?=isset( $data['schedule'] ) ? $data['schedule'] : ''?></textarea>
+							<textarea class="editor" name="schedule" id="schedule" <?=$disabled?>><?=isset( $data['schedule'] ) ? $data['schedule'] : ''?></textarea>
 							<span>Enter the certificate schedule</span>
 						</li>
 						<li>
 							<label for="sort">Position in list</label>
-							<input type="number" name="sort" value="<?=isset( $data['sort'] ) ? $data['sort'] : 0?>">
+							<input type="number" name="sort" value="<?=isset( $data['sort'] ) ? $data['sort'] : 0?>" <?=$disabled?>>
 							<span>Enter the number to place it in the listing</span>
 						</li>
 						<li class="alignleft">
 							<label for="active">Active Certificate</label>
-							<div><input type="checkbox" name="active" <?=$data['active'] == 1 ? 'checked' : ''?>/>Check if this certificate is active</div>
+							<div><input type="checkbox" name="active" <?=$data['active'] == 1 ? 'checked' : ''?> <?=$disabled?>/>Check if this certificate is active</div>
 							<span>Enter the number to place it in the listing</span>
 						</li>
 						<li>
+							<?php if( !$data['readonly'] ){ ?>
 							<input type="submit" value="Save" />
 							<input type="button" class="margin15Left low cancel" value="Cancel" />
+							<?php } else { ?>
+							<input type="button" class="margin15Left cancel" value="Close" />
+							<?php } ?>
 						</li>
 					</ul>
 				</form>

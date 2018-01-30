@@ -248,7 +248,8 @@ EOD;
 								$firstRun = true;
 								foreach( $roles as $role ){
 									if( $role['name'] == 'dataManage' ){
-										if( !$this->users->isAdmin() ){
+										if( !$this->haveAccess( 'dataManage', Core::getSessionId(), -1 ) ){
+//										if( !$this->users->isAdmin() ){
 											continue;
 										}
 									}

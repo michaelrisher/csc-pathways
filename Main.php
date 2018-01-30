@@ -10,12 +10,14 @@
 		public $db;
 		public $url;
 		private $lastError;
+		private $loadedModules;
 
 		public function Main(){
 			$connection = new mysqli( DB_IP, DB_USER, DB_PASS, DB_DB );
+			$this->loadedModules = array();
 
 			if($connection->connect_errno > 0){
-				//TODO change this
+				error_log( 'Unable to connect to database [' . $connection->connect_error . '] Main::Main ');
 				die('Unable to connect to database [' . $connection->connect_error . ']');
 			}
 			$this->db = $connection;
@@ -59,6 +61,7 @@
 			$class = $module;
 			if( file_exists( CORE_PATH . 'modules/' . $module . '.php' ) ) {
 				require_once( CORE_PATH  . 'modules/' . $module . '.php' );
+				array_push( $this->loadedModules, $module );
 			}
 
 			$this->$module = new $class;
@@ -180,5 +183,9 @@
 
 		protected function getLastError(){
 			return $this->lastError;
+		}
+
+		public function getLoadedModules(){
+			return $this->loadedModules;
 		}
 	}

@@ -35,15 +35,38 @@
 				}
 			}
 //				$search = isset( $_POST['search'] ) ? $_POST['search'] : '' ;
-			if( isset( $_POST['all'] ) ){
+			if( isset( $_POST['all'] ) || isset( $_GET['all'] ) ){
 				$query = "SELECT * FROM classes ORDER BY sort";
 			}
 			else if( empty( $search ) ){
-				$query = "SELECT * FROM classes ORDER BY sort LIMIT $offset,$limit";//remove limit for a time LIMIT $page,50
+				$query = "SELECT * FROM classes";// LIMIT $offset,$limit";//remove limit for a time LIMIT $page,50
 			} else {
-				$query = "SELECT * FROM classes WHERE title LIKE '%$search%'ORDER BY sort LIMIT $offset,$limit";
+				$query = "SELECT * FROM classes WHERE title LIKE '%$search%'"; // LIMIT $offset,$limit";
 			}
 
+			if( $this->roles->doesUserHaveRole( Core::getSessionId(), 'dClassView') && !( isset( $_POST['all'] ) || isset( $_GET['all'] ) ) ) {
+				if( empty( $search ) ){
+					if( count( $userDisciplines ) > 0 ) {
+						$query .= ' WHERE (';
+					}
+				} else {
+					if( count( $userDisciplines ) > 0 ){
+						$query .= ' AND (';
+					}
+				}
+				for( $i = 0; $i < count( $userDisciplines ); $i++ ){
+					$query .= 'discipline=' . $userDisciplines[$i];
+					if( $i+1 < count( $userDisciplines ) ){
+						$query .= ' OR ';
+					}
+				}
+				if( count( $userDisciplines ) > 0 )
+					$query .= ')';
+			}
+//			Core::debug( $userDisciplines );
+			$query .= " ORDER BY sort LIMIT $offset, $limit";
+//			echo $query . '<br>';;
+			$temp = $query;
 			if ( !$result = $this->db->query( $query ) ) {
 				echo( 'There was an error running the query [' . $this->db->error . ']' );
 				return null;
@@ -63,12 +86,30 @@
 					array_push( $return, $a );
 				}
 			}
+//			Core::debug( $return );
 
 			//get count of data
 			if( empty( $search ) ) {
 				$query = "SELECT COUNT( id ) AS items FROM classes ";
 			} else {
 				$query = "SELECT COUNT( id ) AS items FROM classes WHERE title LIKE '%$search%'";
+			}
+			if( $this->roles->doesUserHaveRole( Core::getSessionId(), 'dClassView') && !( isset( $_POST['all'] ) || isset( $_GET['all'] ) ) ) {
+				if( empty( $search ) ){
+					if( count( $userDisciplines ) > 0 )
+						$query .= ' WHERE (';
+				} else {
+					if( count( $userDisciplines ) > 0 )
+						$query .= ' AND (';
+				}
+				for( $i = 0; $i < count( $userDisciplines ); $i++ ){
+					$query .= 'discipline=' . $userDisciplines[$i];
+					if( $i+1 < count( $userDisciplines ) ){
+						$query .= ' OR ';
+					}
+				}
+				if( count( $userDisciplines ) > 0 )
+					$query .= ')';
 			}
 			$result->close();
 			if( !$result = $this->db->query( $query ) ) {
@@ -85,7 +126,9 @@
 				'listing' => $return,
 				'count' => intval( $count ),
 				'limit' => $limit,
-				'currentPage' => (int)++$page );
+				'currentPage' => (int)++$page,
+				'query' => $temp
+			);
 			if ( IS_AJAX ) {
 				echo Core::ajaxResponse( $return );
 			}
@@ -194,6 +237,7 @@ EOD;
 			$obj = array();
 			$_POST = Core::sanitize( $_POST, true );
 			if ( $this->users->isLoggedIn() ) {
+				//todo check that this access is correct
 				if( $this->roles->haveAccess( 'ClassEdit', Core::getSessionId(), -1 ) ) {
 					//get the sort from the title
 					$code = explode( ' - ', $_POST['title'] )[0];
@@ -332,6 +376,10 @@ EOD;
 				$class = $this->get( $id, $langCode, true );
 				$class['create'] = 0;
 			} else{ //we are creating a class
+				if( !$this->roles->haveAccess( 'ClassEdit', Core::getSessionId(), -1 ) ){
+					echo "<p>You do not have access to edit classes</p>";
+					return;
+				}
 				$query = "SHOW TABLE STATUS LIKE 'classes'";
 				if ( !$result = $this->db->query( $query ) ) {
 					die( 'There was an error running the query [' . $this->db->error . ']' );
@@ -358,9 +406,11 @@ EOD;
 			}
 			//check if user can edit
 			if( $this->users->isLoggedIn() ) {
-				if( $this->roles->haveAccess( 'ClassEdit', Core::getSessionId(), $class['discipline'] ) && IS_AJAX ){
+				if( $this->roles->haveAccess( 'ClassView', Core::getSessionId(), $class['discipline'] ) && IS_AJAX ){
 					//get disciplines
 					$disciplines = $this->discipline->listing( 0, true );
+					$canEdit = $this->roles->haveAccess( 'ClassEdit', Core::getSessionId(), $class['discipline'] );
+					$disabled = $canEdit ? '' : 'disabled=disabled';
 					?>
 					<p>* fields are required</p>
 					<form>
@@ -372,12 +422,12 @@ EOD;
 						<ul>
 							<li>
 								<label for="title">Title*</label>
-								<input name="title" type="text" value="<?=$class['title']?>" class="tooltip" title="Class title should look like: CIS-1 - Title">
+								<input name="title" type="text" value="<?=$class['title']?>" class="tooltip" title="Class title should look like: CIS-1 - Title" <?=$disabled?>>
 								<span>Enter the class title</span>
 							</li>
 							<li>
 								<label for="discipline">Discipline*</label>
-								<select name="discipline">
+								<select name="discipline" <?=$disabled?>>
 									<option disabled selected> -- Select A Discipline -- </option>
 									<?php
 									foreach( $disciplines['listing'] as $discipline ){
@@ -389,38 +439,38 @@ EOD;
 							</li>
 							<li>
 								<label for="units">Units*</label>
-								<input name="units" type="number" step="0.5" value="<?=$class['units']?>">
+								<input name="units" type="number" step="0.5" value="<?=$class['units']?>" <?=$disabled?>>
 								<span>Enter the class units</span>
 							</li>
 							<li>
 								<label for="transfer">Transfer</label>
-								<input name="transfer" type="text" value="<?=$class['transfer']?>">
+								<input name="transfer" type="text" value="<?=$class['transfer']?>" <?=$disabled?>>
 								<span>Enter the class transfer</span>
 							</li>
 							<li>
 								<label for="advisory">Advisory</label>
-								<input name="advisory" type="text" value="<?=htmlentities( $class['advisory'] )?>">
+								<input name="advisory" type="text" value="<?=htmlentities( $class['advisory'] )?>" <?=$disabled?>>
 								<span>Enter the class advisory<a class="addClass floatright">+ Add Class</a></span>
 							</li>
 							<li>
 								<label for="prereq">Prerequisite</label>
-								<input name="prereq" type="text" value="<?=htmlentities( $class['prereq'] )?>">
+								<input name="prereq" type="text" value="<?=htmlentities( $class['prereq'] )?>" <?=$disabled?>>
 								<span>Enter the class prerequisite<a class="addClass floatright">+ Add Class</a></span>
 							</li>
 							<li>
 								<label for="coreq">Corequisite</label>
-								<input name="coreq" type="text" value="<?=htmlentities( $class['coreq'] )?>">
+								<input name="coreq" type="text" value="<?=htmlentities( $class['coreq'] )?>" <?=$disabled?>>
 								<span>Enter the class corequisite<a class="addClass floatright">+ Add Class</a></span>
 							</li>
 							<li>
 								<label for="description">Description*</label>
-								<textarea onkeyup="adjustTextarea(this)" name="description" type="textarea"><?=$class['description']?></textarea>
+								<textarea onkeyup="adjustTextarea(this)" name="description" type="textarea" <?=$disabled?>><?=$class['description']?></textarea>
 								<span>Enter the class Description</span>
 							</li>
 						</ul>
 					</form><?php
 				} else {
-					echo "<p>You do not have access to edit classes</p>";
+					echo "<p>You do not have access to view classes</p>";
 				}
 			} else {
 				echo "<p>Session expired. Please log in again.</p>";

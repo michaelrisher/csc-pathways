@@ -20,6 +20,11 @@
 	</ul>
 	<div class="floatright">
 		<a href="<?= CORE_URL ?>help">Help</a>
+<!--		<a href="#">--><?//= $_SESSION['session']['username']?><!--</a>-->
+<!--		<ol>-->
+<!--			<li><a href="#">Change Password</a></li>-->
+<!--			<li><a href="--><?//= CORE_URL ?><!--logout">Logout</a></li>-->
+<!--		</ol>-->
 		<a href="<?= CORE_URL ?>logout">Logout</a>
 	</div>
 </div>

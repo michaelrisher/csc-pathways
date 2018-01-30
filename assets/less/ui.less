@@ -464,6 +464,42 @@ form{
 			}
 		}
 	}
+	#roleTable{
+		width: 100%;
+		tr{
+			&:nth-child(odd) {
+				background-color: #b1bcc7;
+			}
+			&.doubleBorder td{
+				border-bottom: 1px solid black;
+				position: relative;
+				&:before{
+					content: "";
+					position: absolute;
+					left: 0px;
+					bottom: 2px;
+					width: 100%;
+					height: 1px;
+					background: #000;
+				}
+			}
+		}
+		th, td {
+			text-align: center;
+			height: 20px;
+			padding: 10px 0px 10px 0px;
+			width: 40px;
+			border: 1px solid black;
+			input[type=checkbox]{
+				margin: 0;
+				-ms-transform: scale( 1.4 ); /* IE */
+				-moz-transform: scale( 1.4 ); /* FF */
+				-webkit-transform: scale( 1.4 ); /* Safari and Chrome */
+				-o-transform: scale( 1.4 ); /* Opera */
+				transform: scale( 1.4);
+			}
+		}
+	}
 }
 
 input[disabled], input[readonly]{

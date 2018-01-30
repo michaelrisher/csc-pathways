@@ -38,7 +38,7 @@
 							} else {
 								$data = $GLOBALS['main']->classes->listing();
 							}
-							if( isset( $data['listing'] ) ) {
+							if( isset( $data['listing'] ) && !empty( $data['listing'] ) ) {
 								foreach ( $data['listing'] as $class ) {
 									echo "<li data-id='${class['id']}'>${class['title']}";
 									if( $class['delete'] )
@@ -46,6 +46,8 @@
 									if( $class['edit'] ) {
 										echo "<img class='languageEdit tooltip' title='Edit in Different Language' src='" . CORE_URL . "assets/img/region.png'/>";
 										echo "<img class='edit tooltip' title='Edit class' src='" . CORE_URL . "assets/img/edit.svg'/>";
+									} else {
+										echo "<img class='view tooltip' title='View class' src='" . CORE_URL . "assets/img/view.png'/>";
 									}
 									echo "</li>";
 								}
@@ -56,6 +58,7 @@
 					</ul>
 				</div>
 				<div class="pages aligncenter" >
+					<?php if( isset( $data['listing'] ) && !empty( $data['listing'] ) ) { ?>
 					<p>Pages</p>
 					<div>
 					<?php
@@ -90,10 +93,16 @@
 							}
 						}
 					?>
+					<?php } ?>
 					</div>
 				</div>
 				<div class="margin25Top">
+					<?php
+						$GLOBALS['main']->loadModule( 'roles' );
+						if( $GLOBALS['main']->roles->haveAccess( 'ClassEdit', Core::getSessionId(), -1 ) ){
+					?>
 					<input type="button" value="Create Class" name="createClass"/>
+					<?php } ?>
 				</div>
 			</div>
 		</div>

@@ -102,6 +102,38 @@
 					$data['categories'] = $this->listCategories();
 					$data['disciplines'] = $this->discipline->listing( -1, true );
 					$data['language'] = $lang; //bug fix when there is not a lang cert yet
+					$data['readonly'] = false;
+					include( CORE_PATH . 'pages/certEdit.php' );
+				} else{
+					Core::errorPage( 403 );
+				}
+			} else {
+				Core::errorPage( 404 );
+			}
+		}
+
+		public function view( $params ){
+			$this->loadModules( 'roles users discipline' );
+			$ROLES = $this->roles->getRolesByModule( $_SESSION['session']['id'], $this->moduleName );
+			if ( $this->users->isLoggedIn()  ) {
+				if( gettype( $params ) == 'array' ){
+					$id = $params[0];
+					$lang = (int)$params[1];
+				} else{
+					$id = $params;
+					$lang = 0;
+				}
+				$data = $this->get( $id, $lang );
+
+				if( $this->roles->haveAccess( 'CertView', Core::getSessionId(), $data['discipline']) ) {
+					Core::queueStyle( 'assets/css/reset.css' );
+					Core::queueStyle( 'assets/css/ui.css' );
+					//put the data onscreen
+
+					$data['categories'] = $this->listCategories();
+					$data['disciplines'] = $this->discipline->listing( -1, true );
+					$data['language'] = $lang; //bug fix when there is not a lang cert yet
+					$data['readonly'] = true;
 					include( CORE_PATH . 'pages/certEdit.php' );
 				} else{
 					Core::errorPage( 403 );

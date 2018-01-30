@@ -29,25 +29,36 @@
 					<?php
 						$GLOBALS['main']->loadModule( 'certs' );
 						$data = $GLOBALS['main']->certs->listing();
-						foreach ( $data['listing'] as $cert ) {
-							echo "<li data-id='${cert['id']}'>";
-							//echo "<img class='key tooltip' title='Id: ${cert['id']}' src='". CORE_URL ."assets/img/key.png'/>";
-							echo "${cert['code']} - ${cert['description']}";
-							if( $cert['delete'] )
-								echo "<img class='delete tooltip' title='Delete certificate' src='". CORE_URL ."assets/img/delete.png'/>";
-							if( $cert['edit'] ) {
-								echo "<img class='languageEdit tooltip' title='Edit in Different Language' src='" . CORE_URL . "assets/img/region.png'/>";
-								echo "<a href='certs/edit/${cert['id']}'><img class='edit tooltip' title='Edit certificate' src='" . CORE_URL . "assets/img/edit.svg'/></a>";
+						if( isset( $data['listing'] ) && !empty( $data['listing'] ) ) {
+							foreach ( $data['listing'] as $cert ) {
+								echo "<li data-id='${cert['id']}'>";
+								//echo "<img class='key tooltip' title='Id: ${cert['id']}' src='". CORE_URL ."assets/img/key.png'/>";
+								echo "${cert['code']} - ${cert['description']}";
+								if ( $cert['delete'] )
+									echo "<img class='delete tooltip' title='Delete certificate' src='" . CORE_URL . "assets/img/delete.png'/>";
+								if ( $cert['edit'] ) {
+									echo "<img class='languageEdit tooltip' title='Edit in Different Language' src='" . CORE_URL . "assets/img/region.png'/>";
+									echo "<a href='certs/edit/${cert['id']}'><img class='edit tooltip' title='Edit certificate' src='" . CORE_URL . "assets/img/edit.svg'/></a>";
+								} else {
+									echo "<a href='certs/view/${cert['id']}'><img class='view tooltip' title='View class' src='" . CORE_URL . "assets/img/view.png'/></a>";
+								}
+								echo "</li>";
 							}
-							echo "</li>";
+						} else {
+							echo "<li>There are no certificates or you do not have the rights to see classes</li>";
 						}
 					?>
 					</ul>
 				</div>
 				<div class="margin25Top">
+					<?php
+						$GLOBALS['main']->loadModule( 'roles' );
+						if( $GLOBALS['main']->roles->haveAccess( 'CertEdit', Core::getSessionId(), -1 ) ){
+					?>
 					<a href="<?=CORE_URL?>certs/create?create=">
 						<input type="button" value="Create Certificate" name="createCert"/>
 					</a>
+					<?php } ?>
 				</div>
 			</div>
 		</div>

@@ -3,6 +3,25 @@
  */
 
 $( document ).ready( function(){
+	//class view
+	$( document ).on( 'click', '#main .classes li img.view', function(){
+		//get the class info
+		var id = $( this ).closest( 'li' ).attr( 'data-id' );
+		$.ajax( {
+			type: 'POST',
+			url: CORE_URL + 'rest/classes/edit/' + id,
+			success: function ( data ) {
+				if ( data ) {
+					createClassModal( data, false, true );
+				} else {
+					var modal = createModal( { title: 'Failed to load user', buttons: [{ value: 'Ok', focus : true }] } );
+					setModalContent( modal, "An error occurred." );
+					displayModal( modal, true )
+				}
+			}
+		} );
+	} );
+
 	//class edit
 	$( document ).on( 'click', '#main .classes li img.edit', function () {
 		//get the class info
@@ -22,12 +41,25 @@ $( document ).ready( function(){
 		} );
 	} );
 
-	function createClassModal( data, create ){
-		var modal = createModal( {
-			title: ( ( create ) ? ( 'Create Class' ) : ( 'Edit Class' ) ),
+	function createClassModal( data, create, readonly ){
+		if ( typeof readonly == 'undefined' ) {
+			readonly = false;
+		}
+		var title = '';
+		if ( create ) {
+			title = 'Create Class';
+		} else if ( readonly ) {
+			title = 'View Class';
+		} else{
+			title = 'Edit Class';
+		}
+		var options = {
+			title: title,
 			shadowClose: true,
-			shadowPrompt: "Are you sure you want to close? The class will not be saved",
-			buttons: [
+			shadowPrompt: "Are you sure you want to close? The class will not be saved"
+		};
+		if( !readonly ) {
+			options.buttons = [
 				{
 					value: 'Save',
 					name: 'save',
@@ -37,8 +69,16 @@ $( document ).ready( function(){
 					value: 'Cancel',
 					class: 'low'
 				}
+			];
+		} else {
+			delete options.shadowPrompt;
+			options.buttons = [
+				{
+					value: 'Close'
+				}
 			]
-		} );
+		}
+		var modal = createModal( options );
 		setModalContent( modal, data );
 		displayModal( modal );
 		adjustTextarea( $( modal ).find( 'textarea' )[0] );
@@ -381,6 +421,8 @@ $( document ).ready( function(){
 						if( item.edit ) {
 							s += '<img class="languageEdit tooltip" title="Edit in Different Language" src="' + CORE_URL + 'assets/img/region.png">';
 							s += '<img class="edit tooltip" title="Edit class" src="' + CORE_URL + 'assets/img/edit.svg">';
+						} else {
+							s += '<img class="view tooltip" title="View class" src="' + CORE_URL + 'assets/img/view.png">';
 						}
 						s += "</li>";
 						$( listing ).append( s );
