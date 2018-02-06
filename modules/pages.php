@@ -307,6 +307,7 @@ class pages extends Main{
 			Core::queueStyle( 'assets/css/ui.css' );
 			Core::queueStyle( 'assets/css/jquery-ui.css');
 			Core::queueStyle( 'assets/css/jquery-ui.structure.css');
+			Core::queueStyle( "assets/css/font-awesome.css" );
 			include( CORE_PATH . 'pages/' . $path . '.php' );
 		} else {
 			//check if page exists in the database
