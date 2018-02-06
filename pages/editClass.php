@@ -28,9 +28,9 @@
 			<div class="classes aligncenter margin15Bottom">
 				<p>Classes</p>
 				<div class="searchBar padding5">
-					<div class="search">
+					<div class="search clearfix">
 						<input type="search" class="search" placeholder="Search Classes..." value="<?= isset( $_GET['q'] ) ? $_GET['q'] : '';?>" />
-						<span><i class="fa fa-chevron-down down" aria-hidden="true"></i></span>
+						<span class="floatright"><i class="fa fa-chevron-down down" aria-hidden="true"></i></span>
 					</div>
 					<div class="none searchFilter">
 <!--						<form>-->

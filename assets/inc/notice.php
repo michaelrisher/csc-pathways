@@ -10,9 +10,8 @@
 ?>
 <div id="warningWrapper" class="error">
 	<div id="warning">
-		<?php Core::queueScript( 'assets/js/fontawesome-all.js') ?>
 		<div class="flex notice">
-			<strong><i class="fas fa-exclamation-circle"></i>&nbsp;Site is undergoing maintenance.&nbsp;</strong>
+			<strong><i class="fa fa-exclamation-circle"></i>&nbsp;Site is undergoing maintenance.&nbsp;</strong>
 			<p>Some features may not work correctly.</p>
 		</div>
 		<div>
@@ -27,9 +26,8 @@
 		?>
 		<div id="warningWrapper" class="error">
 			<div id="warning">
-				<?php Core::queueScript( 'assets/js/fontawesome-all.js') ?>
 				<div class="flex notice">
-					<strong><i class="fas fa-exclamation-circle"></i>&nbsp;Administration portion is undergoing maintenance.&nbsp;</strong>
+					<strong><i class="fa fa-exclamation-circle"></i>&nbsp;Administration portion is undergoing maintenance.&nbsp;</strong>
 					<p>Some features may not work correctly.</p>
 				</div>
 				<div>
@@ -42,9 +40,8 @@
 	?>
 	<div id="warningWrapper" class="notice">
 		<div id="warning">
-			<?php Core::queueScript( 'assets/js/fontawesome-all.js') ?>
 			<div class="flex notice">
-				<strong><i class="fas fa-exclamation-circle"></i>&nbsp;Notice.&nbsp;</strong>
+				<strong><i class="fa fa-exclamation-triangle"></i>&nbsp;Notice.&nbsp;</strong>
 				<p><?= NOTICE_MESSAGE ?></p>
 			</div>
 			<div>
@@ -57,9 +54,8 @@
 		?>
 		<div id="warningWrapper" class="error">
 			<div id="warning">
-				<?php Core::queueScript( 'assets/js/fontawesome-all.js') ?>
 				<div class="flex notice">
-					<strong><i class="fas fa-exclamation-circle"></i>&nbsp;Error.&nbsp;</strong>
+					<strong><i class="fa fa-exclamation-circle"></i>&nbsp;Error.&nbsp;</strong>
 					<p><?= ERROR_MESSAGE ?></p>
 				</div>
 				<div>
