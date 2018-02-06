@@ -55,7 +55,7 @@
 								<option disabled selected> -- Select A Discipline -- </option>
 								<?php
 									foreach( $data['disciplines']['listing'] as $discipline ){
-										echo "<option " . ( ( $discipline['id'] == $data['discipline'] ) ? ( 'selected' ) : ( '' ) ) . " value='${discipline['id']}'>${discipline['description']}</option>";
+										echo "<option " . ( ( $discipline['id'] == $data['discipline'] ) ? ( 'selected' ) : ( '' ) ) . " value='${discipline['id']}'>${discipline['name']} ${discipline['description']}</option>";
 									}
 								?>
 							</select>

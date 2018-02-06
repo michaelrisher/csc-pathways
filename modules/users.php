@@ -738,7 +738,7 @@
 					//update date and ip
 					$query = "UPDATE users SET lastIP = '${_SERVER['REMOTE_ADDR']}', latestDate = CURRENT_TIMESTAMP WHERE id = ${row['id']}";
 					if( $this->db->query( $query ) === true ) {
-						//todo log this error
+						error_log( 'Database error: ' . $this->db->error . ' [users.php login()]');
 					}
 					//echo the reponse to user
 					echo Core::ajaxResponse( $obj );

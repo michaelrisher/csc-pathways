@@ -611,26 +611,26 @@ body {
   font-weight: bold;
   padding: 10px 0 10px 0;
 }
-#wrapper #main .admin > div .listing li:nth-child(even) {
-  background: #b1bcc7;
-}
-#wrapper #main .admin > div li {
+#wrapper #main .admin > div .listing li {
   padding: 10px;
   list-style: none;
   border: 1px solid black;
   border-bottom: none;
 }
-#wrapper #main .admin > div li:last-child {
+#wrapper #main .admin > div .listing li:last-child {
   border-bottom: 1px solid #000000;
 }
-#wrapper #main .admin > div li img {
+#wrapper #main .admin > div .listing li:nth-child(even) {
+  background: #b1bcc7;
+}
+#wrapper #main .admin > div .listing li img {
   cursor: pointer;
   float: right;
   height: 20px;
   vertical-align: text-top;
   padding: 0 5px 0 5px;
 }
-#wrapper #main .admin > div li img.key {
+#wrapper #main .admin > div .listing li img.key {
   float: none;
   padding: 0;
   cursor: default;
@@ -656,11 +656,59 @@ body {
 #wrapper #main .admin > div .pages a.current {
   color: #ffba00;
 }
-#wrapper #main .admin > div .searchBar input {
-  border-radius: 11px;
+#wrapper #main .admin > div .searchBar .search input {
+  border-radius: 11px 0 0 11px;
   background: #ffffff url(../img/search.png) no-repeat 9px 8px;
   padding-left: 46px;
   padding-right: 15px;
+  width: 940px;
+  height: 36px;
+  display: inline-block;
+}
+#wrapper #main .admin > div .searchBar .search span {
+  font-size: 26px;
+  height: 36px;
+  display: inline-block;
+  margin-left: -4px;
+  width: 49px;
+  background-color: #fff;
+  border-radius: 0 11px 11px 0;
+  color: #808080;
+  border-left: 1px solid #e3e3e3;
+  cursor: pointer;
+}
+#wrapper #main .admin > div .searchBar .search span i {
+  vertical-align: middle;
+  font-size: 26px;
+}
+#wrapper #main .admin > div .searchBar .searchFilter {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #4e4e4e;
+  width: 950px;
+  padding: 15px 20px;
+  text-align: left;
+  margin: 1px 0 0 0;
+  border-radius: 11px;
+  background-color: #fff;
+}
+#wrapper #main .admin > div .searchBar .searchFilter label {
+  display: block;
+  margin: 20px 0 20px 0;
+}
+#wrapper #main .admin > div .searchBar .searchFilter label span {
+  margin-bottom: 5px;
+  display: block;
+}
+#wrapper #main .admin > div .searchBar .searchFilter select {
+  height: 40px;
+  width: 950px;
+  border: 1px solid #aaa;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+}
+#wrapper #main .admin > div .searchBar .searchFilter select:focus {
+  border: 1px solid #000;
 }
 #wrapper #main .admin .certs form ul li,
 #wrapper #main .admin .pages form ul li {

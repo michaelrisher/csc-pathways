@@ -1,7 +1,17 @@
 var searchTypingTimer = -1;
-//todo remove class group when leaving it.
 
 $( document ).ready( function () {
+	//auto load selects
+	$( 'select[autoload]' ).each( function( i, elem ){
+		try{
+			var options = {};
+			if( $( elem ).is( '[nosearch]' ) ){
+				options.minimumResultsForSearch = -1;
+			}
+
+			$( elem ).select2( options );
+		}catch ( e ){}
+	} );
 	$( 'html' ).on( 'click', '.fakeLink', function ( e ) {
 		e.preventDefault();
 		var parentDiv = $( this ).closest( '.datablock' );
@@ -220,7 +230,7 @@ $( document ).ready( function () {
 				hasError = true;
 			}
 
-			//todo make sure this doesn't alternate because of the /[a-z]/g flag
+			//DONE make sure this doesn't alternate because of the /[a-z]/g flag
 			if ( !regex['password'].test( $( form ).find( 'input[name=password]' ).val() ) ) {
 				$( form ).find( 'input[name=password]' ).closest( 'li' ).addClass( 'error' );
 				appendModalContent( modal, "Your passwords must have at least:" +
@@ -433,23 +443,6 @@ $( document ).ready( function () {
 	} );
 } );
 
-
-function startTimer( element, fn ) {
-	var time = parseInt( $( element ).attr( 'data-time' ) );
-	var interval = setInterval( function () {
-		$( element ).text( parseInt( $( element ).text() ) - 1 );
-	}, 1000 );
-	setTimeout( function () {
-		clearInterval( interval );
-		fn();
-	}, ( time * 1000 ) + 10 );
-}
-
-function adjustTextarea( h ) {//
-	h.style.height = "20px";
-	h.style.height = (h.scrollHeight) + "px";
-}
-
 window.modals = { ids: [], data: {}, displaying: false };
 /**
  * options structure
@@ -639,6 +632,23 @@ function modalLi( type, name, label, data, text, readOnly, addClass, tooltip ) {
 
 	return html;
 }
+
+function startTimer( element, fn ) {
+	var time = parseInt( $( element ).attr( 'data-time' ) );
+	var interval = setInterval( function () {
+		$( element ).text( parseInt( $( element ).text() ) - 1 );
+	}, 1000 );
+	setTimeout( function () {
+		clearInterval( interval );
+		fn();
+	}, ( time * 1000 ) + 10 );
+}
+
+function adjustTextarea( h ) {//
+	h.style.height = "20px";
+	h.style.height = (h.scrollHeight) + "px";
+}
+
 
 /**
  * read a cookie from storage

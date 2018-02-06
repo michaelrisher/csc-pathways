@@ -291,4 +291,20 @@
 			echo $s;
 			echo '<br>';
 		}
+
+		/**
+		 * get options and insert default options if none are set in the arguments
+		 * @param array $keys the default values
+		 * @param array $arguments the passed in arguments
+		 * @return array
+		 */
+		static function getOptions($keys, $arguments) {
+			// the $keys are name=>value. they are the final defaults.
+			// $arguments always override things.
+			// (this + is called the 'array union operator')
+
+			$options = (is_array($arguments) ? $arguments : array()) + $keys;
+
+			return $options;
+		}
 	}

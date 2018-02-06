@@ -8,64 +8,115 @@
 	 */
 	class classes extends Main {
 		private $moduleName = 'classes';
-
+		//TODO change the search to sort with this select
+		//SELECT SUBSTR( `title`, 0, 3 ) AS prefix, title FROM `classes` WHERE 1
 		/**
 		 * get a simple listing of classes only id and title are returned
 		 * only allowed if the user is admin
 		 * @param int $page not used yet
 		 * @return array
 		 */
-		public function listing( $page = 1 ) {
+		public function listing( $options = array() ) {
+			$options = Core::getOptions( array(
+				'page' => 1,
+				'search' => '',
+				'sort' => ''
+			), $options );
+			//check the post
+			if ( isset( $_POST ) ) {
+				$_POST = Core::sanitize( $_POST );
+				foreach ( $_POST as $key => $val ) {
+					$options[$key] = ( isset( $_POST[$key] ) ? $_POST[$key] : $options[$key] );
+				}
+
+//				$options['search'] = ( isset( $_POST['search'] ) ? $_POST['search'] : $options['search'] );
+			}
+			//check the get for the search query
+			if( isset( $_GET ) ){
+				Core::sanitize( $_GET );
+				$options['search'] = ( isset( $_GET['q'] ) ? $_GET['q'] : $options['search'] );
+				if ( isset( $_GET['sort'] ) ) {
+					$options['filter']['sortBy'] = $_GET['sort'];
+				}
+				if ( isset( $_GET['discs'] ) ) {
+					$options['filter']['disciplines'] = explode( ',', $_GET['discs'] );
+				}
+			}
 			$this->loadModules( 'roles discipline' );
-//			$userRoles = $this->roles->getRolesByModule( Core::getSessionId(), $this->moduleName );
 			$fullRoles = $this->roles->getAllForUser( Core::getSessionId() );
 			$userDisciplines = $this->discipline->getIdsForUser( Core::getSessionId() );
 
 			$limit = 25;
+			$page = $options['page'];
 			$page--;//to make good looking page numbers for users
 			$offset = $page * $limit;
-			$search = '';
-			if( isset( $_POST ) || isset( $_GET ) ){
-				$_POST = Core::sanitize( $_POST );
-				if( isset( $_POST['search'] ) ){
-					$search = $_POST['search'];
-				}
-				if( isset( $_GET['q'] ) ){
-					$search = Core::sanitize( $_GET['q'] );
-				}
-			}
-//				$search = isset( $_POST['search'] ) ? $_POST['search'] : '' ;
+			$search = $options['search'];
+
+			$needWhere = false;
+			$whereAppend = "WHERE (";
 			if( isset( $_POST['all'] ) || isset( $_GET['all'] ) ){
 				$query = "SELECT * FROM classes ORDER BY sort";
 			}
 			else if( empty( $search ) ){
-				$query = "SELECT * FROM classes";// LIMIT $offset,$limit";//remove limit for a time LIMIT $page,50
+				$query = "SELECT * FROM classes ";// LIMIT $offset,$limit";//remove limit for a time LIMIT $page,50
 			} else {
-				$query = "SELECT * FROM classes WHERE title LIKE '%$search%'"; // LIMIT $offset,$limit";
+				$query = "SELECT * FROM classes "; // LIMIT $offset,$limit";
+				$whereAppend = "WHERE (title LIKE '%$search%'";
+				$needWhere = true;
 			}
 
 			if( $this->roles->doesUserHaveRole( Core::getSessionId(), 'dClassView') && !( isset( $_POST['all'] ) || isset( $_GET['all'] ) ) ) {
 				if( empty( $search ) ){
 					if( count( $userDisciplines ) > 0 ) {
-						$query .= ' WHERE (';
+						$needWhere = true;
 					}
 				} else {
 					if( count( $userDisciplines ) > 0 ){
-						$query .= ' AND (';
+						$whereAppend .= ' AND (';
 					}
 				}
 				for( $i = 0; $i < count( $userDisciplines ); $i++ ){
-					$query .= 'discipline=' . $userDisciplines[$i];
+					$whereAppend .= 'discipline=' . $userDisciplines[$i];
 					if( $i+1 < count( $userDisciplines ) ){
-						$query .= ' OR ';
+						$whereAppend .= ' OR ';
 					}
 				}
 				if( count( $userDisciplines ) > 0 )
-					$query .= ')';
+					$whereAppend .= ')';
+			}
+
+			if( isset( $options['filter'] ) ){
+				if( isset( $options['filter']['disciplines'] ) ){
+					if ( $needWhere ) {
+						$whereAppend .= ' AND (';
+					} else {
+						$whereAppend .= ' (';
+					}
+					$needWhere = true;
+					for( $i = 0; $i < count( $options['filter']['disciplines'] ); $i++ ){
+						$whereAppend .= 'discipline=' . $options['filter']['disciplines'][$i];
+						if( $i+1 < count( $options['filter']['disciplines'] ) ){
+							$whereAppend .= ' OR ';
+						}
+					}
+					$whereAppend .= ')';
+				}
 			}
 //			Core::debug( $userDisciplines );
-			$query .= " ORDER BY sort LIMIT $offset, $limit";
-//			echo $query . '<br>';;
+			if( $needWhere ){
+				$whereAppend .= ')';
+				$query .= $whereAppend;
+			}
+
+			if( isset( $options['filter'] ) ){
+				if( isset( $options['filter']['sortBy']) ){
+						$query .= " ORDER BY sort " . $options['filter']['sortBy'];
+				}
+			} else {
+				$query .= " ORDER BY sort";
+			}
+			$query .= " LIMIT $offset, $limit";
+//			echo $query . "\t";
 			$temp = $query;
 			if ( !$result = $this->db->query( $query ) ) {
 				echo( 'There was an error running the query [' . $this->db->error . ']' );
@@ -89,27 +140,9 @@
 //			Core::debug( $return );
 
 			//get count of data
-			if( empty( $search ) ) {
-				$query = "SELECT COUNT( id ) AS items FROM classes ";
-			} else {
-				$query = "SELECT COUNT( id ) AS items FROM classes WHERE title LIKE '%$search%'";
-			}
-			if( $this->roles->doesUserHaveRole( Core::getSessionId(), 'dClassView') && !( isset( $_POST['all'] ) || isset( $_GET['all'] ) ) ) {
-				if( empty( $search ) ){
-					if( count( $userDisciplines ) > 0 )
-						$query .= ' WHERE (';
-				} else {
-					if( count( $userDisciplines ) > 0 )
-						$query .= ' AND (';
-				}
-				for( $i = 0; $i < count( $userDisciplines ); $i++ ){
-					$query .= 'discipline=' . $userDisciplines[$i];
-					if( $i+1 < count( $userDisciplines ) ){
-						$query .= ' OR ';
-					}
-				}
-				if( count( $userDisciplines ) > 0 )
-					$query .= ')';
+			$query = "SELECT COUNT( id ) AS items FROM classes ";
+			if( $needWhere ){
+				$query .= $whereAppend;
 			}
 			$result->close();
 			if( !$result = $this->db->query( $query ) ) {
@@ -127,8 +160,19 @@
 				'count' => intval( $count ),
 				'limit' => $limit,
 				'currentPage' => (int)++$page,
-				'query' => $temp
+				//TODO remove before push!!
+//				'query' => $temp
 			);
+			if( isset( $options['search'] ) ){
+				$return['q'] = $options['search'];
+			}
+			if( isset( $options['filter'] ) && isset( $options['filter']['sortBy'] ) ){
+				$return['sort'] = $options['filter']['sortBy'];
+			}
+			if( isset( $options['filter'] ) && isset( $options['filter']['disciplines'] ) ){
+				$return['discs'] = implode( ',', $options['filter']['disciplines'] );
+			}
+//			$return['debug'] = json_encode( $options );
 			if ( IS_AJAX ) {
 				echo Core::ajaxResponse( $return );
 			}

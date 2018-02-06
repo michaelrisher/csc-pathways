@@ -139,8 +139,6 @@ $( document ).ready( function(){
 								var classCode = $( 'option[value=' + val + ']', that ).html().match( /[a-zA-Z]{3}\-\w?\d{1,4}[a-zA-Z]*/ )[0];
 								var float = $( 'input[name=float]:checked', that ).val();
 								var check = $( that ).find( 'input[name=append]' );
-								//todo remove this was for dev build only
-								//var classCode = classCode.split('-')[1];
 								var str = '[class id="' + $( that ).find( 'select' ).val() + '" text="' + classCode + '" /]';
 								if( check.is( ':checked' ) ){
 									var str = '[class id="' + $( that ).find( 'select' ).val() + '" text="' + optionStr + '" /]';

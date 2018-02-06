@@ -44,33 +44,15 @@
 
 	$GLOBALS['main']->loadModule( $uri['module'] );
 	if ( isset( $uri['params'] ) ) {
-		$response = $GLOBALS['main']->$uri['module']->{$uri['function']}($uri['params']);
+		if( method_exists( $GLOBALS['main']->$uri['module'], $uri['function'] ) ){
+			$response = $GLOBALS['main']->$uri['module']->{$uri['function']}($uri['params']);
+		} else {
+			Core::errorPage( 404 );
+		}
 	} else{
-		$response = $GLOBALS['main']->$uri['module']->{$uri['function']}();
+		if( method_exists( $GLOBALS['main']->$uri['module'], $uri['function'] ) ) {
+			$response = $GLOBALS['main']->$uri['module']->{$uri['function']}();
+		} else {
+			Core::errorPage( 404 );
+		}
 	}
-
-	//TODO fix it so all functions that don't exist go to 404
-//	if ( /*IS_AJAX &&*/ isset( $_GET['rested'] ) ) { //calling a module
-//		$GLOBALS['main']->loadModule( $uri['module'] );
-//		if ( isset( $uri['params'] ) ) {
-//			$response = $GLOBALS['main']->$uri['module']->{$uri['function']}($uri['params']);
-//		} else{
-//			$response = $GLOBALS['main']->$uri['module']->{$uri['function']}();
-//		}
-//	} elseif( $uri['module'] == 'pages' ) {
-//		//simple page call
-//		if( gettype( $uri['params'] ) == 'array' ){
-//			$uri['moreParams'] = $uri['params'][1];
-//			$uri['params'] = $uri['params'][0];
-//		}
-//		//if the page exists load it with the params if there was any
-//		if ( file_exists( CORE_PATH . 'pages/' . $uri['params'] .'.php' ) ) {
-//			$data['params'] = isset( $uri['moreParams'] ) ? $uri['moreParams'] : $uri['params'];
-//			Core::queueStyle( 'assets/css/reset.css' );
-//			Core::queueStyle( 'assets/css/ui.css' );
-//			include( CORE_PATH . 'pages/' . $uri['params'] . '.php' );
-//		} else {
-//			//the page doesn't exist so 404 the user
-//			Core::errorPage( 404 );
-//		}
-//	}

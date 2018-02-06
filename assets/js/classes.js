@@ -386,14 +386,14 @@ $( document ).ready( function(){
 		}
 	} );
 
-	$( '.classes input.search' ).on( 'keyup', function(e) {
+	$( '.classes .search input.search' ).on( 'keyup', function(e) {
 		clearTimeout( searchTypingTimer );
 		if( e.keyCode != 13 ){
 			searchTypingTimer = setTimeout( classSearch, 1000 );
 		}
 	} );
 
-	$( '.classes input.search' ).on( 'search', function( e ){
+	$( '.classes .search input.search' ).on( 'search', function( e ){
 		clearTimeout( searchTypingTimer );
 		classSearch();
 	} );
@@ -409,58 +409,137 @@ $( document ).ready( function(){
 				search : value
 			},
 			success : function( data ){
-				if( data.success ){
-					var listing = $( '.listing ul');
-					$( listing ).html('');
-					var data = data.data;
-					for( var i = 0; i < data.listing.length; i++ ){
-						var item = data.listing[i];
-						var s = "<li data-id='" + item.id + "'>" + item.title;
-						if( item.delete )
-							s += '<img class="delete tooltip" title="Delete class" src="' + CORE_URL + 'assets/img/delete.png">';
-						if( item.edit ) {
-							s += '<img class="languageEdit tooltip" title="Edit in Different Language" src="' + CORE_URL + 'assets/img/region.png">';
-							s += '<img class="edit tooltip" title="Edit class" src="' + CORE_URL + 'assets/img/edit.svg">';
-						} else {
-							s += '<img class="view tooltip" title="View class" src="' + CORE_URL + 'assets/img/view.png">';
-						}
-						s += "</li>";
-						$( listing ).append( s );
-					}
-
-					var pagesDom = $( '.pages div' );
-					$( pagesDom ).html('');
-					var pages = Math.ceil( data.count / data.limit );
-					var currentPage = data.currentPage;
-					var amount = 3;
-					var str = '';
-					if(  currentPage > 1 ){
-						str += "<a href='" + CORE_URL + "editClass/1'/>|&lt;</a>";
-					}
-					//left side of current math
-					var left = 0;
-					if( currentPage <= amount ){
-						left = ( ( currentPage - amount ) + amount ) - 1;
-					} else{
-						left = amount;
-					}
-					for( var i = left; i >= 1; i-- ){
-						str += "<a href='" + CORE_URL + 'editClass/' + ( currentPage - $i ) + "?q=" + value + "'>" + ( currentPage - $i ) + "</a>";
-					}
-					str += "<a href='" + CORE_URL + 'editClass/' + ( currentPage ) + "?q=" + value + "' class='current'>"  + ( currentPage ) + "</a>";
-					//right side of current math
-					for( var i = 1; i <= amount; i++ ){
-						if( ( currentPage + i ) > pages ){ break; }
-						str += "<a href='" + CORE_URL + 'editClass/' + ( currentPage + i ) + "?q=" + value + "'>"  + ( currentPage + i ) + "</a>";
-					}
-					if(  currentPage < pages ){
-						str += "<a href='" + CORE_URL + "editClass/" + pages + "?q=" + value + "'>&gt;|</a>";
-					}
-					$( pagesDom ).html( str );
-				} else{
-					//TODO catch a search failure
-				};
+				populateListing( data );
 			}
 		});
 	}
+
+	function populateListing( data ){
+		if( data.success ){
+			var value = data.data.q;
+			var listing = $( '.listing ul');
+			$( listing ).html('');
+			var pagesDom = $( '.pages div' );
+			var data = data.data;
+			if( data.listing.length > 0 ) {
+				for ( var i = 0; i < data.listing.length; i++ ) {
+					var item = data.listing[i];
+					var s = "<li data-id='" + item.id + "'>" + item.title;
+					if ( item.delete )
+						s += '<img class="delete tooltip" title="Delete class" src="' + CORE_URL + 'assets/img/delete.png">';
+					if ( item.edit ) {
+						s += '<img class="languageEdit tooltip" title="Edit in Different Language" src="' + CORE_URL + 'assets/img/region.png">';
+						s += '<img class="edit tooltip" title="Edit class" src="' + CORE_URL + 'assets/img/edit.svg">';
+					} else {
+						s += '<img class="view tooltip" title="View class" src="' + CORE_URL + 'assets/img/view.png">';
+					}
+					s += "</li>";
+					$( listing ).append( s );
+				}
+
+				$( pagesDom ).html( '' );
+				var pages = Math.ceil( data.count / data.limit );
+				var currentPage = data.currentPage;
+				var amount = 3;
+				var str = '';
+				if ( currentPage > 1 ) {
+					str += "<a href='" + CORE_URL + "editClass/1'/>|&lt;</a>";
+				}
+				//left side of current math
+				var left = 0;
+				if ( currentPage <= amount ) {
+					left = ( ( currentPage - amount ) + amount ) - 1;
+				} else {
+					left = amount;
+				}
+				var qsa = "?q=" + value;
+				if( isset( data.sort ) ){
+					qsa += '&sort=' + data.sort
+				}
+				if( isset( data.discs ) ){
+					qsa += '&discs=' + data.discs;
+				}
+				for ( var i = left; i >= 1; i-- ) {
+					str += "<a href='" + CORE_URL + 'editClass/' + ( currentPage - $i ) + qsa + "'>" + ( currentPage - $i ) + "</a>";
+				}
+				str += "<a href='" + CORE_URL + 'editClass/' + ( currentPage ) + qsa + "' class='current'>" + ( currentPage ) + "</a>";
+				//right side of current math
+				for ( var i = 1; i <= amount; i++ ) {
+					if ( ( currentPage + i ) > pages ) {
+						break;
+					}
+					str += "<a href='" + CORE_URL + 'editClass/' + ( currentPage + i ) + qsa + "'>" + ( currentPage + i ) + "</a>";
+				}
+				if ( currentPage < pages ) {
+					str += "<a href='" + CORE_URL + "editClass/" + pages + qsa + "'>&gt;|</a>";
+				}
+				$( pagesDom ).html( str );
+			} else{
+				$( listing ).append( '<li>There are no classes that match</li>' );
+				$( pagesDom ).html('');
+			}
+		} else{
+			$( '.listing ul' ).html( '<li>An error occured searching for that. Please refresh the page and try again</li>' );
+			$( '.pages div' ).html('');
+		};
+	}
+
+	/****************************Search Filter Button**********************************/
+	$( '.classes .searchBar .search span' ).on( 'click', function(){
+		var chevron = $( 'i', this );
+		var filter = $( '.classes .searchBar .searchFilter' );
+		if( $( chevron ).hasClass( 'down' ) ){
+			//menu is not open
+			//change icon
+			$({deg: 0}).animate({deg: 180}, {
+				step: function(now, fx){
+					$( chevron).css({
+						transform: "rotate(" + now + "deg)"
+					});
+				}
+			});
+			$( filter ).slideDown( 400, function(){
+				$( chevron ).removeClass( 'down' );
+				$( chevron ).addClass( 'up' );
+			} );
+		} else {
+			//menu is open
+			//change icon
+			$({deg: 180}).animate({deg: 0}, {
+				step: function(now, fx){
+					$( chevron).css({
+						transform: "rotate(" + now + "deg)"
+					});
+				}
+			});
+			$( filter ).slideUp( 400, function(){
+				$( chevron ).removeClass( 'up' );
+				$( chevron ).addClass( 'down' );
+			} );
+		}
+	} );
+
+	/****************************Search Filter Dropdown********************************/
+	$( '.classes .searchFilter select' ).on( 'change', function(){
+		var searchVal = $( '.classes input.search' ).val();
+		var selects = $( '.classes .searchFilter select' );
+		var filter = {};
+		$( selects ).each( function( i, elem ){
+			filter[$( elem ).attr( 'name' )] = $( elem ).val();
+		} );
+		console.log( $( this ).attr( 'name' ) );
+		$.ajax({
+			type: 'POST',
+			url: CORE_URL + 'rest/classes/listing',
+			dataType: 'json',
+			data: {
+				page : 1,
+				search : searchVal,
+				filter: filter
+			},
+			success : function( data ){
+				populateListing( data );
+			}
+		});
+	} );
 } );
