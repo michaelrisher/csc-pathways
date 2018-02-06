@@ -35,7 +35,7 @@
 					<div class="none searchFilter">
 <!--						<form>-->
 							<p class="margin15Bottom bold">Search Filter</p>
-							<label><span>Sort By</span>
+							<label><p>Sort By</p>
 							<select name="sortBy" autoload nosearch>
 								<?php
 									$temp = array( 'Ascending', 'Descending' );
@@ -53,7 +53,7 @@
 							</select>
 							</label>
 
-							<label for="filterDiscipline"><span>Filter Disciplines</span>
+							<label for="filterDiscipline"><p>Filter Disciplines</p>
 							<select id="filterDiscipline" multiple autoload name="disciplines">
 								<?php
 									$GLOBALS['main']->loadModule( 'discipline' );
