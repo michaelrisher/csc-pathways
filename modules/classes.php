@@ -20,7 +20,8 @@
 			$options = Core::getOptions( array(
 				'page' => 1,
 				'search' => '',
-				'sort' => ''
+				'sort' => '',
+				'limit' => 25
 			), $options );
 			//check the post
 			if ( isset( $_POST ) ) {
@@ -41,12 +42,16 @@
 				if ( isset( $_GET['discs'] ) ) {
 					$options['filter']['disciplines'] = explode( ',', $_GET['discs'] );
 				}
+				if ( isset( $_GET['limit'] ) ) {
+					$options['filter']['limit'] = intval( $_GET['limit'] );
+				}
 			}
 			$this->loadModules( 'roles discipline' );
 			$fullRoles = $this->roles->getAllForUser( Core::getSessionId() );
 			$userDisciplines = $this->discipline->getIdsForUser( Core::getSessionId() );
 
-			$limit = 25;
+			$limit = intval(( isset( $options['filter']['limit'] ) ? $options['filter']['limit'] : $options['limit'] ));
+			$limit = ( ( $limit > 500 ) ? ( 500 ) : ( $limit ) );
 			$page = $options['page'];
 			$page--;//to make good looking page numbers for users
 			$offset = $page * $limit;
@@ -69,6 +74,7 @@
 				if( empty( $search ) ){
 					if( count( $userDisciplines ) > 0 ) {
 						$needWhere = true;
+						$whereAppend .= '(';
 					}
 				} else {
 					if( count( $userDisciplines ) > 0 ){
@@ -161,7 +167,7 @@
 				'limit' => $limit,
 				'currentPage' => (int)++$page,
 				//TODO remove before push!!
-//				'query' => $temp
+				'query' => $temp
 			);
 			if( isset( $options['search'] ) ){
 				$return['q'] = $options['search'];

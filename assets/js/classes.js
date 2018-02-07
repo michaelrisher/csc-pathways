@@ -459,6 +459,9 @@ $( document ).ready( function(){
 				if( isset( data.discs ) ){
 					qsa += '&discs=' + data.discs;
 				}
+				if( isset( data.limit ) ){
+					qsa += '&limit=' + data.limit;
+				}
 				for ( var i = left; i >= 1; i-- ) {
 					str += "<a href='" + CORE_URL + 'editClass/' + ( currentPage - $i ) + qsa + "'>" + ( currentPage - $i ) + "</a>";
 				}

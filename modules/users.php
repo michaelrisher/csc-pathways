@@ -455,7 +455,12 @@
 				if ( $this->roles->haveAccess( "UserRoles", Core::getSessionId(), -1 )) {
 					//get all the roles for user and compare to whats is in the database already
 
-					$postedRoles = json_decode( $_POST['roles'] );
+					$postedRoles = array();
+					foreach ( $_POST['tester'] as $modules ) {
+						foreach ( $modules as $k => $r ) {
+							array_push( $postedRoles, $r );
+						}
+					}
 
 					$roleError = false;
 
@@ -476,6 +481,7 @@
 					echo Core::ajaxResponse( $obj, false );
 				} else {
 					$token = $this->createResetPassword( $id, true, false );
+					$obj['id'] = $id;
 					$obj['msg'] = "Created User successfully<br>";
 					$obj['msg'] .= "Give the user this link so they can set their password<br>";
 					$obj['msg'] .= '<a href="' . CORE_URL . 'users/resetPassword&token=' . $token . '">';

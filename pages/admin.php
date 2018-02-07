@@ -6,7 +6,8 @@
 	 * Time: 09:47
 	 */
 	if( !$GLOBALS['main']->users->isLoggedIn() ){
-		Core::errorPage( 404 );
+		Core::phpRedirect( 'login' );
+//		Core::errorPage( 404 );
 	}
 	$params = $data['params'];
 ?>

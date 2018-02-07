@@ -62,6 +62,8 @@ $( document ).ready( function(){
 		readonly = ( typeof readonly == 'undefined' ? false : true );
 		var modalData = {
 			title: 'Edit User',
+			shadowClose: true,
+			shadowPrompt: "Are you sure you want to close? The user will not be saved",
 			buttons: [
 				{
 					value: 'Save',

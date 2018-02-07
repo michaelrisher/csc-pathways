@@ -7,7 +7,8 @@
 	 */
 	$GLOBALS['main']->loadModule( 'users' );
 	if( !$GLOBALS['main']->users->isLoggedIn() ){
-		Core::errorPage( 404 );
+//		Core::errorPage( 404 );
+		Core::phpRedirect( 'login' );
 	}
 ?>
 <!DOCTYPE html>

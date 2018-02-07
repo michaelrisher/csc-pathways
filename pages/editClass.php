@@ -6,7 +6,8 @@
 	 * Time: 10:13
 	 */
 	if( !$GLOBALS['main']->users->isLoggedIn() ){
-		Core::errorPage( 404 );
+		//Core::errorPage( 404 );
+		Core::phpRedirect( 'login' );
 	}
 	$params = $data['params'];
 ?>
@@ -33,44 +34,56 @@
 						<span class="floatright"><i class="fa fa-chevron-down down" aria-hidden="true"></i></span>
 					</div>
 					<div class="none searchFilter">
-<!--						<form>-->
-							<p class="margin15Bottom bold">Search Filter</p>
-							<label><p>Sort By</p>
-							<select name="sortBy" autoload nosearch>
-								<?php
-									$temp = array( 'Ascending', 'Descending' );
-									$sorts = array( 'ASC', 'DESC' );
-									if( isset( $_GET['sort'] ) ){
-										$selectedSort = Core::sanitize( $_GET['sort'] );
-									}
-									$i = 0;
-									foreach ( $sorts as $sort ) {
-										$selected = ( $selectedSort == $sort ? 'selected' : '' );
-										echo "<option value='$sort' $selected>${temp[$i++]}</option>";
-									}
+						<p class="margin15Bottom bold">Search Filter</p>
+						<label><p>Sort By</p>
+						<select name="sortBy" autoload nosearch>
+							<?php
+								$temp = array( 'Ascending', 'Descending' );
+								$sorts = array( 'ASC', 'DESC' );
+								if( isset( $_GET['sort'] ) ){
+									$selectedSort = Core::sanitize( $_GET['sort'] );
+								}
+								$i = 0;
+								foreach ( $sorts as $sort ) {
+									$selected = ( $selectedSort == $sort ? 'selected' : '' );
+									echo "<option value='$sort' $selected>${temp[$i++]}</option>";
+								}
 
+							?>
+						</select>
+						</label>
+
+						<label for="filterDiscipline"><p>Filter Disciplines</p>
+						<select id="filterDiscipline" multiple autoload name="disciplines">
+							<?php
+								$GLOBALS['main']->loadModule( 'discipline' );
+								$disciplines = $GLOBALS['main']->discipline->listing( -1, true );
+								if( isset( $_GET['discs'] ) ) {
+									$selectedDiscs = explode( ',', Core::sanitize( $_GET['discs'] ) );
+								} else $selectedDiscs = array();
+								foreach ( $disciplines['listing'] as $d ) {
+									if( Core::inArray( $d['id'], $selectedDiscs ) ){
+										echo "<option selected value='${d['id']}'>${d['name']} - ${d['description']}</option>";
+									} else
+										echo "<option value='${d['id']}'>${d['name']} - ${d['description']}</option>";
+								}
+							?>
+						</select>
+						</label>
+						<label for="limit"><p>Amount per page</p>
+							<select autoload name="limit">
+								<?php
+									if( isset( $_GET['limit'] ) ){
+										$selected = intval( $_GET['limit'] );
+									} else {
+										$selected = 25;
+									}
+									for( $i = 25; $i <= 100; $i+=25 ){
+										echo "<option value='$i' " . ( $selected == $i ? 'selected' : '' ) . ">$i</option>";
+									}
 								?>
 							</select>
-							</label>
-
-							<label for="filterDiscipline"><p>Filter Disciplines</p>
-							<select id="filterDiscipline" multiple autoload name="disciplines">
-								<?php
-									$GLOBALS['main']->loadModule( 'discipline' );
-									$disciplines = $GLOBALS['main']->discipline->listing( -1, true );
-									if( isset( $_GET['discs'] ) ) {
-										$selectedDiscs = explode( ',', Core::sanitize( $_GET['discs'] ) );
-									} else $selectedDiscs = array();
-									foreach ( $disciplines['listing'] as $d ) {
-										if( Core::inArray( $d['id'], $selectedDiscs ) ){
-											echo "<option selected value='${d['id']}'>${d['name']} - ${d['description']}</option>";
-										} else
-											echo "<option value='${d['id']}'>${d['name']} - ${d['description']}</option>";
-									}
-								?>
-							</select>
-							</label>
-<!--						</form>-->
+						</label>
 					</div>
 				</div>
 				<div class="listing alignleft">
@@ -102,47 +115,8 @@
 					</ul>
 				</div>
 				<div class="pages aligncenter" >
-					<?php if( isset( $data['listing'] ) && !empty( $data['listing'] ) ) { ?>
-					<p>Pages</p>
-					<div>
-					<?php
-						if ( isset( $data['count'] ) && $data['limit'] ) {
-							$pages = ceil( $data['count'] / $data['limit'] );
-							$currentPage = $data['currentPage'];
-							$amount = 3;
-//							echo '#' . $pages;
-							$search = isset( $_GET['q'] ) ? ( '?q=' . $_GET['q'] ) : '';
-							$qsa = $search;
-							$qsa .= ( isset( $_GET['sort'] ) ? '&sort=' .$_GET['sort'] : '' );
-							$qsa .= ( isset( $_GET['discs'] ) ? '&discs=' .$_GET['discs'] : '' );
+					<?php Core::pages( $data, 'editClass' ); ?>
 
-							if ( $currentPage > 1 ) {
-								echo "<a href='" . CORE_URL . "editClass/1" . $search . "'>|&lt;</a>";
-							}
-							//left side of current math
-							if ( $currentPage <= $amount ) {
-								$left = ( ( $currentPage - $amount ) + $amount ) - 1;
-							} else {
-								$left = $amount;
-							}
-							for ( $i = $left; $i >= 1; $i-- ) {
-								echo "<a href='" . CORE_URL . 'editClass/' . ( $currentPage - $i ) . $qsa . "'>" . ( $currentPage - $i ) . "</a>";
-							}
-							echo "<a href='" . CORE_URL . 'editClass/' . ( $currentPage ) . $qsa . "' class='current'>" . ( $currentPage ) . "</a>";
-							//right side of current math
-							for ( $i = 1; $i <= $amount; $i++ ) {
-								if ( ( $currentPage + $i ) > $pages ) {
-									break;
-								}
-								echo "<a href='" . CORE_URL . 'editClass/' . ( $currentPage + $i ) . $qsa . "'>" . ( $currentPage + $i ) . "</a>";
-							}
-							if ( $currentPage < $pages ) {
-								echo "<a href='" . CORE_URL . "editClass/" . $pages . $qsa . "'>&gt;|</a>";
-							}
-						}
-					?>
-					<?php } ?>
-					</div>
 				</div>
 				<div class="margin25Top">
 					<?php

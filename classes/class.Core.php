@@ -307,4 +307,46 @@
 
 			return $options;
 		}
+
+		static function pages( $data, $link ){
+			if( isset( $data['listing'] ) && !empty( $data['listing'] ) ) {
+				echo '<p>Pages</p>';
+				echo '<div>';
+				if ( isset( $data['count'] ) && $data['limit'] ) {
+					$pages = ceil( $data['count'] / $data['limit'] );
+					$currentPage = $data['currentPage'];
+					$amount = 3;
+					$search = isset( $_GET['q'] ) ? ( '?q=' . $_GET['q'] ) : '';
+					$qsa = $search;
+					$qsa .= ( isset( $_GET['sort'] ) ? '&sort=' . $_GET['sort'] : '' );
+					$qsa .= ( isset( $_GET['discs'] ) ? '&discs=' . $_GET['discs'] : '' );
+					$qsa .= ( isset( $_GET['limit'] ) ? '&limit=' . $_GET['limit'] : '' );
+
+					if ( $currentPage > 1 ) {
+						echo "<a href='" . CORE_URL . $link . "/1" . $search . "'>|&lt;</a>";
+					}
+					//left side of current math
+					if ( $currentPage <= $amount ) {
+						$left = ( ( $currentPage - $amount ) + $amount ) - 1;
+					} else {
+						$left = $amount;
+					}
+					for ( $i = $left; $i >= 1; $i-- ) {
+						echo "<a href='" . CORE_URL . $link . '/' . ( $currentPage - $i ) . $qsa . "'>" . ( $currentPage - $i ) . "</a>";
+					}
+					echo "<a href='" . CORE_URL . $link . '/' . ( $currentPage ) . $qsa . "' class='current'>" . ( $currentPage ) . "</a>";
+					//right side of current math
+					for ( $i = 1; $i <= $amount; $i++ ) {
+						if ( ( $currentPage + $i ) > $pages ) {
+							break;
+						}
+						echo "<a href='" . CORE_URL . $link . '/' . ( $currentPage + $i ) . $qsa . "'>" . ( $currentPage + $i ) . "</a>";
+					}
+					if ( $currentPage < $pages ) {
+						echo "<a href='" . CORE_URL . $link . "/" . $pages . $qsa . "'>&gt;|</a>";
+					}
+				}
+				echo '</div>';
+			}
+		}
 	}

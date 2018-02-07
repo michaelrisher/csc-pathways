@@ -7,7 +7,8 @@
 	 */
 	$GLOBALS['main']->loadModule( 'users' );
 	if( !$GLOBALS['main']->users->isLoggedIn() ){
-		Core::errorPage( 404 );
+		Core::phpRedirect( 'login' );
+//		Core::errorPage( 404 );
 	}
 ?>
 <!DOCTYPE html>
@@ -56,7 +57,7 @@
 								<option disabled selected> -- Select A Discipline -- </option>
 								<?php
 									foreach( $data['disciplines']['listing'] as $discipline ){
-										echo "<option " . ( ( $discipline['id'] == $data['discipline'] ) ? ( 'selected' ) : ( '' ) ) . " value='${discipline['id']}'>${discipline['description']}</option>";
+										echo "<option " . ( ( $discipline['id'] == $data['discipline'] ) ? ( 'selected' ) : ( '' ) ) . " value='${discipline['id']}'>${discipline['name']} ${discipline['description']}</option>";
 									}
 								?>
 							</select>
