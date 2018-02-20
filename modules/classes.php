@@ -60,7 +60,7 @@
 			$needWhere = false;
 			$whereAppend = "WHERE (";
 			if( isset( $_POST['all'] ) || isset( $_GET['all'] ) ){
-				$query = "SELECT * FROM classes ORDER BY sort";
+				$query = "SELECT * FROM classes";
 			}
 			else if( empty( $search ) ){
 				$query = "SELECT * FROM classes ";// LIMIT $offset,$limit";//remove limit for a time LIMIT $page,50
@@ -121,7 +121,9 @@
 			} else {
 				$query .= " ORDER BY sort";
 			}
-			$query .= " LIMIT $offset, $limit";
+			if( !isset( $_POST['all'] ) && !isset( $_GET['all'] ) ) {
+				$query .= " LIMIT $offset, $limit";
+			}
 //			echo $query . "\t";
 			$temp = $query;
 			if ( !$result = $this->db->query( $query ) ) {

@@ -2,3 +2,5 @@
 *.iml
 *.iws
 .htaccess
+config.php
+config-old.php

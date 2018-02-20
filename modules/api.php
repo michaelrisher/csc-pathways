@@ -8,7 +8,23 @@
 
 class api extends Main{
 	private $moduleName = 'api';
+	private $errors = array();
 
+//	public function course( $endpoints = null ){
+//		$this->loadModule( 'classes' );
+//		$obj = [];
+//		if( is_array( $endpoints ) ){
+//		} else {
+//			if( $endpoints == null ){
+//				$this->classes->listing();
+//			}
+//		}
+//
+//		if( !empty( $this->errors ) ){
+//			$obj = $this->errorResponse( $this->errors );
+//		}
+//		echo json_encode( $obj );
+//	}
 	public function course( $endpoints = '' ){
 		if ( is_array( $endpoints ) ) {
 			$endpoints = join( '/', $endpoints );
@@ -74,6 +90,7 @@ class api extends Main{
 		}
 		echo json_encode( $obj );
 	}
+
 
 	public function certificate( $endpoints = '' ){
 		if ( is_array( $endpoints ) ) {

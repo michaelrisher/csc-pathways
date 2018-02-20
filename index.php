@@ -5,7 +5,7 @@
 	 * Date: 5/22/2017
 	 * Time: 09:41
 	 */
-	require_once 'config.php';
+	require_once 'config-old.php';
 
 	//clean the get
 	$_GET = Core::sanitize($_GET);
