@@ -339,7 +339,7 @@ EOD;
 					$_POST['code'] = core::sanitize( $_POST['code'] );
 					$_POST['units'] = core::sanitize( $_POST['units'] );
 					$_POST['discipline'] = core::sanitize( $_POST['discipline'] );
-//					$_POST['category'] = core::sanitize( $_POST['category'] );
+					$_POST['category'] = 0; //core::sanitize( $_POST['category'] );
 					$_POST['description'] = core::sanitize( $_POST['description'], true );
 					$_POST['elo'] = core::sanitize( $_POST['elo'], true );
 					$_POST['schedule'] = core::sanitize( $_POST['schedule'], true );
@@ -355,7 +355,7 @@ EOD;
 						'code' => (string)$_POST['code'],
 						'hasAs' => $hasAs,
 						'hasCe' => $hasCe,
-//						'category' => (int)$_POST['category'],
+						'category' => (int)$_POST['category'],
 						'units' => (int)$_POST['units'],
 						'description' => $_POST['title'],
 						'sort' => (int)$_POST['sort'],
@@ -366,6 +366,7 @@ EOD;
 					$error = '';
 					if ( !$certListUpdated ) {
 						$error = 'List failed to upsert';
+						$error .= '<br>' . $this->db->error;
 					}
 
 					$certDataUpdated = $this->upsertRecord( 'certificateData', "cert=$id AND language=$language", array(
