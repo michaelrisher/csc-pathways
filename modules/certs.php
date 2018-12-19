@@ -430,9 +430,10 @@ EOD;
 							'schedule' => '',
 							'sort' => 0,
 							'categories' => $this->listCategories(),
-							'disciplines' => $this->discipline->listing( true ),
+							'disciplines' => $this->discipline->listing( -1, true ),
 							'language' => 0,
-							'active' => 0
+							'active' => 0,
+							'readonly' => 0
 						);
 					}
 					$result->close();

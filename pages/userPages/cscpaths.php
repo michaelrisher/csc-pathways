@@ -137,6 +137,30 @@
 					</table>
 				</div>
 			</div>
+			<div class="clearfix">
+				<div class="floatleft">
+					<div class="treeCertSubject">
+						<p><?= $lang->o('certNonCredit')?></p>
+					</div>
+					<table width="328px">
+						<tr class="treeCertsDesc">
+							<td><?= $lang->o( 'certListDesc' )?></td>
+							<td><?= $lang->o( 'certListCert' )?></td>
+							<td><?= $lang->o( 'certListHour' )?></td>
+						</tr>
+						<tr class='treeCert'>
+							<td><?=Core::fakeLink( 'cert', -1, "Coding Prep" );?></td>
+							<td>In Development</td>
+							<td>54</td>
+						</tr>
+						<tr class='treeCert'>
+							<td><?=Core::fakeLink( 'cert', -1, "Python" );?></td>
+							<td>In Development</td>
+							<td>54</td>
+						</tr>
+					</table>
+				</div>
+			</div>
 		</div>
 		<div class="datablock<?= ( isset( $_GET ) && isset( $_GET['cert'] )) ? '' : ' none';?>" id="cert">
 			<?php

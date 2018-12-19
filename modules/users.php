@@ -416,10 +416,13 @@
 		 */
 		private function create( $data ){
 			$obj = array();
+			$obj['error']='';
 			if( $this->isLoggedIn() ) {
 				$error = false;
 				if ( $this->roles->haveAccess( "UserEdit", Core::getSessionId(), -1 ) ) {
 					$statement = $this->db->prepare( "INSERT INTO users (username,isAdmin,active) VALUES (?,?,?) " );
+					$_POST['isAdmin'] = intval( $_POST['isAdmin'] );
+					$_POST['active'] = intval( $_POST['active'] );
 					$statement->bind_param( "sii", $_POST['username'], $_POST['isAdmin'], $_POST['active'] );
 					if ( $statement->execute() ) {
 						$obj['msg'] = "User created successfully.";

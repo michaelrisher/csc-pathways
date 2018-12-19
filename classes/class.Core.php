@@ -55,6 +55,7 @@
 		 * @param $goto string where to go to link cert or class
 		 * @param $code string what to load
 		 * @param $text string text to display
+		 * @param null $float is floating element or not
 		 * @return string output
 		 */
 		public static function fakeLink( $goto, $code, $text, $float = null ){

@@ -44,14 +44,14 @@
 
 	$GLOBALS['main']->loadModule( $uri['module'] );
 	if ( isset( $uri['params'] ) ) {
-		if( method_exists( $GLOBALS['main']->$uri['module'], $uri['function'] ) ){
-			$response = $GLOBALS['main']->$uri['module']->{$uri['function']}($uri['params']);
+		if( method_exists( $GLOBALS['main']->{$uri['module']}, $uri['function'] ) ){
+			$response = $GLOBALS['main']->{$uri['module']}->{$uri['function']}($uri['params']);
 		} else {
 			Core::errorPage( 404 );
 		}
 	} else{
-		if( method_exists( $GLOBALS['main']->$uri['module'], $uri['function'] ) ) {
-			$response = $GLOBALS['main']->$uri['module']->{$uri['function']}();
+		if( method_exists( $GLOBALS['main']->{$uri['module']}, $uri['function'] ) ) {
+			$response = $GLOBALS['main']->{$uri['module']}->{$uri['function']}();
 		} else {
 			Core::errorPage( 404 );
 		}
