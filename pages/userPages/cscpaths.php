@@ -2,14 +2,6 @@
 	/**
 	 * Created by IntelliJ IDEA.
 	 * User: Michael Risher
-	 * Date: 11/14/2017
-	 * Time: 19:41
-	 */
-?>
-<?php
-	/**
-	 * Created by IntelliJ IDEA.
-	 * User: Michael Risher
 	 * Date: 5/22/2017
 	 * Time: 09:47
 	 */
@@ -25,24 +17,14 @@
 		$category[0] = $GLOBALS['main']->certs->listingByCodes( array( 650, 728, 803, 809, 816, 806 ) )['listing'];
 		$category[1] = $GLOBALS['main']->certs->listingByCodes( array( 810, 740 ) )['listing'];
 		$category[2] = $GLOBALS['main']->certs->listingByCodes( array( 843, 820, 726 ) )['listing'];
+		$nonCreds = $GLOBALS['main']->certs->listingByCodes( array( 999, 998 ) )['listing'];
 	?>
 </head>
 <body>
 <div id="wrapper">
-	<div id="headerWrapper">
-		<div id="header">
-			<div class="clearfix">
-				<div class="floatleft title"><a href="<?= CORE_URL ?>home"><?= $lang->o('title1') . '<br>' . $lang->o('title0') ?></a></div>
-				<div class="floatleft subtitle"><?= $lang->o('subtitle') ?></div>
-			</div>
-			<?php if( $GLOBALS['main']->users->isLoggedIn() ) {
-				include CORE_PATH . 'assets/inc/nav.php';
-			}
-			?>
-		</div>
-	</div>
+	<?php include CORE_PATH . 'assets/inc/logo.php' ?>
 	<div id="main">
-		<div id="tree">
+		<div id="tree" class="datablock">
 			<div class="aligncenter treemap">
 				<img src="<?= CORE_URL . 'assets/img/tree.png'?>" alt="Picture of a path to follow, top class cis 1a, bottom left class csc or cis 5, bottom right class cis 17a/b"/>
 			</div>
@@ -148,16 +130,26 @@
 							<td><?= $lang->o( 'certListCert' )?></td>
 							<td><?= $lang->o( 'certListHour' )?></td>
 						</tr>
-						<tr class='treeCert'>
-							<td><?=Core::fakeLink( 'cert', -1, "Coding Prep" );?></td>
-							<td>In Development</td>
-							<td>54</td>
-						</tr>
-						<tr class='treeCert'>
-							<td><?=Core::fakeLink( 'cert', -1, "Python" );?></td>
-							<td>In Development</td>
-							<td>54</td>
-						</tr>
+						<?php
+
+							foreach( $nonCreds as $item ){
+								echo "<tr class='treeCert'>";
+								echo "<td>" . Core::fakeLink( 'cert', $item['id'], $item['description']) . "</td>";
+								echo "<td>In Development</td>";
+								/*
+								if( $item['hasAs'] ){
+									echo 'AS/';
+								}
+								if( $item['hasCe'] ){
+									echo 'CE';
+								}
+								echo $item['code'] . "</td>";
+								echo "<td>${item['units']}</td>";
+								*/
+								echo "<td>54</td>";
+								echo "</tr>";
+							}
+						?>
 					</table>
 				</div>
 			</div>
@@ -197,3 +189,12 @@
 ?>
 </body>
 </html>
+
+<!--
+<tr class="treeCert">
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+
+-->
