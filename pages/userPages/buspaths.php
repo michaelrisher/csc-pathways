@@ -89,7 +89,7 @@
 						</tr>
 					</table>
 				</div>
-				<div class="floatright">
+				<div class="floatright" style="max-width: 340px;">
 					<div class="treeCertSubject">
 						<p><?= $lang->o('busCertGroup3')?></p>
 					</div>
