@@ -135,7 +135,7 @@
 							foreach( $nonCreds as $item ){
 								echo "<tr class='treeCert'>";
 								echo "<td>" . Core::fakeLink( 'cert', $item['id'], $item['description']) . "</td>";
-								echo "<td>In Development</td>";
+								echo "<td>In Dev</td>";
 								/*
 								if( $item['hasAs'] ){
 									echo 'AS/';
