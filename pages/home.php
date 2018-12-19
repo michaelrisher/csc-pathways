@@ -17,6 +17,7 @@
 		$category[0] = $GLOBALS['main']->certs->listingByCodes( array( 650, 728, 803, 809, 816, 806 ) )['listing'];
 		$category[1] = $GLOBALS['main']->certs->listingByCodes( array( 810, 740 ) )['listing'];
 		$category[2] = $GLOBALS['main']->certs->listingByCodes( array( 843, 820, 726 ) )['listing'];
+		$nonCreds = $GLOBALS['main']->certs->listingByCodes( array( 999, 998 ) )['listing'];
 	?>
 </head>
 <body>
@@ -129,16 +130,26 @@
 								<td><?= $lang->o( 'certListCert' )?></td>
 								<td><?= $lang->o( 'certListHour' )?></td>
 							</tr>
-							<tr class='treeCert'>
-								<td><?=Core::fakeLink( 'cert', -1, "Coding Prep" );?></td>
-								<td>In Development</td>
-								<td>54</td>
-							</tr>
-							<tr class='treeCert'>
-								<td><?=Core::fakeLink( 'cert', -1, "Python" );?></td>
-								<td>In Development</td>
-								<td>54</td>
-							</tr>
+							<?php 
+								 
+								foreach( $nonCreds as $item ){
+									echo "<tr class='treeCert'>";
+									echo "<td>" . Core::fakeLink( 'cert', $item['id'], $item['description']) . "</td>";
+									echo "<td>In Development</td>";
+									/*
+									if( $item['hasAs'] ){
+										echo 'AS/';
+									}
+									if( $item['hasCe'] ){
+										echo 'CE';
+									}
+									echo $item['code'] . "</td>";
+									echo "<td>${item['units']}</td>";
+									*/
+									echo "<td>54</td>";
+									echo "</tr>";
+								}
+							?>
 						</table>
 					</div>
 				</div>
