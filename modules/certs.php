@@ -366,7 +366,6 @@ EOD;
 					$error = '';
 					if ( !$certListUpdated ) {
 						$error = 'List failed to upsert';
-						$error .= '<br>' . $this->db->error;
 					}
 
 					$certDataUpdated = $this->upsertRecord( 'certificateData', "cert=$id AND language=$language", array(
