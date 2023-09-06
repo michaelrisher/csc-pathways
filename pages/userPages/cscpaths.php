@@ -17,7 +17,7 @@
 		$category[0] = $GLOBALS['main']->certs->listingByCodes( array( 650, 728, 741, 742, 816, 806 ) )['listing'];
 		$category[1] = $GLOBALS['main']->certs->listingByCodes( array( 920, 740 ) )['listing'];
 		$category[2] = $GLOBALS['main']->certs->listingByCodes( array( 934, 933, 726 ) )['listing'];
-		$nonCreds = $GLOBALS['main']->certs->listingByCodes( array( 999, 998 ) )['listing'];
+		$nonCreds = $GLOBALS['main']->certs->listingByCodes( array( 8010, 8003, 8002 ) )['listing'];
 	?>
 </head>
 <body>
