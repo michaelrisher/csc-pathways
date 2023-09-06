@@ -14,9 +14,9 @@
 		Core::includeStyles();
 		$GLOBALS['main']->loadModule('certs');
 		$category = array();
-		$category[0] = $GLOBALS['main']->certs->listingByCodes( array( 650, 728, 803, 809, 816, 806 ) )['listing'];
-		$category[1] = $GLOBALS['main']->certs->listingByCodes( array( 810, 740 ) )['listing'];
-		$category[2] = $GLOBALS['main']->certs->listingByCodes( array( 843, 820, 726 ) )['listing'];
+		$category[0] = $GLOBALS['main']->certs->listingByCodes( array( 650, 728, 741, 742, 816, 806 ) )['listing'];
+		$category[1] = $GLOBALS['main']->certs->listingByCodes( array( 920, 740 ) )['listing'];
+		$category[2] = $GLOBALS['main']->certs->listingByCodes( array( 934, 933, 726 ) )['listing'];
 		$nonCreds = $GLOBALS['main']->certs->listingByCodes( array( 999, 998 ) )['listing'];
 	?>
 </head>
