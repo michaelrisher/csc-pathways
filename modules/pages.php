@@ -155,6 +155,36 @@ class pages extends Main{
 	}
 
 	/**
+	 * Download a page from the edit screen
+	 * @param string $path path for the file to download
+	 */
+	public function download( $path ){
+		$this->loadModules( 'users roles audit' );
+		// Core::debug( $path );
+		if( $this->users->isLoggedIn() ) {
+			if( $this->roles->haveAccess( 'dataManage', Core::getSessionId(), -1  ) ){
+				//clean post
+				$path = Core::sanitize( $path );
+				$targetDir = "pages/userPages/";
+				$targetFile = $targetDir . $path;
+
+				if ( file_exists( $targetFile ) ) {
+					header( 'Content-Description: File Transfer' );
+					header( 'Content-Type: application/octet-stream' );
+					header( 'Content-Disposition: attachment; filename="'. $path . '"' );
+					header( 'Expires: 0' );
+					header( 'Cache-Control: must-revalidate' );
+					header( 'Pragma: public' );
+					header( 'Content-Length: ' . filesize($targetFile) );
+					readfile( $targetFile );
+				} else {
+					echo $targetFile . ' not found';
+				}
+			} 
+		}
+	}
+	
+	/**
 	 * save an item from the database
 	 * this function can not be done by ajax
 	 * @param int $id id for the item
@@ -293,7 +323,6 @@ class pages extends Main{
 	 * @param $path
 	 */
 	public function display( $path ){
-//		Core::debug( $path );
 		if( is_array( $path ) ){
 			$data['params'] = $path;
 			$path = $path[0];

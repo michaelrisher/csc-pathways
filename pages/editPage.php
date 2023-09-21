@@ -66,7 +66,7 @@
 							<div class="tripleInput">
 								<input type="text" name="headerTemplate" value="<?=isset( $data['headerTemplate'] ) ? $data['headerTemplate'] : ''?>"/>
 								<button type="button" class="upload" accept=".html,.php,.htm,.xhtml,.dhtml"><i class="fa fa-upload"></i> Upload</button>
-								<input type="button" value="Open Text Editor" disabled class="low" />
+								<a target="_blank" href="<?=CORE_URL?>pages/download/<?=$data['headerTemplate']?>"><input type="button" value="Download File" class="low" /></a>
 							</div>
 							<span>Enter the file name for the header template</span>
 						</li>
@@ -75,7 +75,7 @@
 							<div class="tripleInput">
 								<input type="text" name="bodyTemplate" value="<?=isset( $data['bodyTemplate'] ) ? $data['bodyTemplate'] : ''?>"/>
 								<button type="button" class="upload" accept=".html,.php,.htm,.xhtml,.dhtml"><i class="fa fa-upload"></i> Upload</button>
-								<input type="button" value="Open Text Editor" disabled class="low" />
+								<a target="_blank" href="<?=CORE_URL?>pages/download/<?=$data['bodyTemplate']?>"><input type="button" value="Download File" class="low" /></a>
 							</div>
 							<span>Enter the file name for the body template</span>
 						</li>
@@ -84,7 +84,7 @@
 							<div class="tripleInput">
 								<input type="text" name="stylesheet" value="<?=isset( $data['stylesheet'] ) ? $data['stylesheet'] : ''?>"/>
 								<button type="button" class="upload" accept=".css,.min"><i class="fa fa-upload"></i> Upload</button>
-								<input type="button" value="Open Text Editor" disabled class="low" />
+								<a target="_blank" href="<?=CORE_URL?>pages/download/<?=$data['stylesheet']?>"><input type="button" value="Download File" class="low" /></a>
 							</div>
 							<span>Enter the file name for the custom stylesheet</span>
 						</li>
@@ -93,7 +93,7 @@
 							<div class="tripleInput">
 								<input type="text" name="javascript" value="<?=isset( $data['javascript'] ) ? $data['javascript'] : ''?>"/>
 								<button type="button" class="upload" accept=".js,.map,.min"><i class="fa fa-upload"></i> Upload</button>
-								<input type="button" value="Open Text Editor" disabled class="low" />
+								<a target="_blank" href="<?=CORE_URL?>pages/download/<?=$data['javascript']?>"><input type="button" value="Download File" class="low" /></a>
 							</div>
 							<span>Enter the file name for the custom javascript</span>
 						</li>
@@ -147,5 +147,5 @@
 
 <?php
 	//	Core::debug( $_SESSION );
-	//	Core::debug( $_SERVER );
+	// Core::debug( $data );
 ?>
